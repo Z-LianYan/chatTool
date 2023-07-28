@@ -7,7 +7,26 @@ class AppStore {
     makeAutoObservable(this)
   }
 
-  tabBarBadge = "Badge";
+  tabBar = {
+    ChatPage: {
+      badge: 10,
+      isShowDot: false
+    },
+    AddressBookPage: {
+      badge: 123456,
+      isShowDot: false
+    },
+    FindPage: {
+      badge: 0,
+      isShowDot: true
+    },
+    MePage: {
+      badge: 3,
+      isShowDot: false
+    },
+  };
+
+
 
   userInfo = null;
 

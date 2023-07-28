@@ -65,7 +65,8 @@ function StackNavigators(){
             //     return <Text>Right</Text>
             // },
             headerStyle:{
-                backgroundColor:colorScheme=='dark'?'#000':Theme.primaryColor,
+                // backgroundColor:colorScheme=='dark'?'#000':Theme.primaryColor,
+                backgroundColor:colorScheme=='dark'?'#000':'blue',
                 borderBottomWidth:1,
                 borderBottomColor:colorScheme=='dark'?'#1a1b1c':Theme.primaryColor,
                 

@@ -3,7 +3,7 @@
 
 
 import * as React from 'react';
-import { observer, inject } from 'mobx-react'
+import { observer, inject } from 'mobx-react';
 import {Text, View, Image,useColorScheme,TouchableHighlight,TouchableOpacity} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -20,6 +20,8 @@ import ChatPage from '../views/ChatPage';
 import AddressBookPage from '../views/AddressBookPage';
 import FindPage from '../views/FindPage';
 import MePage from '../views/MePage';
+import { CINEMA_ACTIVE_ICON, CINEMA_ICON, FIlM_ACTIVE_ICON, FIlM_ICON, MINE_ACTIVE_ICON, MINE_ICON } from '../assets/image';
+import MyThemed from '../constants/MyThemed';
 const routes=[
   {
     component: ChatPage, 
@@ -45,13 +47,14 @@ const routes=[
       // tabBarBadge:3,
       title:'发现',
       headerShown:false,//是否隐藏头部导航
+      isShowDot: true,//显示有消息点
     } 
   },
   { 
     component: MePage, 
     name: "MePage", 
     options: {
-      // tabBarBadge:3,
+      tabBarBadge:3,
       title:'我',
       headerShown:false,//是否隐藏头部导航
     } 
@@ -63,69 +66,41 @@ const Tab = createBottomTabNavigator();
 
 function tabBarScreen(props:any){
   return routes.map((item)=>{
+    // if(item.name==='FindPage') 
     return <Tab.Screen 
     key={item.name} 
     name={item.name}
     component={item.component} 
     options={{
       ...item.options,
+      tabBarBadge: props.AppStore.tabBar[item.name].badge
     }}/>
   })
 }
 
 
-function BottomTabNavigator(props:any) {
+function BottomTabNavigator(props:any) {//AppStore
   const colorScheme = useColorScheme();
   return (
     <Tab.Navigator
-    initialRouteName="HomePage"
+    initialRouteName="ChatPage"
     tabBar={_props => <MyTabBar {..._props} />}
     screenOptions={({ route }) => ({
-      headerShown:true,//是否隐藏头部导航
-      // tabBarIcon: ({ focused, color, size }) => {
-      //   let iconName; 
-
-      //   if (route.name === 'HomePage') {
-      //     iconName = focused
-      //       ? FIlM_ACTIVE_ICON
-      //       : FIlM_ICON;
-      //   } else if (route.name === 'CinemaPage') {
-      //     iconName = focused ? CINEMA_ACTIVE_ICON : CINEMA_ICON;
-      //   }else if (route.name === 'MinePage') {
-      //     iconName = focused ? MINE_ACTIVE_ICON : MINE_ICON;
-      //   }
-      //   return <TouchableHighlight onPress={()=>{
-      //     // console.log(12345)
-      //   }}>
-      //     <Image
-      //       style={{width:20,height:20}}
-      //       source={iconName}
-      //     />
-      //   </TouchableHighlight>;
-      // },
-      tabBarActiveTintColor: '#e54847',//激活的颜色
-      tabBarInactiveTintColor: '#333',//未必激活的颜色
-
+      // headerShown:true,//是否隐藏头部导航
       headerTitleAlign:'center',//头部标题居中
-      tabBarLabelStyle:{
-        marginBottom:5
-      },
-      tabBarStyle:{
-      },
       headerStyle: { 
-        backgroundColor: colorScheme=='dark'?'#000':Theme.primaryColor,
-        borderBottomWidth:1,
-        borderBottomColor:colorScheme=='dark'?'#1a1b1c':Theme.primaryColor
+        backgroundColor: MyThemed[colorScheme||'light'].bg,
+        // borderBottomWidth:1,
+        // borderBottomColor:config.theme[colorScheme||'light'].headerborderBottomColor
       },
       headerTitleStyle: {
         // fontSize: 18,
-        color:'#fff' 
+        color: MyThemed[colorScheme||'light'].ftCr
       }
     })}
-    
     >
       {tabBarScreen(props)}
     </Tab.Navigator>
   );
 }
-export default BottomTabNavigator;
+export default inject("AppStore")(observer(BottomTabNavigator));

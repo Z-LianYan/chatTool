@@ -47,12 +47,6 @@
  } from '../component/teaset/index';
  import PropTypes, { number } from 'prop-types';
  import { 
-   FIlM_ICON,
-   FIlM_ACTIVE_ICON, 
-   CINEMA_ICON,
-   CINEMA_ACTIVE_ICON,
-   MINE_ICON,
-   MINE_ACTIVE_ICON,
    DETAIL_AVATAR
  } from '../assets/image/index';
  

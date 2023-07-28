@@ -11,7 +11,7 @@
 import React, { useState,useEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   SafeAreaView,
   ScrollView,
@@ -43,14 +43,7 @@ import {
   Theme
 } from '../component/teaset/index';
 import PropTypes, { number } from 'prop-types';
-import { 
-  FIlM_ICON,
-  FIlM_ACTIVE_ICON, 
-  CINEMA_ICON,
-  CINEMA_ACTIVE_ICON,
-  MINE_ICON,
-  MINE_ACTIVE_ICON,
-} from '../assets/image/index';
+
 
 import { get_film_hot } from '../api/film';
 type TypeProps = {
