@@ -20,8 +20,6 @@ import ChatPage from '../views/ChatPage';
 import AddressBookPage from '../views/AddressBookPage';
 import FindPage from '../views/FindPage';
 import MePage from '../views/MePage';
-import { CINEMA_ACTIVE_ICON, CINEMA_ICON, FIlM_ACTIVE_ICON, FIlM_ICON, MINE_ACTIVE_ICON, MINE_ICON } from '../assets/image';
-import MyThemed from '../constants/MyThemed';
 const routes=[
   {
     component: ChatPage, 
@@ -54,7 +52,7 @@ const routes=[
     component: MePage, 
     name: "MePage", 
     options: {
-      tabBarBadge:3,
+      // tabBarBadge:3,
       title:'我',
       headerShown:false,//是否隐藏头部导航
     } 
@@ -89,13 +87,13 @@ function BottomTabNavigator(props:any) {//AppStore
       // headerShown:true,//是否隐藏头部导航
       headerTitleAlign:'center',//头部标题居中
       headerStyle: { 
-        backgroundColor: MyThemed[colorScheme||'light'].bg,
-        // borderBottomWidth:1,
-        // borderBottomColor:config.theme[colorScheme||'light'].headerborderBottomColor
+        backgroundColor: props.MyThemed[colorScheme||'light'].tbBg,
+        borderBottomWidth:1,
+        borderBottomColor: props.MyThemed[colorScheme||'light'].headerborderBottomColor
       },
       headerTitleStyle: {
         // fontSize: 18,
-        color: MyThemed[colorScheme||'light'].ftCr
+        color: props.MyThemed[colorScheme||'light'].ftCr
       }
     })}
     >
@@ -103,4 +101,4 @@ function BottomTabNavigator(props:any) {//AppStore
     </Tab.Navigator>
   );
 }
-export default inject("AppStore")(observer(BottomTabNavigator));
+export default inject("AppStore","MyThemed")(observer(BottomTabNavigator));

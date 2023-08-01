@@ -9,11 +9,11 @@ class AppStore {
 
   tabBar = {
     ChatPage: {
-      badge: 10,
+      badge: 10123,
       isShowDot: false
     },
     AddressBookPage: {
-      badge: 123456,
+      badge: '',
       isShowDot: false
     },
     FindPage: {
@@ -21,7 +21,7 @@ class AppStore {
       isShowDot: true
     },
     MePage: {
-      badge: 3,
+      badge: 1,
       isShowDot: false
     },
   };

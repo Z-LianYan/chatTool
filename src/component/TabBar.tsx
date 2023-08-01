@@ -41,21 +41,22 @@ import {
 } from '../component/teaset/index';
 import PropTypes, { number } from 'prop-types';
 import { 
-  FIlM_ICON,
-  FIlM_ACTIVE_ICON, 
-  CINEMA_ICON,
-  CINEMA_ACTIVE_ICON,
+  CHAT_ICON,
+  CHAT_ACTIVATE_ICON, 
+  ADDRESS_BOOK_ICON,
+  ADDRESS_BOOK_ACTIVATE_ICON,
+  FIND_ICON,
+  FIND_ACTIVATE_ICON,
   MINE_ICON,
-  MINE_ACTIVE_ICON,
+  MINE_ACTIVATE_ICON,
 } from '../assets/image/index';
 
 import { get_film_hot } from '../api/film';
-import MyThemed from '../constants/MyThemed';
 // type TypeProps = {
 //   index?: number
 // }
 const TabBar = ({
-   state, descriptors, navigation,AppStore
+   state, descriptors, navigation,AppStore,MyThemed
 }:any) => {
   const colorScheme = useColorScheme();
   useEffect(()=>{
@@ -81,15 +82,13 @@ const TabBar = ({
 
     let iconName; 
     if (route.name === 'ChatPage') {
-      iconName = isFocused
-        ? FIlM_ACTIVE_ICON
-        : FIlM_ICON;
+      iconName = isFocused ? CHAT_ACTIVATE_ICON : CHAT_ICON;
     } else if (route.name === 'AddressBookPage') {
-      iconName = isFocused ? CINEMA_ACTIVE_ICON : CINEMA_ICON;
+      iconName = isFocused ? ADDRESS_BOOK_ACTIVATE_ICON : ADDRESS_BOOK_ICON;
     }else if (route.name === 'FindPage') {
-      iconName = isFocused ? MINE_ACTIVE_ICON : MINE_ICON;
+      iconName = isFocused ? FIND_ACTIVATE_ICON : FIND_ICON;
     }else if (route.name === 'MePage') {
-      iconName = isFocused ? MINE_ACTIVE_ICON : MINE_ICON;
+      iconName = isFocused ? MINE_ACTIVATE_ICON : MINE_ICON;
     }
 
     const onPress = () => {
@@ -100,12 +99,12 @@ const TabBar = ({
       });
 
       if (!isFocused && !event.defaultPrevented) {
-        if(route.name=='MinePage' && !AppStore.userInfo){
-          navigation.navigate({ name: 'LoginPage', params:{
-            toUrl:'MinePage'
-          }});
-          return;
-        }
+        // if(route.name=='MinePage' && !AppStore.userInfo){
+        //   navigation.navigate({ name: 'LoginPage', params:{
+        //     toUrl:'MinePage'
+        //   }});
+        //   return;
+        // }
         navigation.navigate({ name: route.name, merge: true });
       }
     };
@@ -129,7 +128,12 @@ const TabBar = ({
         key={route.name}
         style={{ flex: 1,alignItems:'center',justifyContent:'center' }}
       >
-        <View style={{ alignItems:'center',justifyContent:'center', position:'relative',backgroundColor: MyThemed[colorScheme||'light'].tbBg }}>
+        <View style={{ 
+          alignItems:'center',
+          justifyContent:'center', 
+          position:'relative',
+          backgroundColor: MyThemed[colorScheme||'light'].tbBg 
+        }}>
           <Image
             style={{width:20,height:20,tintColor: MyThemed[colorScheme||'light'][isFocused?'actColor':'ftCr']}}
             source={iconName}
@@ -148,11 +152,11 @@ const TabBar = ({
               right: -5,
               backgroundColor: MyThemed.mgDotCr,
               borderRadius: 5,
-            }}></Text>: options.tabBarBadge && <Text style={{
+            }}></Text>: options.tabBarBadge>0 &&  <Text style={{
               minWidth: 15,
               position: 'absolute',
               top:0,
-              left: 15,
+              left: 20,
               fontSize: 10,
               backgroundColor: MyThemed.mgDotCr,
               color: MyThemed.mgDotFtCr,
@@ -181,4 +185,4 @@ const styles = StyleSheet.create({
   // }
 });
 
-export default inject("AppStore")(observer(TabBar));
+export default inject("AppStore","MyThemed")(observer(TabBar));

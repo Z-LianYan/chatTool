@@ -29,20 +29,22 @@ import {
   DefaultTheme,
   useNavigationContainerRef 
 } from '@react-navigation/native';
-import MyTheme from './constants/MyThemed';
+
+console.log('DefaultTheme--->>',DefaultTheme)
+
+import NavigationContainerCom from './navigators/NavigationContainer';
+
+
 
 function App(): JSX.Element {
   const colorScheme = useColorScheme();
   const navigationRef = useNavigationContainerRef(); // You can also use a regular ref with `React.useRef()`
   return <Provider {...store}>
-      <SafeAreaView style={{flex:1,backgroundColor: 'red'}}>
+      <SafeAreaView style={{flex:1, backgroundColor: store.MyThemed[colorScheme||'light'].bg}}>
         <TopView style={{flex:1}}>
-          <NavigationContainer //给react navigation 设置夜间模式和白天模式
-          theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-          ref={navigationRef} 
-          onReady={()=>{}}>
+          <NavigationContainerCom>
             <StackNavigators/>
-          </NavigationContainer>
+          </NavigationContainerCom>
         </TopView>
       </SafeAreaView>
   </Provider>;

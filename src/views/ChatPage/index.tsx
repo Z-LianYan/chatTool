@@ -29,25 +29,32 @@ import { View,Text } from '../../component/Themed';
 //   Text
 // } from '../component/Themed';
 const ChatPage = ({ 
-  AppStore
+  AppStore,
+  MyThemed
 }:any) => {
     
   const colorScheme = useColorScheme();
 
   useEffect(()=>{
   })
-  return <Vw style={{
+  return <View style={{
     height:500,
     borderWidth: 1,
     borderColor: 'red',
   }}>
     <Text onPress={()=>{
     runInAction(()=>{
-      AppStore.tabBar['ChatPage'].badge += 12345678
+      AppStore.tabBar['ChatPage'].badge += 12345678;
+      MyThemed.light.bg ='#'+Math.floor(Math.random()*1000000);
+      setTimeout(() => {
+        console.log('MyThemed--->>',MyThemed);
+      }, 100);
+      
     });
-  }}>ChatPage</Text>
 
-  </Vw>;
+  }}>ChatPage {MyThemed.light.bg}</Text>
+
+  </View>;
   
   
 };
@@ -55,4 +62,4 @@ const ChatPage = ({
 const styles = StyleSheet.create({
 });
 
-export default inject("AppStore")(observer(ChatPage));
+export default inject("AppStore","MyThemed")(observer(ChatPage));
