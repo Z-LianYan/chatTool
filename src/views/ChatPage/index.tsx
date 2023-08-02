@@ -23,36 +23,38 @@ import {
   DarkTheme,
   DefaultTheme, 
 } from '@react-navigation/native';
-import { View,Text } from '../../component/Themed';
+import { View,Text } from '../../component/customThemed';
+
+import NavigationBar from '../../component/NavigationBar';
 // import { 
 //   View,
 //   Text
-// } from '../component/Themed';
+// } from '../component/customThemed';
 const ChatPage = ({ 
   AppStore,
-  MyThemed
+  MyThemed,
+  navigation,
 }:any) => {
-    
   const colorScheme = useColorScheme();
 
   useEffect(()=>{
+    // navigation.setOptions({
+    //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
+    // });
   })
   return <View style={{
-    height:500,
-    borderWidth: 1,
-    borderColor: 'red',
   }}>
+    <NavigationBar title={'聊天'} leftView=" "/>
     <Text onPress={()=>{
     runInAction(()=>{
-      AppStore.tabBar['ChatPage'].badge += 12345678;
-      MyThemed.light.bg ='#'+Math.floor(Math.random()*1000000);
+      AppStore.tabBar['ChatPage'].msgCnt += 12345678;
+      MyThemed[colorScheme||'light'].ctBg ='#'+Math.floor(Math.random()*1000000);
       setTimeout(() => {
         console.log('MyThemed--->>',MyThemed);
       }, 100);
       
     });
-
-  }}>ChatPage {MyThemed.light.bg}</Text>
+    }}>ChatPage </Text>
 
   </View>;
   

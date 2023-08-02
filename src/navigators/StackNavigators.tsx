@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/core';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getHeaderTitle } from '@react-navigation/elements';
 import {Image,useColorScheme,TouchableHighlight,TouchableOpacity} from 'react-native';
+import { observer, inject } from 'mobx-react';
 
 const Stack = createStackNavigator();
 import {
@@ -20,10 +21,30 @@ import {
 } from '../component/teaset/index';
 
 import BottomTabNavigator from './BottomTabNavigator';
+// import InitPage from '../views/InitPage';
+import LoginPage from '../views/Login/index';
+import InitPage from '../views/InitPage';
+import { BACK_ICON } from '../component/teaset/icons';
+
 const routes=[
     { 
         component: BottomTabNavigator, 
         name: "AppTabBar", 
+        options: {
+            headerShown:false
+        } 
+    },
+    { 
+        component: LoginPage, 
+        name:"LoginPage",
+        options: {
+            headerShown:true,
+            title:'登录',
+        } 
+    },
+    { 
+        component: InitPage, 
+        name:"InitPage",
         options: {
             headerShown:false
         } 
@@ -44,7 +65,8 @@ function renderStackItems(){
 
 
 
-function StackNavigators(){
+function StackNavigators(props:any){
+    const { MyThemed } = props;
     let navigation:any = useNavigation();
     const colorScheme = useColorScheme();
     return <Stack.Navigator
@@ -59,23 +81,24 @@ function StackNavigators(){
                 // onPress={()=>{
                 //     navigation.goBack()
                 // }}/>
-                return <Text>1234</Text>
+                return <Image 
+                style={{width:20,height:20,tintColor: MyThemed[colorScheme||'light'].ftCr}}
+                source={BACK_ICON}/>
             },
             // headerRight:()=>{
             //     return <Text>Right</Text>
             // },
             headerStyle:{
-                // backgroundColor:colorScheme=='dark'?'#000':Theme.primaryColor,
-                backgroundColor:colorScheme=='dark'?'#000':'blue',
-                borderBottomWidth:1,
-                borderBottomColor:colorScheme=='dark'?'#1a1b1c':Theme.primaryColor,
-                
+                backgroundColor: MyThemed[colorScheme||'light'].bg,
+                // borderBottomWidth:1,
+                // borderBottomColor: MyThemed[colorScheme||'light'].hdbrBmCr
             },
             headerTitleStyle: {
-                color: '#fff'
+                color: MyThemed[colorScheme||'light'].ftCr
             },
             // headerTintColor:'#000',//头部导航标题颜色
             headerTitleAlign:'center',//头部标题居中
+            
             // header: ({ navigation, route, options, back }) => {
             //     const title = getHeaderTitle(options, route.name);
                 
@@ -85,10 +108,10 @@ function StackNavigators(){
             // }
             headerBackTitle:' ',//返回键右侧的文字 置为 空，配置了此项 ，ios端显示，android不显示，不配置此项android端会默认显示screen name
         }}
-        initialRouteName="AppTabBar"
+        initialRouteName="LoginPage"
         >
         {renderStackItems()}
     </Stack.Navigator>
 }
 
-export default StackNavigators;
+export default inject("AppStore","MyThemed")(observer(StackNavigators));

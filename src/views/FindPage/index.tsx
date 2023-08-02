@@ -23,10 +23,9 @@ import {
 // import { 
 //   View,
 //   Text
-// } from '../component/Themed';
-const FindPage = ({ 
-}:any) => {
-    
+// } from '../component/customThemed';
+const FindPage = (props:any) => {
+    console.log('props====>>>',props)
   const colorScheme = useColorScheme();
 
   useEffect(()=>{

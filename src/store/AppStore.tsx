@@ -9,19 +9,19 @@ class AppStore {
 
   tabBar = {
     ChatPage: {
-      badge: 10123,
-      isShowDot: false
+      msgCnt: 10123,//消息数量
+      isShowDot: false//tabbar是否显示有消息小点 （如果 isShowDot 为 true 消息数量msgCnt 就不会显示 ）
     },
     AddressBookPage: {
-      badge: '',
+      msgCnt: '',
       isShowDot: false
     },
     FindPage: {
-      badge: 0,
+      msgCnt: 0,
       isShowDot: true
     },
     MePage: {
-      badge: 1,
+      msgCnt: 1,
       isShowDot: false
     },
   };

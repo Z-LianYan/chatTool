@@ -23,7 +23,7 @@ import {
 // import { 
 //   View,
 //   Text
-// } from '../component/Themed';
+// } from '../component/customThemed';
 const MePage = ({ 
 }:any) => {
     

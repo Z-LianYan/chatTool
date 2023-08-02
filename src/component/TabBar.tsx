@@ -32,7 +32,7 @@ import {
 import { 
   View,
   Text
-} from '../component/Themed';
+} from './customThemed';
 import { 
   Button,
   Carousel,
@@ -144,7 +144,7 @@ const TabBar = ({
             {label}
           </Text>
           {
-            AppStore.tabBar[route.name].isShowDot ? <Text style={{
+            AppStore.tabBar[route.name].isShowDot ? <View style={{
               width: 10,
               height: 10,
               position: 'absolute',
@@ -152,7 +152,7 @@ const TabBar = ({
               right: -5,
               backgroundColor: MyThemed.mgDotCr,
               borderRadius: 5,
-            }}></Text>: options.tabBarBadge>0 &&  <Text style={{
+            }}></View>: options.tabBarBadge>0 &&  <View style={{
               minWidth: 15,
               position: 'absolute',
               top:0,
@@ -164,7 +164,15 @@ const TabBar = ({
               textAlign: 'center',
               paddingHorizontal: 6,
               paddingVertical: 1,
-            }}>{String(options.tabBarBadge).length>3?(String(options.tabBarBadge).substring(0,3)+'...'):options.tabBarBadge}</Text>
+            }}>
+              {/* 这里需要套一个View组件 因为直接用Text组件在ios端设置 borderRadius 不成功 */}
+              <Text style={{
+                fontSize: 10,
+                color: MyThemed.mgDotFtCr,
+                paddingHorizontal: 6,
+                paddingVertical: 1,
+              }}>{String(options.tabBarBadge).length>3?(String(options.tabBarBadge).substring(0,3)+'...'):options.tabBarBadge}</Text>
+            </View>
           }
         </View>
       </TouchableOpacity>

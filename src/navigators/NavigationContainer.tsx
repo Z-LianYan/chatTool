@@ -24,7 +24,7 @@ import {
 } from '@react-navigation/native';
 
 
-function NavigationContainerCom(props:any) {//AppStore
+function NavigationContainerCom(props:any) {
   const colorScheme = useColorScheme();
   const navigationRef = useNavigationContainerRef(); // You can also use a regular ref with `React.useRef()`
 
@@ -49,4 +49,4 @@ function NavigationContainerCom(props:any) {//AppStore
     </NavigationContainer>
   );
 }
-export default inject("AppStore","MyThemed")(observer(NavigationContainerCom));
+export default inject("MyThemed")(observer(NavigationContainerCom));

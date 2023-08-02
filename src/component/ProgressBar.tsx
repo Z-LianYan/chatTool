@@ -33,7 +33,7 @@ import {
 import { 
   View,
   Text
-} from '../component/Themed';
+} from './customThemed';
 import { 
   Button,
   Carousel,

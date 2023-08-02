@@ -11,7 +11,7 @@
 import React, { useState,useEffect } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   SafeAreaView,
   ScrollView,
@@ -32,7 +32,7 @@ import {
 import { 
   View,
   Text
-} from '../component/Themed';
+} from './customThemed';
 import { 
   Button,
   Carousel,
@@ -40,6 +40,7 @@ import {
   Theme
 } from '../component/teaset/index';
 import PropTypes, { number } from 'prop-types';
+import { BACK_ICON } from './teaset/icons';
 
 
 import { get_film_hot } from '../api/film';
@@ -50,7 +51,9 @@ type TypeProps = {
   position?:string,
   leftView?: number|string|Element,
   rightView?: number|string|Element,
-  onBack?:Function
+  onBack?:Function,
+  MyThemed?: any,
+  AppStore?: any,
 }
 const _NavigationBar = ({
   title,
@@ -60,48 +63,51 @@ const _NavigationBar = ({
   leftView,
   rightView,
   onBack,
+  MyThemed,
+  AppStore,
 }:TypeProps) => {
-    
+
   const colorScheme = useColorScheme();
   let navigation:any = useNavigation();
-  // const [groupValues, setGroupValues] = useState(['0']);
 
-  useEffect(()=>{},[title])
+  const navigationState = navigation.getState();
+  const routeName = navigationState.routeNames[navigationState.index]
+  useEffect(()=>{
+
+  },[title]);
 
   return (<View style={{...style}}>
     <NavigationBar 
     statusBarColor={'transparent'}
     statusBarInsets={Platform.OS === 'ios' ? false : true} 
-    statusBarStyle={'default'}
-    title={title?(typeof title === 'number'||'string'?<Text style={{fontSize:20,color:'#fff'}}>{title}</Text>:title):''}
+    statusBarStyle={colorScheme=='dark'?'light-content':'dark-content'}
+    title={title+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:'')}
     titleStyle={{
-      // fontSize:30
+      fontSize:18,
+      marginTop:8,
+      color: MyThemed[colorScheme||'light'].ftCr,
+      fontWeight: 'bold'
     }}
     style={{
-      backgroundColor:backgroundColor?backgroundColor:colorScheme === 'dark' ? Theme.primaryColor : Theme.primaryColor,
-      position:position?position:'relative'
+      backgroundColor:backgroundColor?backgroundColor:MyThemed[colorScheme||'light'].hdBg,
+      position:position?position:'relative',
+      height: Platform.OS === "android"?90:50
     }}
-    borderBottomColor={backgroundColor=='transparent'?'transparent':colorScheme=='dark'?Theme.navSeparatorDarkColor:Theme.primaryColor}
+    borderBottomColor={'transparent'}
     leftView={leftView?(typeof leftView === 'number'||'string'?<Text>{leftView}</Text>:leftView):<View 
       style={{
         flexDirection:'row',
         alignItems:'center',
-        backgroundColor:Theme.primaryColor
-      }}>
-        <Ionicons 
-        name={'chevron-back'} 
-        size={25} 
-        color={colorScheme === 'dark' ? '#fff' : '#fff'} 
-        onPress={()=>{
-          onBack ? onBack(): navigation.goBack();
-        }}/>
-        {/* <Ionicons 
-        name={'home'} 
-        size={25} 
-        color={colorScheme === 'dark' ? '#fff' : '#000'} 
-        onPress={()=>{
-            navigation.goBack()
-        }}/> */}
+        backgroundColor:MyThemed[colorScheme||'light'].hdBg,
+      }}
+      >
+        <TouchableOpacity onPress={()=>{
+           onBack ? onBack(): navigation.goBack();
+        }}>
+          <Image 
+          style={{width:20,height:20,tintColor: MyThemed[colorScheme||'light'].ftCr}}
+          source={BACK_ICON}/>
+        </TouchableOpacity>
       </View>
     }
     rightView={typeof rightView == 'number'||'string'?<Text>{rightView}</Text>:rightView}
@@ -115,4 +121,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default _NavigationBar;
+export default inject("AppStore","MyThemed")(observer(_NavigationBar));

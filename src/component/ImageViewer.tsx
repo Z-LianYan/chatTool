@@ -11,7 +11,7 @@
 import React, { useState,useEffect, useCallback,useImperativeHandle,forwardRef } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   SafeAreaView,
   ScrollView,
@@ -39,7 +39,7 @@ import {
 import { 
   View,
   Text
-} from '../component/Themed';
+} from './customThemed';
 import { 
   Button,
   Carousel,
@@ -48,7 +48,7 @@ import {
   AlbumView
 } from '../component/teaset/index';
 
-import ImageViewer from 'react-native-image-zoom-viewer';
+// import ImageViewer from 'react-native-image-zoom-viewer';
 // import CameraRoll from "@react-native-community/cameraroll";
 type TypeProps = {
   // index?: number,

@@ -20,7 +20,7 @@ import {
 import { 
   View,
   Text
-} from './Themed';
+} from './customThemed';
 import { 
   EMPTY_CONTENT
 } from '../assets/image';

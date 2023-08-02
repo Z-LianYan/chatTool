@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import {Text, View, Image,useColorScheme,TouchableHighlight,TouchableOpacity} from 'react-native';
+import {Text, View, Image,useColorScheme,TouchableHighlight,TouchableOpacity, Platform} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
@@ -24,6 +24,7 @@ const routes=[
   {
     component: ChatPage, 
     name: "ChatPage", 
+    title:'1234',
     options: {
       // tabBarBadge:1,
       title:'聊天',
@@ -63,15 +64,16 @@ const routes=[
 const Tab = createBottomTabNavigator();
 
 function tabBarScreen(props:any){
+  const { AppStore } = props;
   return routes.map((item)=>{
-    // if(item.name==='FindPage') 
     return <Tab.Screen 
     key={item.name} 
     name={item.name}
     component={item.component} 
     options={{
       ...item.options,
-      tabBarBadge: props.AppStore.tabBar[item.name].badge
+      tabBarBadge: AppStore.tabBar[item.name].msgCnt,
+      // title: item.options.title + (AppStore.tabBar[item.name||'']?.msgCnt?`(${AppStore.tabBar[item.name||''].msgCnt})`:'')
     }}/>
   })
 }
@@ -87,14 +89,16 @@ function BottomTabNavigator(props:any) {//AppStore
       // headerShown:true,//是否隐藏头部导航
       headerTitleAlign:'center',//头部标题居中
       headerStyle: { 
-        backgroundColor: props.MyThemed[colorScheme||'light'].tbBg,
-        borderBottomWidth:1,
-        borderBottomColor: props.MyThemed[colorScheme||'light'].headerborderBottomColor
+        backgroundColor: props.MyThemed[colorScheme||'light'].hdBg,
+        // borderBottomWidth:1,
+        // borderBottomColor: props.MyThemed[colorScheme||'light'].hdbrBmCr
+        height: Platform.OS === "android"?90:50
       },
       headerTitleStyle: {
-        // fontSize: 18,
-        color: props.MyThemed[colorScheme||'light'].ftCr
-      }
+        fontSize: 18,
+        color: props.MyThemed[colorScheme||'light'].ftCr,
+        fontWeight: 'bold'
+      },
     })}
     >
       {tabBarScreen(props)}
