@@ -36,7 +36,8 @@ const ChatPage = ({
   navigation,
 }:any) => {
   const colorScheme = useColorScheme();
-
+  // const navigationState = navigation.getState();
+  // const routeName = navigationState.routeNames[navigationState.index]
   useEffect(()=>{
     // navigation.setOptions({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
@@ -44,7 +45,7 @@ const ChatPage = ({
   })
   return <View style={{
   }}>
-    <NavigationBar title={'聊天'} leftView=" "/>
+    {/* <NavigationBar title={'聊天'} leftView=" "/> */}
     <Text onPress={()=>{
     runInAction(()=>{
       AppStore.tabBar['ChatPage'].msgCnt += 12345678;

@@ -24,37 +24,40 @@ const routes=[
   {
     component: ChatPage, 
     name: "ChatPage", 
-    title:'1234',
     options: {
-      // tabBarBadge:1,
-      title:'聊天',
-      headerShown:false,//是否隐藏头部导航
+      // title:'聊天',
+      headerTitle:'聊天',
+      tabBarLabel: '聊天',
+      headerShown:true,//是否隐藏头部导航
     } 
   },
   { 
     component: AddressBookPage, 
     name:"AddressBookPage",
     options:{
-      // tabBarBadge:1,
-      title:'通讯录',
+      // title:'通讯录',
+      headerTitle:'通讯录',
+      tabBarLabel: '通讯录',
     }
   },
   { 
     component: FindPage, 
     name: "FindPage", 
     options: {
-      // tabBarBadge:3,
-      title:'发现',
+      // title:'发现',// title 可用作 headerTitle 标题 tabBarLabel
+      headerTitle:'发现',
+      tabBarLabel: '发现',
       headerShown:false,//是否隐藏头部导航
-      isShowDot: true,//显示有消息点
+      isShowDot: true,// 显示有消息点 (这个是自定义属性，不是组件本身的 )
     } 
   },
   { 
     component: MePage, 
     name: "MePage", 
     options: {
-      // tabBarBadge:3,
-      title:'我',
+      // title:'我',
+      headerTitle:'我',
+      tabBarLabel: '我',
       headerShown:false,//是否隐藏头部导航
     } 
   }
@@ -73,7 +76,7 @@ function tabBarScreen(props:any){
     options={{
       ...item.options,
       tabBarBadge: AppStore.tabBar[item.name].msgCnt,
-      // title: item.options.title + (AppStore.tabBar[item.name||'']?.msgCnt?`(${AppStore.tabBar[item.name||''].msgCnt})`:'')
+      headerTitle: item.options.headerTitle + (AppStore.tabBar[item.name||'']?.msgCnt?`(${AppStore.tabBar[item.name||''].msgCnt})`:'')
     }}/>
   })
 }
