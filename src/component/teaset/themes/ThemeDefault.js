@@ -42,8 +42,8 @@ export default {
   labelFontSizeMD: 14,
   labelFontSizeSM: 10,
   labelFontSizeXS: 8,
-  labelTitleScale: 1.1, //29, 22, 15, 11, 9
-  labelDetailScale: 0.9, //23, 18, 13, 9, 7
+  labelTitleScale: 1, //29, 22, 15, 11, 9
+  labelDetailScale: 1, //23, 18, 13, 9, 7
   labelDangerScale: 1,
 
   //Button - background color

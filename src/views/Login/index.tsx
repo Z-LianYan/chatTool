@@ -28,6 +28,7 @@ import CustomListRow from '../../component/CustomListRow';
 // declare function setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): NodeJS.Timer;
 
 const Login = (props:any) => {
+  const { MyThemed } = props;
   const colorScheme = useColorScheme();
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
@@ -139,13 +140,14 @@ const Login = (props:any) => {
             width: '60%',
             borderWidth:0,
             backgroundColor:'transparent',
-            color:colorScheme=='dark'?'#fff':'#000'
+            color: MyThemed[colorScheme||'light'].ftCr
           }} />
         } detail={
           <Button
             style={{backgroundColor:'transparent'}}
+            titleStyle={{color: MyThemed[colorScheme||'light'].primaryColor}}
             title={isCodeDisabled ? (code_time + 's后再发送') : '发送验证码'}
-            type="default"
+            type="primary"
             disabled={isCodeDisabled}
             onPress={() => {
               sendVerifyCode()
@@ -167,9 +169,10 @@ const Login = (props:any) => {
             width: '100%',
             borderWidth:0,
             backgroundColor:'transparent',
-            color:colorScheme=='dark'?'#fff':'#000'
+            color: MyThemed[colorScheme||'light'].ftCr
           }} />
-        } detail='' />
+        } 
+        detail=''/>
 
         <Button
           title={'登录'}
@@ -181,6 +184,7 @@ const Login = (props:any) => {
           }}
         />
         <Text style={styles.tip}>⚠️已注册的直接登录，未注册的自动注册，注册后直接登录</Text>
+
     </View>
     
   </View>);
@@ -196,8 +200,7 @@ const styles = StyleSheet.create({
   },
   tip:{
     textAlign:'center',
-    color:'#666',
     marginTop:20
   }
 });
-export default inject("AppStore")(observer(Login));
+export default inject("AppStore","MyThemed")(observer(Login));

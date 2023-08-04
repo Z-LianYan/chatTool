@@ -135,11 +135,11 @@ const TabBar = ({
           backgroundColor: MyThemed[colorScheme||'light'].tbBg 
         }}>
           <Image
-            style={{width:20,height:20,tintColor: MyThemed[colorScheme||'light'][isFocused?'actColor':'ftCr']}}
+            style={{width:20,height:20,tintColor: MyThemed[colorScheme||'light'][isFocused?'primaryColor':'ftCr']}}
             source={iconName}
           />
           <Text style={{ 
-            color: MyThemed[colorScheme||'light'][isFocused?'actColor':'ftCr']
+            color: MyThemed[colorScheme||'light'][isFocused?'primaryColor':'ftCr']
           }}>
             {label}
           </Text>
@@ -159,18 +159,17 @@ const TabBar = ({
               left: 20,
               fontSize: 10,
               backgroundColor: MyThemed.mgDotCr,
-              color: MyThemed.mgDotFtCr,
               borderRadius: 10,
               textAlign: 'center',
-              paddingHorizontal: 6,
+              paddingHorizontal: 5,
               paddingVertical: 1,
             }}>
               {/* 这里需要套一个View组件 因为直接用Text组件在ios端设置 borderRadius 不成功 */}
               <Text style={{
                 fontSize: 10,
                 color: MyThemed.mgDotFtCr,
-                paddingHorizontal: 6,
-                paddingVertical: 1,
+                // paddingHorizontal: 3,
+                // paddingVertical: 1,
               }}>{String(options.tabBarBadge).length>3?(String(options.tabBarBadge).substring(0,3)+'...'):options.tabBarBadge}</Text>
             </View>
           }

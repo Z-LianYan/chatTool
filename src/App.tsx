@@ -45,9 +45,33 @@ function App(): JSX.Element {
 
   Theme.set({
     primaryColor:'blue',
-    btnPrimaryBorderColor: store.MyThemed[colorScheme||'light'].btnPrimaryColor,
-    btnPrimaryColor: store.MyThemed[colorScheme||'light'].btnPrimaryColor
-  })
+
+    btnPrimaryBorderColor: store.MyThemed[colorScheme||'light'].btnPrimaryBorderColor,// button组件 type=‘primary’ 边框颜色
+    btnPrimaryColor: store.MyThemed[colorScheme||'light'].btnPrimaryColor,// button组件 type=‘primary’ 背景颜色
+    btnPrimaryTitleColor: store.MyThemed[colorScheme||'light'].btnPrimaryTitleColor,// type=‘primary’ title颜色
+
+    btnColor: store.MyThemed[colorScheme||'light'].btnColor, // button组件 type=‘default’ 背景颜色
+    btnBorderColor: store.MyThemed[colorScheme||'light'].btnBorderColor,// button组件  type=‘default’ 边框颜色
+    btnTitleColor: store.MyThemed[colorScheme||'light'].btnTitleColor,// button组件  type=‘default’ title字体颜色
+
+    btnSecondaryColor: store.MyThemed[colorScheme||'light'].btnSecondaryColor,// type='secondary' 背景颜色
+    btnSecondaryBorderColor: store.MyThemed[colorScheme||'light'].btnSecondaryBorderColor,//type='secondary' 边框颜色
+    btnSecondaryTitleColor: store.MyThemed[colorScheme||'light'].btnSecondaryTitleColor,// type='secondary' title颜色
+
+
+    btnDangerColor: store.MyThemed[colorScheme||'light'].btnDangerColor,//type='danger' 背景颜色
+    btnDangerBorderColor: store.MyThemed[colorScheme||'light'].btnDangerBorderColor,//type='danger' 边框颜色
+    btnDangerTitleColor: store.MyThemed[colorScheme||'light'].btnDangerTitleColor,//type='danger' title颜色
+
+    btnLinkColor: store.MyThemed[colorScheme||'light'].btnLinkColor,//type='link' 背景颜色
+    btnLinkBorderColor: store.MyThemed[colorScheme||'light'].btnLinkBorderColor,//type='link' 边框颜色
+    btnLinkTitleColor: store.MyThemed[colorScheme||'light'].btnLinkTitleColor,// type='link' title颜色
+
+    labelTextColor: store.MyThemed[colorScheme||'light'].labelTextColor,
+    labelTextTitleColor: store.MyThemed[colorScheme||'light'].labelTextTitleColor,
+    labelTextDetailColor: store.MyThemed[colorScheme||'light'].labelTextDetailColor,
+    labelTextDangerColor: store.MyThemed[colorScheme||'light'].labelTextDangerColor,
+  });
   return <Provider {...store}>
       <SafeAreaView style={{flex:1, backgroundColor: store.MyThemed[colorScheme||'light'].bg}}>
         <TopView style={{flex:1}}>

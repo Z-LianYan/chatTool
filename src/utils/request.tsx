@@ -71,7 +71,7 @@ export function post(url:string, data?:any, text?:string,headers={}) {
         resolve(res.data);
         if (text) hideLoading();
         if(res.data.error==401){
-          data.navigation && data.navigation.navigate('HomePage');
+          data.navigation && data.navigation.navigate('LoginPage');
           app.setUserInfo(null);
         }
       })

@@ -11,7 +11,6 @@
 import React, { useState,useEffect } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   SafeAreaView,
   ScrollView,
@@ -58,6 +57,7 @@ const CustomListRow = ({
   activeOpacity=1,
   titleStyle={} ,
   backgroundColor,
+  MyThemed,
 }:any) => {
     
   const colorScheme = useColorScheme();
@@ -67,10 +67,10 @@ const CustomListRow = ({
 
   const obj = {
     style:{
-      backgroundColor:backgroundColor?backgroundColor:colorScheme=='dark'?'#000':'#fff'
+      backgroundColor:backgroundColor?backgroundColor:MyThemed[colorScheme||'light'].ctBg
     },
     titleStyle:{
-      color:colorScheme=='dark'?'#fff':'#000',
+      color:MyThemed[colorScheme||'light'].ftCr,
       ...titleStyle
     },
     bottomSeparator:bottomSeparator,
@@ -89,4 +89,4 @@ const CustomListRow = ({
 const styles = StyleSheet.create({
 });
 
-export default CustomListRow;
+export default inject("AppStore","MyThemed")(observer(CustomListRow));

@@ -103,6 +103,9 @@ const InitPage = ({AppStore,navigation,route}:any) => {
     {/* <Text style={{textAlign:'center'}}>
       qq：2930638161
     </Text> */}
+    {/* <Image source={{uri:'http://zly.imgresource.com.cn/public/chat/initPageBg.png'}}/> */}
+    {/* <Image source={require('./assets/image/address-book-activate.png')}/> */}
+    {/* <Text>234</Text> */}
   </View>;
 };
 
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     justifyContent:'space-between',
     paddingHorizontal: 40,
-    paddingTop:50
+    paddingTop:50,
   }
   
 });

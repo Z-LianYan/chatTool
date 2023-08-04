@@ -50,7 +50,7 @@ export default {
   btnColor: defaultColor,
   btnPrimaryColor: primaryColor,
   btnSecondaryColor: secondaryColor,
-  btnDangerColor: '#e34043',
+  btnDangerColor: '#e6a23c',
   btnLinkColor: 'rgba(0, 0, 0, 0)',
   //Button - title color
   btnTitleColor: primaryColor,
