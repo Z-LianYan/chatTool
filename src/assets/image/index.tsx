@@ -12,3 +12,4 @@ export const EMPTY_CONTENT = require('./empty.png');
 export const DETAIL_AVATAR = require('./detailAvatar.png');
 
 export const APP_LOGO = require('./app-logo.png');
+// export const INIT_PAGE = require('./init-page-bg.png');

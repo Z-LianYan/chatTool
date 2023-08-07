@@ -46,7 +46,8 @@ const routes=[
         component: InitPage, 
         name:"InitPage",
         options: {
-            headerShown:false
+            headerShown:false,
+            title:'',
         } 
     },
     

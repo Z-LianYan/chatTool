@@ -49,13 +49,12 @@ export function send_verify_code(params:any) {
 export function get_user_info(params?:any,text="") {
   return new Promise((resolve, reject) => {
     HttpUtils.post(Api.GET_USER_INFO, params, text).then((res:any) => {
+      console.log('res--->>',res)
       switch (res.error) {
         case 0:
           resolve(res.data);
           break;
         default:
-          // Toast.message(res.message);
-          // Toast.fail(res.message);
           reject(res);
           break;
       }

@@ -24,19 +24,25 @@ import { phone_register, send_verify_code } from "../../api/user";
 // import tools from "../../utils/tools";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomListRow from '../../component/CustomListRow';
+import { useNavigation } from '@react-navigation/native';
 
 // declare function setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): NodeJS.Timer;
 
 const Login = (props:any) => {
   const { MyThemed } = props;
   const colorScheme = useColorScheme();
+  const navigation:any = useNavigation();
+
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
-  // useLayoutEffect(() => {
-  //   navigation.setOptions({
-  //     title:'登录'
-  //   });
-  // });
+  useLayoutEffect(() => {
+    if(props.route.params && props.route.params.hidBackBtn){
+      navigation.setOptions({
+        headerLeft:''
+      });
+    }
+    
+  });
   
   let [phone_number,set_phone_number] = useState('13536681616');
   let [verify_code,set_verify_code] = useState('1234');
@@ -46,7 +52,6 @@ const Login = (props:any) => {
   let reg_tel = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
 
   useEffect(()=>{
-    console.log('-----',props)
     return ()=>{
       clearIntervalDis()
     }

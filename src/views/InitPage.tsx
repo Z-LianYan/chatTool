@@ -35,77 +35,67 @@ import {
   Input
 } from '../component/teaset/index';
 import PropTypes, { number, string } from 'prop-types';
-import { get_film_hot } from '../api/film';
 import CustomListRow from '../component/CustomListRow';
 import NavigationBar from '../component/NavigationBar';
 import { login_out } from "../api/user";
 import { edit_user_info, get_user_info } from "../api/user";
 var ScreenObj = Dimensions.get('window');
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { INIT_PAGE } from '../assets/image';
 
 const InitPage = ({AppStore,navigation,route}:any) => {
-  let [time,setTime] = useState(10);
+  let [time,setTime] = useState(3);
+  let [userInfo,setUserInfo] = useState(null);
   const colorScheme = useColorScheme();
   useEffect(()=>{
-
-    
-    getStorage();
-
+    getUserInfo();
     let timer = setInterval(() => {
       if(time<=0) {
         clearInterval(timer);
-        navigation.replace('AppTabBar');
+        if(AppStore.userInfo) {
+          navigation.replace('AppTabBar')
+        }else{
+          navigation.replace('LoginPage',{
+            hidBackBtn:true
+          })
+        };
       };
       time -= 1;
-      setTime(time)
+      setTime(time);
     }, 1000);
     return ()=>{
       clearInterval(timer);
     }
   },[]);
 
-  const getStorage = useCallback(async()=>{
-    let res:string|null = await AsyncStorage.getItem('locationInfo');
-    if(!res) return;
-    let _res:{city_id:number,city_name:string} = JSON.parse(res)
-    AppStore.setLocationInfo({
-      city_id: _res.city_id, //默认城市编码
-      city_name: _res.city_name, //默认城市广州
-    })
-  },[])
+  const  getUserInfo = useCallback(async ()=>{
+    try{
+      const result:any = await get_user_info();
+      if(result) AppStore.setUserInfo(result);
+    }catch(err:any){
+      console.log(err.message)
+    }
+  },[]);
+
+  // const getStorage = useCallback(async()=>{
+  //   let res:string|null = await AsyncStorage.getItem('locationInfo');
+  //   if(!res) return;
+  //   let _res:{city_id:number,city_name:string} = JSON.parse(res)
+  //   AppStore.setLocationInfo({
+  //     city_id: _res.city_id, //默认城市编码
+  //     city_name: _res.city_name, //默认城市广州
+  //   })
+  // },[])
   
   return <View style={styles.container}>
-    {/* <StatusBar 
-    hidden={false} 
-    translucent={true}//指定状态栏是否透明
-    backgroundColor={"transparent"} //状态栏的背景色  
-    barStyle={colorScheme=='dark'?'light-content':'dark-content'}
-    /> */}
-    <View style={styles.headContainer}>
-      <Text></Text>
-      <Text 
-      style={{
-        borderWidth:1,
-        borderColor:'#eee',
-        paddingHorizontal:10,
-        paddingVertical:5,
-        borderRadius:15
-      }}
-      onPress={()=>{
-        console.log('12345')
-        navigation.replace('AppTabBar');
-      }}>跳过{time<0?0:time}</Text>
-    </View>
-    <Text style={{textAlign:'center',marginTop:100}}>欢迎光临，聊天app</Text>
-    {/* <Text style={{textAlign:'center',marginTop:100}}>
-      聊天app
-    </Text> */}
-    {/* <Text style={{textAlign:'center'}}>
-      qq：2930638161
-    </Text> */}
-    {/* <Image source={{uri:'http://zly.imgresource.com.cn/public/chat/initPageBg.png'}}/> */}
-    {/* <Image source={require('./assets/image/address-book-activate.png')}/> */}
-    {/* <Text>234</Text> */}
+    <Image style={{ 
+      width:'100%',
+      flex:1
+    }} source={{uri:'https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png'}}/>
+    {/* <Image style={{ 
+      width:'100%',
+      flex:1
+    }} source={INIT_PAGE}/> */}
   </View>;
 };
 
