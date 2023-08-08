@@ -2,10 +2,14 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+
+
+    <!--android:usesCleartextTraffic="true" 为true时 http协议能请求-->
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
+      android:usesCleartextTraffic="true"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/AppTheme">

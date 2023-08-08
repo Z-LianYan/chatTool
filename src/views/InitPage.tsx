@@ -41,7 +41,7 @@ import { login_out } from "../api/user";
 import { edit_user_info, get_user_info } from "../api/user";
 var ScreenObj = Dimensions.get('window');
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { INIT_PAGE } from '../assets/image';
+import { INIT_PAGE } from '../assets/image';
 
 const InitPage = ({AppStore,navigation,route}:any) => {
   let [time,setTime] = useState(3);
@@ -91,11 +91,7 @@ const InitPage = ({AppStore,navigation,route}:any) => {
     <Image style={{ 
       width:'100%',
       flex:1
-    }} source={{uri:'https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png'}}/>
-    {/* <Image style={{ 
-      width:'100%',
-      flex:1
-    }} source={INIT_PAGE}/> */}
+    }} source={INIT_PAGE}/>
   </View>;
 };
 
