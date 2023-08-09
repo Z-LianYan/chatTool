@@ -32,7 +32,7 @@
     "react-native-screens": "^3.23.0",
     "react-timer-mixin": "^0.13.4",
     "rebound": "^0.1.0",
-    "socket.io-client": "^4.7.1"
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

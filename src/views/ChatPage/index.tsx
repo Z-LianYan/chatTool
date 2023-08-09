@@ -26,6 +26,8 @@ import {
 import { View,Text } from '../../component/customThemed';
 
 import NavigationBar from '../../component/NavigationBar';
+import CustomListRow from '../../component/CustomListRow';
+import MyCell from '../../component/MyCell';
 // import { 
 //   View,
 //   Text
@@ -43,20 +45,13 @@ const ChatPage = ({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
   })
-  return <View style={{
-  }}>
-    {/* <NavigationBar title={'聊天'} leftView=" "/> */}
-    <Text onPress={()=>{
-    runInAction(()=>{
-      AppStore.tabBar['ChatPage'].msgCnt += 12345678;
-      MyThemed[colorScheme||'light'].ctBg ='#'+Math.floor(Math.random()*1000000);
-      setTimeout(() => {
-        console.log('MyThemed--->>',MyThemed);
-      }, 100);
-      
-    });
-    }}>ChatPage </Text>
-
+  return <View style={{}}>
+    <CustomListRow
+    bottomSeparator="none" 
+    title={<Image style={{height:50,width:50}} source={{uri:'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}}/>} detail={'detail'} />
+    <MyCell 
+    title='title' 
+    avatar="https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png"/>
   </View>;
   
   

@@ -36,6 +36,42 @@ console.log('DefaultTheme--->>',DefaultTheme)
 
 import NavigationContainerCom from './navigators/NavigationContainer';
 
+import socketIo from "socket.io-client";
+import config from './config';
+
+const socket = socketIo(`${config.HOST}/test`,{
+  transports: ['websocket'],
+});
+
+socket.on('connect', () => {
+  const id = socket.id;
+
+  console.log('#connect,', id, socket);
+
+  // 监听自身 id 以实现 p2p 通讯
+  socket.on(id, (msg) => {
+    console.log('#receive,', msg);
+  });
+});
+
+// 接收在线用户信息
+socket.on('online', (msg) => {
+  console.log('#online,', msg);
+});
+
+// 系统事件
+socket.on('disconnect', (msg) => {
+  console.log('#disconnect', msg);
+});
+
+socket.on('disconnecting', () => {
+  console.log('#disconnecting');
+});
+
+socket.on('error', () => {
+  console.log('#error');
+});
+
 
 
 function App(): JSX.Element {
@@ -44,7 +80,7 @@ function App(): JSX.Element {
   const navigationRef = useNavigationContainerRef(); // You can also use a regular ref with `React.useRef()`
 
   Theme.set({
-    primaryColor:'blue',
+    primaryColor: store.MyThemed[colorScheme||'light'].primaryColor,
 
     btnPrimaryBorderColor: store.MyThemed[colorScheme||'light'].btnPrimaryBorderColor,// button组件 type=‘primary’ 边框颜色
     btnPrimaryColor: store.MyThemed[colorScheme||'light'].btnPrimaryColor,// button组件 type=‘primary’ 背景颜色
