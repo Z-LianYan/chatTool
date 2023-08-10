@@ -35,7 +35,6 @@ import {
   Input
 } from '../component/teaset/index';
 import PropTypes, { number, string } from 'prop-types';
-import CustomListRow from '../component/CustomListRow';
 import NavigationBar from '../component/NavigationBar';
 import { login_out } from "../api/user";
 import { edit_user_info, get_user_info } from "../api/user";

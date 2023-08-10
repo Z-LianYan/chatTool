@@ -13,3 +13,6 @@ export const DETAIL_AVATAR = require('./detailAvatar.png');
 
 export const APP_LOGO = require('./app-logo.png');
 export const INIT_PAGE = require('./initPageBg.png');
+export const BAN_LD = require('./banLd.png');
+export const RIGHT_ARROW = require('./rightArrow.png');
+export const NEW_FIREND = require('./newFirend.png');

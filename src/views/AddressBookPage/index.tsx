@@ -20,6 +20,9 @@ import {
   DarkTheme,
   DefaultTheme, 
 } from '@react-navigation/native';
+import MyCell from '../../component/MyCell';
+import { NEW_FIREND } from '../../assets/image';
+import { View } from '../../component/customThemed';
 // import { 
 //   View,
 //   Text
@@ -31,7 +34,29 @@ const AddressBookPage = ({
 
   useEffect(()=>{
   })
-  return <Text>AddressBookPage</Text>;
+  return <>
+    <MyCell
+    title='新的朋友' 
+    avatar={NEW_FIREND}
+    showBottomBorder={true}
+    showRightArrow={false}/>
+    <MyCell
+    title='仅聊天的朋友' 
+    avatar={NEW_FIREND}
+    showBottomBorder={false}
+    showRightArrow={false}/>
+
+    
+    <MyCell
+    style={{marginTop:30}}
+    title='晓明' 
+    avatar="https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png"
+    showBottomBorder={false}
+    showRightArrow/>
+    <MyCell
+    title='张三' 
+    avatar="https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png"/>
+  </>;
 };
 
 const styles = StyleSheet.create({

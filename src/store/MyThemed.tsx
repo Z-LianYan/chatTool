@@ -12,6 +12,7 @@ const ftCr3Light = '#7586a2';
 const primaryColorDark = '#05c160';//深色模式
 const primaryColorLight = '#05c160';//明亮模式
 
+
 //次要 color
 const secondaryColorDark = '#76c79d';
 const secondaryColorLight = '#76c79d';

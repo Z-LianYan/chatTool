@@ -20,6 +20,7 @@ import {
   DarkTheme,
   DefaultTheme, 
 } from '@react-navigation/native';
+import MyCell from '../../component/MyCell';
 // import { 
 //   View,
 //   Text
@@ -28,9 +29,22 @@ const FindPage = (props:any) => {
     console.log('props====>>>',props)
   const colorScheme = useColorScheme();
 
-  useEffect(()=>{
-  })
-  return <Text>FindPage</Text>;
+  useEffect(()=>{});
+{/* <Image 
+      style={{width:30,height:30}} 
+      source={{uri:'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}}
+      resizeMode="cover"/> */}
+  return <>
+    <MyCell
+    title='朋友圈' 
+    avatar="https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png"
+    showBottomBorder={false}
+    showRightArrow={true}
+    rightValue={<Image 
+      style={{width:30,height:30}} 
+      source={{uri:'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}}
+      resizeMode="cover"/>}/>
+  </>;
 };
 
 const styles = StyleSheet.create({

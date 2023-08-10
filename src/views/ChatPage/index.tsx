@@ -28,6 +28,7 @@ import { View,Text } from '../../component/customThemed';
 import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
+import { NEW_FIREND } from '../../assets/image';
 // import { 
 //   View,
 //   Text
@@ -45,16 +46,28 @@ const ChatPage = ({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
   })
-  return <View style={{}}>
-    <CustomListRow
-    bottomSeparator="none" 
-    title={<Image style={{height:50,width:50}} source={{uri:'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}}/>} detail={'detail'} />
+  return <>
     <MyCell 
-    title='title' 
+    time='12:59'
+    title='标题' 
+    showDisNotice={true}
+    showRightArrow={true}
+    rightValue="12345"
+    msg='1234567898765积分个懒人沙发就是浪费的时刻就放假睡懒觉饭都是废话lkl互粉啦放假啦大家福利都放假了就放辣椒来得及放辣椒的费拉达斯见风使舵了人家饿了人家了'
+    hasNewMsg={true}
+    showBottomBorder={true}
+    avatar={'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}
+    onPress={()=>{
+      console.log('123456')
+    }}/>
+    <MyCell 
+    time='12:59'
+    title='标题' 
+    showDisNotice={true}
+    msg='1234567898765积分个懒人沙发就是浪费的时刻就放假睡懒觉饭都是废话lkl互粉啦放假啦大家福利都放假了就放辣椒来得及放辣椒的费拉达斯见风使舵了人家饿了人家了'
+    hasNewMsg={true}
     avatar="https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png"/>
-  </View>;
-  
-  
+  </>;
 };
 
 const styles = StyleSheet.create({
