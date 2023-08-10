@@ -16,3 +16,6 @@ export const INIT_PAGE = require('./initPageBg.png');
 export const BAN_LD = require('./banLd.png');
 export const RIGHT_ARROW = require('./rightArrow.png');
 export const NEW_FIREND = require('./newFirend.png');
+export const FRIENDCIRCLE = require('./friendCircle.png');
+export const QRCODE = require('./qrCode.png');
+export const SETICON = require('./set.png');

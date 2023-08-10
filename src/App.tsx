@@ -109,7 +109,10 @@ function App(): JSX.Element {
     labelTextDangerColor: store.MyThemed[colorScheme||'light'].labelTextDangerColor,
   });
   return <Provider {...store}>
-      <SafeAreaView style={{flex:1, backgroundColor: store.MyThemed[colorScheme||'light'].bg}}>
+      <SafeAreaView style={{
+        flex:1, 
+        backgroundColor: store.MyThemed[colorScheme||'light'].bg
+        }}>
         <TopView style={{flex:1}}>
           <StatusBar 
           hidden={false} 

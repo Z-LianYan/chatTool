@@ -54,6 +54,7 @@ const MyCell = ({
   rightValue,
   onPress,
   MyThemed,
+  isAvatarTintColor=true,
   style
 }:any) => {
     
@@ -74,22 +75,24 @@ const MyCell = ({
     <TouchableOpacity style={styles.container} activeOpacity={0.6} onPress={()=>{
       onPress && onPress();
     }}>
-      <View
-      style={styles.avatarContainer}
-      >
-        <View style={styles.avatarWrapper}>
-          <Image style={{
-            ...styles.avatarImg,
-            tintColor: typeof avatar == 'number' && MyThemed[colorScheme||'light'].primaryColor
-          }} source={typeof avatar == 'number'?avatar:{uri:avatar}}/>
-          {
-            hasNewMsg && <View style={{
-              ...styles.msgDot,
-              backgroundColor: MyThemed.mgDotCr,
-            }}></View>
-          }
+      {
+        avatar && <View
+        style={styles.avatarContainer}
+        >
+          <View style={styles.avatarWrapper}>
+            <Image style={{
+              ...styles.avatarImg,
+              tintColor: isAvatarTintColor && (typeof avatar == 'number' && MyThemed[colorScheme||'light'].primaryColor)
+            }} source={typeof avatar == 'number'?avatar:{uri:avatar}}/>
+            {
+              hasNewMsg && <View style={{
+                ...styles.msgDot,
+                backgroundColor: MyThemed.mgDotCr,
+              }}></View>
+            }
+          </View>
         </View>
-      </View>
+      }
       
       <View style={{
         ...styles.rightWrapper,
@@ -149,6 +152,7 @@ const MyCell = ({
 const styles = StyleSheet.create({
   container:{
     flexDirection: 'row', 
+    paddingLeft:10,
   },
   rightWrapper:{
     flexDirection: 'row', 
@@ -158,7 +162,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   avatarContainer:{
-    padding: 10,
+    paddingVertical: 10,
+    paddingRight: 10,
+    justifyContent:'center'
   },
   avatarWrapper:{
     width: 46,

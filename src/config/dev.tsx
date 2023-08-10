@@ -11,5 +11,5 @@ import {
 // export const HOST = process.env.NODE_ENV=='development'?'http://192.168.0.26:7002':'http://film.imgresource.com.cn'
 
 export default {
-  HOST: 'http://192.168.8.66:7002'
+  HOST: 'http://192.168.0.26:7002'
 }

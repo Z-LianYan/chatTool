@@ -24,6 +24,7 @@ import BottomTabNavigator from './BottomTabNavigator';
 // import InitPage from '../views/InitPage';
 import LoginPage from '../views/Login/index';
 import InitPage from '../views/InitPage';
+import Set from '../views/Set';
 import { BACK_ICON } from '../component/teaset/icons';
 
 const routes=[
@@ -48,6 +49,14 @@ const routes=[
         options: {
             headerShown:false,
             title:'',
+        } 
+    },
+    { 
+        component: Set, 
+        name:"Set",
+        options: {
+            headerShown:true,
+            title:'设置',
         } 
     },
     

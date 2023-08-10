@@ -34,7 +34,7 @@ const AddressBookPage = ({
 
   useEffect(()=>{
   })
-  return <>
+  return <ScrollView>
     <MyCell
     title='新的朋友' 
     avatar={NEW_FIREND}
@@ -56,7 +56,7 @@ const AddressBookPage = ({
     <MyCell
     title='张三' 
     avatar="https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png"/>
-  </>;
+  </ScrollView>;
 };
 
 const styles = StyleSheet.create({
