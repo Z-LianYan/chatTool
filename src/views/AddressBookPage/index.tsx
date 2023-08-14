@@ -51,7 +51,7 @@ const AddressBookPage = ({
     style={{marginTop:30}}
     title='晓明' 
     avatar="https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png"
-    showBottomBorder={false}
+    showBottomBorder={true}
     showRightArrow/>
     <MyCell
     title='张三' 

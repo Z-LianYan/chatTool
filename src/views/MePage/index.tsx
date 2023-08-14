@@ -85,8 +85,7 @@ const MePage = ({
     showRightArrow={true}
     onPress={()=>{
       navigation.navigate('Set')
-    }}
-    />
+    }}/>
   </ScrollView>
   
   ;

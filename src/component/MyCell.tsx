@@ -56,8 +56,10 @@ const MyCell = ({
   MyThemed,
   isAvatarTintColor=true,
   style,
-  avatarHeight=34,
-  avatarWidth=34,
+  avatarStyle={
+    width: 34,
+    height: 34
+  }
 }:any) => {
     
   const colorScheme = useColorScheme();
@@ -85,8 +87,7 @@ const MyCell = ({
             <Image style={{
               ...styles.avatarImg,
               tintColor: isAvatarTintColor && (typeof avatar == 'number' && MyThemed[colorScheme||'light'].primaryColor),
-              height: avatarHeight,
-              width: avatarWidth,
+              ...avatarStyle,
             }} source={typeof avatar == 'number'?avatar:{uri:avatar}}/>
             {
               hasNewMsg && <View style={{

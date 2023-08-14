@@ -91,9 +91,16 @@ function StackNavigators(props:any){
                 // onPress={()=>{
                 //     navigation.goBack()
                 // }}/>
-                return <Image 
-                style={{width:20,height:20,tintColor: MyThemed[colorScheme||'light'].ftCr}}
-                source={BACK_ICON}/>
+                return <TouchableOpacity 
+                activeOpacity={0.6}
+                onPress={()=>{
+                    navigation.goBack()
+                }}>
+                    <Image 
+                    style={{width:20,height:20,tintColor: MyThemed[colorScheme||'light'].ftCr}}
+                    source={BACK_ICON}
+                    />
+                </TouchableOpacity>
             },
             // headerRight:()=>{
             //     return <Text>Right</Text>
