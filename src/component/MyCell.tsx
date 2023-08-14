@@ -55,7 +55,9 @@ const MyCell = ({
   onPress,
   MyThemed,
   isAvatarTintColor=true,
-  style
+  style,
+  avatarHeight=34,
+  avatarWidth=34,
 }:any) => {
     
   const colorScheme = useColorScheme();
@@ -82,7 +84,9 @@ const MyCell = ({
           <View style={styles.avatarWrapper}>
             <Image style={{
               ...styles.avatarImg,
-              tintColor: isAvatarTintColor && (typeof avatar == 'number' && MyThemed[colorScheme||'light'].primaryColor)
+              tintColor: isAvatarTintColor && (typeof avatar == 'number' && MyThemed[colorScheme||'light'].primaryColor),
+              height: avatarHeight,
+              width: avatarWidth,
             }} source={typeof avatar == 'number'?avatar:{uri:avatar}}/>
             {
               hasNewMsg && <View style={{
@@ -167,13 +171,15 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   avatarWrapper:{
-    width: 46,
-    height: 46,
+    // width: 46,
+    // height: 46,
     position:'relative',
+    // borderWidth:1,
+    // borderColor:'red'
   },
   avatarImg:{
-    height:44,
-    width:44,
+    // height:44,
+    // width:44,
     borderRadius: 5
   },
   msgDot:{

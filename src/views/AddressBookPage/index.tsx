@@ -39,7 +39,7 @@ const AddressBookPage = ({
     title='新的朋友' 
     avatar={NEW_FIREND}
     showBottomBorder={true}
-    showRightArrow={false}/>
+    showRightArrow={false} />
     <MyCell
     title='仅聊天的朋友' 
     avatar={NEW_FIREND}
