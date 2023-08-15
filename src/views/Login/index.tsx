@@ -20,7 +20,7 @@ import {
   ListRow,
   Toast
 } from '../../component/teaset/index';
-import { phone_register, send_verify_code } from "../../api/user";
+import { userLogin, phone_register, send_verify_code } from "../../api/user";
 // import tools from "../../utils/tools";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomListRow from '../../component/CustomListRow';
@@ -46,7 +46,7 @@ const Login = (props:any) => {
   });
   
   let [form_data,set_form_data] = useState({
-    phone_number: '',
+    phone_number: '13536681616',
     password: '123456'
   });
   let reg_tel = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
@@ -58,6 +58,7 @@ const Login = (props:any) => {
   async function doLogin() {
     // if(!isCodeDisabled) return Toast.message("请输入发送短信验证码");
     const { phone_number, password } = form_data;
+    
     try{
       let route = props.route;
       if (!phone_number) {
@@ -67,6 +68,8 @@ const Login = (props:any) => {
         return Toast.message("请输入正确的手机号");
       }
       console.log('route------>>>', route);
+
+      await userLogin(form_data);
       // let result:any = await phone_register(form_data);
       // clearIntervalDis();
       
@@ -132,12 +135,30 @@ const Login = (props:any) => {
           }} />
         } />
 
-        <TouchableOpacity activeOpacity={0.6}>
-          <Text style={{
-            ...styles.tip,
-            color: MyThemed[colorScheme||'light'].primaryColor
-          }}>短信验证码登录</Text>
-        </TouchableOpacity>
+        <View style={{flexDirection: 'row',justifyContent: 'space-between'}}>
+          <TouchableOpacity activeOpacity={0.6} onPress={()=>{
+            props.navigation.replace('VerifyCodeLogin',{
+              hidBackBtn:true
+            })
+          }}>
+            <Text style={{
+              ...styles.tip,
+              color: MyThemed[colorScheme||'light'].primaryColor
+            }}>短信验证码登录</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+          activeOpacity={0.6} 
+          onPress={()=>{
+            props.navigation.navigate('RegisterPage')
+          }}>
+            <Text style={{
+              ...styles.tip,
+              color: MyThemed[colorScheme||'light'].primaryColor
+            }}>注册</Text>
+          </TouchableOpacity>
+        </View>
+        
 
         <Button
           title={'登录'}
@@ -163,10 +184,7 @@ const styles = StyleSheet.create({
     paddingTop:60
   },
   tip:{
-    // textAlign:'center',
-    // marginTop:20
-    marginLeft: 25,
-    marginTop: 10
+    padding: 25
   }
 });
 export default inject("AppStore","MyThemed")(observer(Login));

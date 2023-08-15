@@ -25,10 +25,11 @@ import { phone_register, send_verify_code } from "../../api/user";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomListRow from '../../component/CustomListRow';
 import { useNavigation } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 // declare function setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): NodeJS.Timer;
 
-const Login = (props:any) => {
+const VerifyCodeLogin = (props:any) => {
   const { MyThemed } = props;
   const colorScheme = useColorScheme();
   const navigation:any = useNavigation();
@@ -178,6 +179,32 @@ const Login = (props:any) => {
           }} />
         } 
         detail=''/>
+        <View style={{flexDirection: 'row',justifyContent: 'space-between'}}>
+          <TouchableOpacity 
+          activeOpacity={0.6} 
+          onPress={()=>{
+            props.navigation.replace('LoginPage',{
+              hidBackBtn:true
+            })
+          }}>
+            <Text style={{
+              ...styles.tip,
+              color: MyThemed[colorScheme||'light'].primaryColor
+            }}>密码登录</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+          activeOpacity={0.6} 
+          onPress={()=>{
+            props.navigation.navigate('RegisterPage')
+          }}>
+            <Text style={{
+              ...styles.tip,
+              color: MyThemed[colorScheme||'light'].primaryColor
+            }}>注册</Text>
+          </TouchableOpacity>
+        </View>
+        
 
         <Button
           title={'登录'}
@@ -188,8 +215,6 @@ const Login = (props:any) => {
             doLogin()
           }}
         />
-        <Text style={styles.tip}>⚠️已注册的直接登录，未注册的自动注册，注册后直接登录</Text>
-
     </View>
     
   </View>);
@@ -204,8 +229,7 @@ const styles = StyleSheet.create({
     paddingTop:60
   },
   tip:{
-    textAlign:'center',
-    marginTop:20
+    padding: 25,
   }
 });
-export default inject("AppStore","MyThemed")(observer(Login));
+export default inject("AppStore","MyThemed")(observer(VerifyCodeLogin));

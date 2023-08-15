@@ -2,9 +2,30 @@ import * as HttpUtils from '../utils/request';
 import * as Api from './constant';
 import {Theme, Toast} from '../component/teaset/index';
 
-export function phone_register(params:any,text='登录中...') {
+export function userLogin(params:any,text='登录中...') {
   return new Promise((resolve, reject) => {
-    HttpUtils.post(Api.PHONE_REGISTER, params, text).then((res:any)=> {
+    HttpUtils.post(Api.LOGIN, params, text).then((res:any)=> {
+      switch (res.error) {
+        case 0:
+          resolve(res.data);
+          Toast.show({
+            icon: 'success',
+            duration: 2000,
+            text: res.message,
+          });
+          break;
+        default:
+          Toast.fail(res.message);
+          reject(res);
+          break;
+      }
+    });
+  });
+}
+
+export function registerUser(params:any,text='注册中...') {
+  return new Promise((resolve, reject) => {
+    HttpUtils.post(Api.REGISTER_USER, params, text).then((res:any)=> {
       switch (res.error) {
         case 0:
           resolve(res.data);
@@ -25,7 +46,7 @@ export function phone_register(params:any,text='登录中...') {
 
 export function send_verify_code(params:any) {
   return new Promise((resolve, reject) => {
-    HttpUtils.post(Api.SEND_VERIFY_CODE, params, '努力加载中...').then((res:any) => {
+    HttpUtils.post(Api.SEND_VERIFY_CODE, params, '正在发送中...').then((res:any) => {
       console.log('12345', res);
       switch (res.error) {
         case 0:
@@ -45,6 +66,14 @@ export function send_verify_code(params:any) {
     });
   });
 }
+
+
+
+
+
+
+
+
 
 export function get_user_info(params?:any,text="") {
   return new Promise((resolve, reject) => {

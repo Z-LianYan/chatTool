@@ -26,6 +26,8 @@ import LoginPage from '../views/Login/index';
 import InitPage from '../views/InitPage';
 import Set from '../views/Set';
 import { BACK_ICON } from '../component/teaset/icons';
+import VerifyCodeLogin from '../views/Login/VerifyCodeLogin';
+import RegisterPage from '../views/Register/index';
 
 const routes=[
     { 
@@ -41,6 +43,24 @@ const routes=[
         options: {
             headerShown:true,
             title:'登录',
+        } 
+    },
+    ,
+    { 
+        component: VerifyCodeLogin, 
+        name:"VerifyCodeLogin",
+        options: {
+            headerShown:true,
+            title:'登录',
+        } 
+    },
+
+    { 
+        component: RegisterPage, 
+        name:"RegisterPage",
+        options: {
+            headerShown:true,
+            title:'注册',
         } 
     },
     { 
