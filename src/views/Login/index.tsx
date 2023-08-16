@@ -46,8 +46,9 @@ const Login = (props:any) => {
   });
   
   let [form_data,set_form_data] = useState({
-    phone_number: '13536681616',
-    password: '123456'
+    mobile_phone: '13536681616',
+    password: '123456',
+    type:'password'
   });
   let reg_tel = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
 
@@ -57,14 +58,14 @@ const Login = (props:any) => {
 
   async function doLogin() {
     // if(!isCodeDisabled) return Toast.message("请输入发送短信验证码");
-    const { phone_number, password } = form_data;
+    const { mobile_phone, password } = form_data;
     
     try{
       let route = props.route;
-      if (!phone_number) {
+      if (!mobile_phone) {
         return Toast.message("请输入手机号");
       }
-      if (!reg_tel.test(phone_number)) {
+      if (!reg_tel.test(mobile_phone)) {
         return Toast.message("请输入正确的手机号");
       }
       console.log('route------>>>', route);
@@ -97,13 +98,13 @@ const Login = (props:any) => {
           <Input 
           placeholder="请输入手机号" 
           maxLength={11}
-          value={form_data.phone_number} 
+          value={form_data.mobile_phone} 
           keyboardType="numeric"
           onChangeText={(text:any)=>{
-            // set_phone_number(text);
+            // set_mobile_phone(text);
             set_form_data({
               ...form_data,
-              phone_number: text
+              mobile_phone: text
             })
           }}
           style={{
@@ -163,7 +164,7 @@ const Login = (props:any) => {
         <Button
           title={'登录'}
           type="primary"
-          disabled={(form_data.phone_number && form_data.phone_number.length==11 && form_data.password && form_data.password.length>=6)?false:true}
+          disabled={(form_data.mobile_phone && form_data.mobile_phone.length==11 && form_data.password && form_data.password.length>=6)?false:true}
           style={{marginLeft:10,marginRight:10,marginTop:50}}
           onPress={() => {
             doLogin()

@@ -18,7 +18,8 @@ import {
   ActionSheet,
   Input,
   ListRow,
-  Toast
+  Toast,
+  Checkbox
 } from '../../component/teaset/index';
 import { registerUser, send_verify_code } from "../../api/user";
 // import tools from "../../utils/tools";
@@ -47,13 +48,15 @@ const RegisterPage = (props:any) => {
   
   let [mobile_phone,set_mobile_phone] = useState(process.env.NODE_ENV=='development'?'13536681616':'');
   let [verify_code,set_verify_code] = useState(process.env.NODE_ENV=='development'?'1234':'');
+  let [user_name,set_user_name] = useState(process.env.NODE_ENV=='development'?'lend':'');
+  let [sex,set_sex] = useState(true);
   let [password,set_password] = useState('');
   let [password_comfirm,set_password_comfirm] = useState('');
   let [code_time,set_code_time] = useState(60);
   let [isCodeDisabled,set_is_code_disabled] = useState(false);
   let [timer,set_timer] = useState(0);
   let reg_tel = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
-
+  
   useEffect(()=>{
     return ()=>{
       clearIntervalDis()
@@ -78,7 +81,7 @@ const RegisterPage = (props:any) => {
         clearInterval(timer);
       }
       set_code_time(code_time <= 0 ? 60 : code_time);
-      set_is_code_disabled(code_time <= 0 ? false : true)
+      set_is_code_disabled(code_time <= 0 ? false : true);
     }, 1000);
     set_timer(timer);
   }
@@ -103,6 +106,7 @@ const RegisterPage = (props:any) => {
       if (verify_code.length < 4) {
         return Toast.message("请输入4位数的短信验证码");
       }
+      if (!user_name) return Toast.message("请输入用户名称");
       if (!password) return Toast.message("请输入密码");
       if (password.length<6) {
         return Toast.message("请输入至少6位数的密码");
@@ -115,7 +119,9 @@ const RegisterPage = (props:any) => {
       let result:any = await registerUser({
         mobile_phone: mobile_phone,
         verify_code,
-        password
+        user_name,
+        password,
+        sex: sex?1:0
       },'');
       clearIntervalDis();
       
@@ -123,13 +129,14 @@ const RegisterPage = (props:any) => {
       // await AsyncStorage.setItem('token', result.token);
       delete result.token
       props.AppStore.setUserInfo(result);
-
-      if(route.params && route.params.toUrl){
-        props.navigation.navigate(route.params.toUrl);
-        return;
-      }
-      // props.navigation.goBack();
-      props.navigation.replace('AppTabBar',{});
+      
+      props.navigation.goBack();
+      // if(route.params && route.params.toUrl){
+      //   props.navigation.navigate(route.params.toUrl);
+      //   return;
+      // }
+      // 
+      // props.navigation.replace('AppTabBar',{});
     }catch(err:any){
       console.log(err.message)
     }
@@ -176,12 +183,31 @@ const RegisterPage = (props:any) => {
         bottomSeparator="none"  
         title={
           <Input 
-          placeholder="请输入短信验证码" 
+          placeholder="请输入短信验证码(默认1234)" 
           maxLength={4}
           keyboardType="numeric"
           value={verify_code} 
           onChangeText={(text:any)=>{
             set_verify_code(String(text).trim());
+          }}
+          style={{
+            width: '100%',
+            borderWidth:0,
+            backgroundColor:'transparent',
+            color: MyThemed[colorScheme||'light'].ftCr
+          }} />
+        } 
+        detail=''/>
+        <CustomListRow 
+        bottomSeparator="none"  
+        title={
+          <Input 
+          placeholder="请输入用户名称" 
+          maxLength={4}
+          keyboardType="default"
+          value={user_name} 
+          onChangeText={(text:any)=>{
+            set_user_name(String(text).trim());
           }}
           style={{
             width: '100%',
@@ -198,7 +224,7 @@ const RegisterPage = (props:any) => {
           <Input 
           placeholder="请输入密码" 
           maxLength={100}
-          keyboardType="numeric"
+          keyboardType="default"
           value={password} 
           onChangeText={(text:any)=>{
             set_password(String(text).trim());
@@ -215,9 +241,9 @@ const RegisterPage = (props:any) => {
         bottomSeparator="none"  
         title={
           <Input 
-          placeholder="再次确认密码密码" 
+          placeholder="确认密码" 
           maxLength={100}
-          keyboardType="numeric"
+          keyboardType="default"
           value={password_comfirm} 
           onChangeText={(text:any)=>{
             set_password_comfirm(String(text).trim());
@@ -230,6 +256,46 @@ const RegisterPage = (props:any) => {
           }} />
         } 
         detail=''/>
+
+        <CustomListRow 
+        bottomSeparator="none"  
+        title={<Text style={{paddingLeft:12}}>性别</Text>}
+        detail={
+          <View style={{flexDirection:'row'}}>
+            <Checkbox
+            title='男'
+            checked={sex}
+            checkedIconStyle={{
+              width: 20,
+              height: 20,
+              borderRadius: 0
+            }}
+            uncheckedIconStyle={{
+              width: 20,
+              height: 20,
+              borderRadius: 0
+            }}
+            onChange={(value:boolean) => set_sex(value)}
+            />
+            <Checkbox
+
+            style={{marginLeft: 50}}
+            title='女'
+            checked={!sex}
+            checkedIconStyle={{
+              width: 20,
+              height: 20,
+              borderRadius: 0
+            }}
+            uncheckedIconStyle={{
+              width: 20,
+              height: 20,
+              borderRadius: 0
+            }}
+            onChange={(value:boolean) => set_sex(!value)}
+            />
+          </View>
+        }/>
        
         
 

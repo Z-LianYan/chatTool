@@ -107,6 +107,11 @@ function App(): JSX.Element {
     labelTextTitleColor: store.MyThemed[colorScheme||'light'].labelTextTitleColor,
     labelTextDetailColor: store.MyThemed[colorScheme||'light'].labelTextDetailColor,
     labelTextDangerColor: store.MyThemed[colorScheme||'light'].labelTextDangerColor,
+
+
+    cbTitleColor: store.MyThemed[colorScheme||'light'].ftCr,
+    cbCheckedTintColor: store.MyThemed[colorScheme||'light'].primaryColor,
+    cbUncheckedTintColor: store.MyThemed[colorScheme||'light'].ftCr,
   });
   return <Provider {...store}>
       <SafeAreaView style={{

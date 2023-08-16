@@ -29,7 +29,7 @@ const service = axios.create({
   baseURL: config.HOST, // api的base_url
   timeout: 10000, //1m request timeout
   headers: {
-    platform: Platform.OS=='ios'?'rnIos':'rnAndroid',
+    platform: Platform.OS=='ios'?'rnIosChat':'rnAndroidChat',
     "Content-Type": "application/json;charset=UTF-8",
   },
   // withCredentials: true

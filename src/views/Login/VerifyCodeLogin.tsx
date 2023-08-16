@@ -20,7 +20,7 @@ import {
   ListRow,
   Toast
 } from '../../component/teaset/index';
-import { phone_register, send_verify_code } from "../../api/user";
+import { userLogin, send_verify_code } from "../../api/user";
 // import tools from "../../utils/tools";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomListRow from '../../component/CustomListRow';
@@ -45,7 +45,7 @@ const VerifyCodeLogin = (props:any) => {
     
   });
   
-  let [phone_number,set_phone_number] = useState('13536681616');
+  let [mobile_phone,set_mobile_phone] = useState('13536681616');
   let [verify_code,set_verify_code] = useState('1234');
   let [code_time,set_code_time] = useState(60);
   let [isCodeDisabled,set_is_code_disabled] = useState(false);
@@ -61,14 +61,15 @@ const VerifyCodeLogin = (props:any) => {
 
   async function sendVerifyCode(){
 
-    if (!phone_number) {
+    if (!mobile_phone) {
       return Toast.message('请输入手机号');
     }
-    if (!reg_tel.test(phone_number)) {
+    if (!reg_tel.test(mobile_phone)) {
       return Toast.message('请输入正确的手机号');
     }
     await send_verify_code({
-      phone_number: phone_number,
+      mobile_phone: mobile_phone,
+      key: 'phoneVerifyCodeLogin',
     });
     let timer:any = setInterval(() => {
       code_time -= 1;
@@ -89,10 +90,10 @@ const VerifyCodeLogin = (props:any) => {
     // if(!isCodeDisabled) return Toast.message("请输入发送短信验证码");
     try{
       let route = props.route;
-      if (!phone_number) {
+      if (!mobile_phone) {
         return Toast.message("请输入手机号");
       }
-      if (!reg_tel.test(phone_number)) {
+      if (!reg_tel.test(mobile_phone)) {
         return Toast.message("请输入正确的手机号");
       }
       if (!verify_code) {
@@ -101,9 +102,10 @@ const VerifyCodeLogin = (props:any) => {
       if (verify_code.length < 4) {
         return Toast.message("请输入4位数的短信验证码");
       }
-      let result:any = await phone_register({
-        phone_number,
-        verify_code
+      let result:any = await userLogin({
+        mobile_phone,
+        verify_code,
+        type: 'verify_code'
       },'');
       clearIntervalDis();
       
@@ -119,6 +121,7 @@ const VerifyCodeLogin = (props:any) => {
       // props.navigation.goBack();
       props.navigation.replace('AppTabBar',{});
     }catch(err:any){
+      clearIntervalDis();
       console.log(err.message)
     }
     
@@ -137,10 +140,10 @@ const VerifyCodeLogin = (props:any) => {
           <Input 
           placeholder="请输入手机号" 
           maxLength={11}
-          value={phone_number} 
+          value={mobile_phone} 
           keyboardType="numeric"
           onChangeText={(text:any)=>{
-            set_phone_number(text);
+            set_mobile_phone(text);
           }}
           style={{
             width: '60%',
