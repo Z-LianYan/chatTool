@@ -91,7 +91,6 @@ const RegisterPage = (props:any) => {
     set_is_code_disabled(false);
   }
   async function doRegister() {
-    // if(!isCodeDisabled) return Toast.message("请输入发送短信验证码");
     try{
       let route = props.route;
       if (!mobile_phone) {
@@ -124,31 +123,16 @@ const RegisterPage = (props:any) => {
         sex: sex?1:0
       },'');
       clearIntervalDis();
-      
-      // let storage_token = await AsyncStorage.getItem('token');
-      // await AsyncStorage.setItem('token', result.token);
       delete result.token
       props.AppStore.setUserInfo(result);
       
       props.navigation.goBack();
-      // if(route.params && route.params.toUrl){
-      //   props.navigation.navigate(route.params.toUrl);
-      //   return;
-      // }
-      // 
-      // props.navigation.replace('AppTabBar',{});
     }catch(err:any){
       console.log(err.message)
     }
     
   }
   return (<View style={styles.container}>
-    {/* <NavigationBar 
-    onBack={()=>{
-      props.navigation.goBack()
-      console.log('navigation',props.route);
-    }}
-    title={'登录'}/> */}
     <View style={styles.contentContainer}>
         <CustomListRow 
         bottomSeparator="none" 
@@ -225,6 +209,7 @@ const RegisterPage = (props:any) => {
           placeholder="请输入密码" 
           maxLength={100}
           keyboardType="default"
+          secureTextEntry={true}
           value={password} 
           onChangeText={(text:any)=>{
             set_password(String(text).trim());
@@ -244,6 +229,7 @@ const RegisterPage = (props:any) => {
           placeholder="确认密码" 
           maxLength={100}
           keyboardType="default"
+          secureTextEntry={true}
           value={password_comfirm} 
           onChangeText={(text:any)=>{
             set_password_comfirm(String(text).trim());
@@ -303,7 +289,7 @@ const RegisterPage = (props:any) => {
           title={'注册'}
           type="primary"
           disabled={!isCodeDisabled}
-          style={{marginLeft:10,marginRight:10,marginTop:50}}
+          style={{marginHorizontal:10,marginTop:50,height: 44}}
           onPress={() => {
             doRegister()
           }}

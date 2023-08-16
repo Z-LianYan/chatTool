@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation,StackActions } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import {
   SafeAreaView,
@@ -14,7 +14,6 @@ import {
   TouchableHighlight,
   Alert
 } from 'react-native';
-
 import { 
   NavigationContainer,
   DarkTheme,
@@ -60,9 +59,13 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
         },
         { text: "确定", onPress: async () => {
           await login_out();
-          navigation.navigate("HomePage");
           AppStore.setUserInfo(null);
-          // navigation.replace('LoginPage')
+          navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
+          navigation.replace('LoginPage',{
+            hidBackBtn: true
+          })
+          // navigation.popToTop()
+          
         } }
       ]
     );
@@ -87,7 +90,7 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
                 
 
       <Button
-        style={{marginTop:100,marginLeft:20,marginRight:20}}
+        style={{marginHorizontal:10,marginTop:50,height: 44}}
         title={'退出登录'}
         type="default"
         onPress={() => {

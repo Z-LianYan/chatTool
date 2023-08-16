@@ -45,8 +45,8 @@ const VerifyCodeLogin = (props:any) => {
     
   });
   
-  let [mobile_phone,set_mobile_phone] = useState('13536681616');
-  let [verify_code,set_verify_code] = useState('1234');
+  let [mobile_phone,set_mobile_phone] = useState(process.env.NODE_ENV=='development'?'13536681616':'');
+  let [verify_code,set_verify_code] = useState(process.env.NODE_ENV=='development'?'1234':'');
   let [code_time,set_code_time] = useState(60);
   let [isCodeDisabled,set_is_code_disabled] = useState(false);
   let [timer,set_timer] = useState(0);
@@ -109,16 +109,13 @@ const VerifyCodeLogin = (props:any) => {
       },'');
       clearIntervalDis();
       
-      // let storage_token = await AsyncStorage.getItem('token');
-      // await AsyncStorage.setItem('token', result.token);
       delete result.token
       props.AppStore.setUserInfo(result);
 
       if(route.params && route.params.toUrl){
-        props.navigation.navigate(route.params.toUrl);
+        props.navigation.replace(route.params.toUrl);
         return;
       }
-      // props.navigation.goBack();
       props.navigation.replace('AppTabBar',{});
     }catch(err:any){
       clearIntervalDis();
@@ -127,12 +124,6 @@ const VerifyCodeLogin = (props:any) => {
     
   }
   return (<View style={styles.container}>
-    {/* <NavigationBar 
-    onBack={()=>{
-      props.navigation.goBack()
-      console.log('navigation',props.route);
-    }}
-    title={'登录'}/> */}
     <View style={styles.contentContainer}>
         <CustomListRow 
         bottomSeparator="none" 
@@ -213,7 +204,7 @@ const VerifyCodeLogin = (props:any) => {
           title={'登录'}
           type="primary"
           disabled={!isCodeDisabled}
-          style={{marginLeft:10,marginRight:10,marginTop:50}}
+          style={{marginHorizontal:10,marginTop:50,height: 44}}
           onPress={() => {
             doLogin()
           }}

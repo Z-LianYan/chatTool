@@ -83,7 +83,7 @@ const routes=[
 ]
 
 function renderStackItems(){
-    return routes.map((item)=>{
+    return routes.map((item:any)=>{
         return <Stack.Screen
             key={item.name} 
             name={item.name}
@@ -113,6 +113,7 @@ function StackNavigators(props:any){
                 // }}/>
                 return <TouchableOpacity 
                 activeOpacity={0.6}
+                style={{paddingLeft:10,paddingTop: 8,}}
                 onPress={()=>{
                     navigation.goBack()
                 }}>

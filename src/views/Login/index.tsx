@@ -1,5 +1,6 @@
 import React,{ Component, useEffect,useLayoutEffect, useState } from 'react';
 import {
+  Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -20,12 +21,13 @@ import {
   ListRow,
   Toast
 } from '../../component/teaset/index';
-import { userLogin, phone_register, send_verify_code } from "../../api/user";
+import { userLogin } from "../../api/user";
 // import tools from "../../utils/tools";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomListRow from '../../component/CustomListRow';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,StackActions } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { BACK_ICON } from '../../component/teaset/icons';
 
 // declare function setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): NodeJS.Timer;
 
@@ -42,12 +44,11 @@ const Login = (props:any) => {
         headerLeft:''
       });
     }
-    
   });
   
   let [form_data,set_form_data] = useState({
-    mobile_phone: '13536681616',
-    password: '123456',
+    mobile_phone: process.env.NODE_ENV=='development'?'13536681616':'',
+    password: process.env.NODE_ENV=='development'?'123456':'',
     type:'password'
   });
   let reg_tel = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
@@ -70,21 +71,14 @@ const Login = (props:any) => {
       }
       console.log('route------>>>', route);
 
-      await userLogin(form_data);
-      // let result:any = await phone_register(form_data);
-      // clearIntervalDis();
-      
-      // let storage_token = await AsyncStorage.getItem('token');
-      // await AsyncStorage.setItem('token', result.token);
-      // delete result.token
-      // props.AppStore.setUserInfo(result);
+      const result = await userLogin(form_data);
+      console.log('00000---000>>>',result);
 
-      // if(route.params && route.params.toUrl){
-      //   props.navigation.navigate(route.params.toUrl);
-      //   return;
-      // }
-      // props.navigation.goBack();
-      // props.navigation.replace('AppTabBar',{});
+      if(route.params && route.params.toUrl){
+        props.navigation.replace(route.params.toUrl);
+        return;
+      }
+      props.navigation.replace('AppTabBar',{});
     }catch(err:any){
       console.log(err.message)
     }
@@ -122,6 +116,7 @@ const Login = (props:any) => {
           maxLength={99}
           value={form_data.password} 
           keyboardType="default"
+          secureTextEntry={true}
           onChangeText={(text:any)=>{
             set_form_data({
               ...form_data,
@@ -165,7 +160,7 @@ const Login = (props:any) => {
           title={'登录'}
           type="primary"
           disabled={(form_data.mobile_phone && form_data.mobile_phone.length==11 && form_data.password && form_data.password.length>=6)?false:true}
-          style={{marginLeft:10,marginRight:10,marginTop:50}}
+          style={{marginHorizontal:10,marginTop:50,height: 44}}
           onPress={() => {
             doLogin()
           }}
@@ -182,7 +177,7 @@ const styles = StyleSheet.create({
   },
   contentContainer:{
     flex:1,
-    paddingTop:60
+    paddingTop:60,
   },
   tip:{
     padding: 25

@@ -67,6 +67,33 @@ export function send_verify_code(params:any) {
   });
 }
 
+export function login_out(params?:any) {
+  return new Promise((resolve, reject) => {
+    HttpUtils.post(Api.LOGIN_OUT, params, '').then((res:any) => {
+      console.log('res---->>',res)
+      switch (res.error) {
+        case 0:
+          Toast.show({
+            icon: 'success',
+            duration: 800,
+            text: res.message,
+          });
+          resolve(res.data);
+          break;
+        default:
+          // Toast.message(res.message);
+          Toast.fail(res.message);
+          reject(res.data);
+          break;
+      }
+    });
+  });
+}
+
+
+
+
+
 
 
 
@@ -101,27 +128,7 @@ export function get_user_info(params?:any,text="") {
   });
 }
 
-export function login_out(params?:any) {
-  return new Promise((resolve, reject) => {
-    HttpUtils.post(Api.LOGIN_OUT, params, '').then((res:any) => {
-      switch (res.error) {
-        case 0:
-          Toast.show({
-            icon: 'success',
-            duration: 800,
-            text: res.message,
-          });
-          resolve(res.data);
-          break;
-        default:
-          // Toast.message(res.message);
-          Toast.fail(res.message);
-          reject(res.data);
-          break;
-      }
-    });
-  });
-}
+
 
 export function user_recharge(params:any) {
   return new Promise((resolve, reject) => {
