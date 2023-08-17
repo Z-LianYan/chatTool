@@ -10,19 +10,28 @@ import {
 import { useState } from 'react';
 
 import config from '../config/index';
-import { TopView, Toast,ModalIndicator } from '../component/teaset/index';
+import { TopView, Toast,ModalIndicator, Theme } from '../component/teaset/index';
 import app from '../store/AppStore';
 
 // let routerNavigation:any = null;
-
+let tip:any = null;
 function isLoading(text?:string){
   if(text){
-    ModalIndicator.hide()
-    ModalIndicator.show(text)
+    tip = Toast.show({
+      text: text,
+      icon: <ActivityIndicator size='large' color={Theme.toastIconTintColor} />,
+      position: 'center',
+      duration: 200000,
+      modal: true
+    });
   }
 }
 function hideLoading(){
-  ModalIndicator.hide()
+  if(tip){
+    Toast.hide(tip);
+    tip = null;
+  }
+  
 }
 axios.defaults.withCredentials = true;
 const service = axios.create({

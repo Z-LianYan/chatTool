@@ -1,5 +1,6 @@
 import React,{ Component, useEffect,useLayoutEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
   ScrollView,
@@ -58,7 +59,6 @@ const Login = (props:any) => {
   },[]);
 
   async function doLogin() {
-    // if(!isCodeDisabled) return Toast.message("请输入发送短信验证码");
     const { mobile_phone, password } = form_data;
     
     try{
