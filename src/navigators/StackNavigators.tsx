@@ -146,7 +146,7 @@ function StackNavigators(props:any){
             // }
             headerBackTitle:' ',//返回键右侧的文字 置为 空，配置了此项 ，ios端显示，android不显示，不配置此项android端会默认显示screen name
         }}
-        initialRouteName="LoginPage"
+        initialRouteName="InitPage"
         >
         {renderStackItems()}
     </Stack.Navigator>
