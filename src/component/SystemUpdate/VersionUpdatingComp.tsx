@@ -71,6 +71,7 @@ export class VersionUpdatingComp extends Component<IProps,IState> {
         }
     }
     async componentDidMount(){
+        console.log('------------>>',this.state.download_url)
         if(this.state.download_url){
            this.downloadApp();
         }

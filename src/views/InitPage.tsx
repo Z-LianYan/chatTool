@@ -47,7 +47,7 @@ const InitPage = ({AppStore,navigation,route}:any) => {
   let [userInfo,setUserInfo] = useState(null);
   const colorScheme = useColorScheme();
   useEffect(()=>{
-    getUserInfo();
+    // getUserInfo();
     let timer = setInterval(() => {
       if(time<=0) {
         clearInterval(timer);
@@ -67,14 +67,14 @@ const InitPage = ({AppStore,navigation,route}:any) => {
     }
   },[]);
 
-  const  getUserInfo = useCallback(async ()=>{
-    try{
-      const result:any = await get_user_info();
-      if(result) AppStore.setUserInfo(result);
-    }catch(err:any){
-      console.log(err.message)
-    }
-  },[]);
+  // const  getUserInfo = useCallback(async ()=>{
+  //   try{
+  //     const result:any = await get_user_info();
+  //     if(result) AppStore.setUserInfo(result);
+  //   }catch(err:any){
+  //     console.log(err.message)
+  //   }
+  // },[]);
 
   // const getStorage = useCallback(async()=>{
   //   let res:string|null = await AsyncStorage.getItem('locationInfo');

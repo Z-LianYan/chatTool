@@ -28,6 +28,7 @@ import Set from '../views/Set';
 import { BACK_ICON } from '../component/teaset/icons';
 import VerifyCodeLogin from '../views/Login/VerifyCodeLogin';
 import RegisterPage from '../views/Register/index';
+import VersionPage from '../views/VersionPage/index';
 
 const routes=[
     { 
@@ -77,6 +78,14 @@ const routes=[
         options: {
             headerShown:true,
             title:'设置',
+        } 
+    },
+    { 
+        component: VersionPage, 
+        name:"VersionPage",
+        options: {
+            headerShown:true,
+            title:'版本',
         } 
     },
     

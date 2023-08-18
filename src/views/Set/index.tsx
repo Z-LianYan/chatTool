@@ -76,13 +76,17 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
     stickyHeaderIndices={[]}
     onMomentumScrollEnd={(event:any)=>{}}>
       
-      <MyCell
-      style={{marginTop:0}}
-      title='关于' 
-      showBottomBorder={false}
-      showRightArrow={true}
-      onPress={()=>{
-      }}/>
+      {
+        Platform.OS == 'android' && <MyCell
+        style={{marginTop:0}}
+        title='关于' 
+        showBottomBorder={false}
+        showRightArrow={true}
+        rightValue={'版本号'+AppVersions.versionName}
+        onPress={()=>{
+          navigation.navigate('VersionPage');
+        }}/>
+      }
 
       
 
@@ -92,11 +96,12 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
       <Button
         style={{marginHorizontal:10,marginTop:50,height: 44}}
         title={'退出登录'}
-        type="default"
+        type="primary"
         onPress={() => {
           onLoginOut()
         }}
       />
+
 
       
     </ScrollView>;

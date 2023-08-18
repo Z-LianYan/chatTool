@@ -32,45 +32,45 @@ import {
 // import { useNavigation } from '@react-navigation/core';
 
 
-console.log('DefaultTheme--->>',DefaultTheme)
+// console.log('DefaultTheme--->>',DefaultTheme)
 
 import NavigationContainerCom from './navigators/NavigationContainer';
 
-import socketIo from "socket.io-client";
-import config from './config';
+// import socketIo from "socket.io-client";
+// import config from './config';
 
-const socket = socketIo(`${config.HOST}/test`,{
-  transports: ['websocket'],
-});
+// const socket = socketIo(`${config.HOST}/test`,{
+//   transports: ['websocket'],
+// });
 
-socket.on('connect', () => {
-  const id = socket.id;
+// socket.on('connect', () => {
+//   const id = socket.id;
 
-  console.log('#connect,', id, socket);
+//   console.log('#connect,', id);
 
-  // 监听自身 id 以实现 p2p 通讯
-  socket.on(id, (msg) => {
-    console.log('#receive,', msg);
-  });
-});
+//   // 监听自身 id 以实现 p2p 通讯
+//   socket.on(id, (msg) => {
+//     console.log('#receive,', msg);
+//   });
+// });
 
-// 接收在线用户信息
-socket.on('online', (msg) => {
-  console.log('#online,', msg);
-});
+// // 接收在线用户信息
+// socket.on('online', (msg) => {
+//   console.log('#online,', msg);
+// });
 
-// 系统事件
-socket.on('disconnect', (msg) => {
-  console.log('#disconnect', msg);
-});
+// // 系统事件
+// socket.on('disconnect', (msg) => {
+//   console.log('#disconnect', msg);
+// });
 
-socket.on('disconnecting', () => {
-  console.log('#disconnecting');
-});
+// socket.on('disconnecting', () => {
+//   console.log('#disconnecting');
+// });
 
-socket.on('error', () => {
-  console.log('#error');
-});
+// socket.on('error', () => {
+//   console.log('#error');
+// });
 
 
 

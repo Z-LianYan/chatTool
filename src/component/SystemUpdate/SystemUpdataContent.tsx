@@ -42,7 +42,7 @@ export class SystemUpdataContent extends Component<IProps,IState> {
     }
     async componentDidMount(): Promise<void> {
         let lastVersion:any = await store.AppVersions.checkAppUpdate()                      
-        console.log("lastVersion.build_number",lastVersion?.versionCode,store.AppVersions.versionCode,this.props.isClickCheck);
+        console.log("lastVersion.build_number---",lastVersion,store.AppVersions.versionCode,this.props.isClickCheck);
         if(!this.props.isClickCheck){
             if(!lastVersion){
                 return this.props.hide();
@@ -125,7 +125,7 @@ export class SystemUpdataContent extends Component<IProps,IState> {
                     return this.props.hide();
                 }}/>}
                 {(lastVersion && step==2) && <VersionUpdatingComp 
-                 lastVersion={lastVersion}
+                lastVersion={lastVersion}
                 hide={()=>{
                     return this.props.hide();
                 }}/>}
