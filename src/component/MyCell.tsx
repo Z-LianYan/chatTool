@@ -73,8 +73,7 @@ const MyCell = ({
     borderBottomWidth: 0.3,
     borderColor: MyThemed[colorScheme||'light'].ftCr2
   }
-
-  console.log('showRightArrow---->>>', typeof rightValue)
+  
   return <View style={style}>
     <TouchableOpacity style={styles.container} activeOpacity={0.6} onPress={()=>{
       onPress && onPress();

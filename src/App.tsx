@@ -113,6 +113,7 @@ function App(): JSX.Element {
     cbCheckedTintColor: store.MyThemed[colorScheme||'light'].primaryColor,
     cbUncheckedTintColor: store.MyThemed[colorScheme||'light'].ftCr,
   });
+
   return <Provider {...store}>
       <SafeAreaView style={{
         flex:1, 

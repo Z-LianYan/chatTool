@@ -1,6 +1,7 @@
 import React,{ Component, useEffect,useLayoutEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  AppState,
   Image,
   SafeAreaView,
   ScrollView,
@@ -29,11 +30,12 @@ import CustomListRow from '../../component/CustomListRow';
 import { useNavigation,StackActions } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { BACK_ICON } from '../../component/teaset/icons';
+import SocketIoClient from '../../socketIo';
 
 // declare function setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): NodeJS.Timer;
 
 const Login = (props:any) => {
-  const { MyThemed } = props;
+  const { MyThemed,AppStore } = props;
   const colorScheme = useColorScheme();
   const navigation:any = useNavigation();
 
@@ -69,10 +71,15 @@ const Login = (props:any) => {
       if (!reg_tel.test(mobile_phone)) {
         return Toast.message("请输入正确的手机号");
       }
-      console.log('route------>>>', route);
-
+      // console.log('route------>>>', route);
+      
       const result = await userLogin(form_data);
       console.log('00000---000>>>',result);
+      AppStore.setUserInfo(result);
+
+      const sockitIo = SocketIoClient.getInstance();
+      
+      
 
       if(route.params && route.params.toUrl){
         props.navigation.replace(route.params.toUrl);
