@@ -8,11 +8,11 @@ export function userLogin(params:any,text='登录中...') {
       switch (res.error) {
         case 0:
           resolve(res.data);
-          Toast.show({
-            icon: 'success',
-            duration: 2000,
-            text: res.message,
-          });
+          // Toast.show({
+          //   icon: 'success',
+          //   duration: 2000,
+          //   text: res.message,
+          // });
           break;
         default:
           Toast.fail(res.message);

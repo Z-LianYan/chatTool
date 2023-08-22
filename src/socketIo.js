@@ -21,12 +21,12 @@ export default class SocketIoClient {
     }
     
     connect(){
-        console.log('连接socket服务');
-        const { userInfo } = store?.AppStore
+        const { userInfo } = store?.AppStore;
+        console.log('连接socket服务',userInfo);
         const socket = socket_io_client(`${config.HOST}/chat`,{
             // 实际使用中可以在这里传递参数
             query: {
-                token: userInfo.token
+                token: userInfo?.token
             },
             transports: ['websocket'],
         });

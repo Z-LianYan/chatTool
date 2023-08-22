@@ -73,17 +73,22 @@ const Login = (props:any) => {
       }
       // console.log('route------>>>', route);
       
-      const result = await userLogin(form_data);
+      const result:any = await userLogin(form_data);
       console.log('00000---000>>>',result);
       AppStore.setUserInfo(result);
+      if(result && result.token){
+        const sockitIo = SocketIoClient.getInstance(()=>{
+          if(route.params && route.params.toUrl){
+            props.navigation.replace(route.params.toUrl);
+            return;
+          }
+          props.navigation.replace('AppTabBar',{});
+        });
 
-      const sockitIo = SocketIoClient.getInstance(()=>{
-        if(route.params && route.params.toUrl){
-          props.navigation.replace(route.params.toUrl);
-          return;
-        }
-        props.navigation.replace('AppTabBar',{});
-      });
+        await AsyncStorage.setItem('chatToken',result.token);
+      }else{
+        Toast.message('服务端未返回token');
+      }
     }catch(err:any){
       console.log(err.message)
     }

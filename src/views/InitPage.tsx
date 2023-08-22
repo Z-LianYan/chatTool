@@ -47,18 +47,19 @@ const InitPage = ({AppStore,navigation,route}:any) => {
   let [userInfo,setUserInfo] = useState(null);
   const colorScheme = useColorScheme();
   useEffect(()=>{
-    getUserInfo();
+    
     let timer = setInterval(async () => {
       if(time<=0) {
         clearInterval(timer);
-        if(AppStore.userInfo) {
-          navigation.replace('AppTabBar')
-        }else{
-          // const chatToken = await AsyncStorage.getItem('chatToken');
-          navigation.replace('LoginPage',{
-            hidBackBtn:true
-          })
-        };
+        getUserInfo();
+        // if(AppStore.userInfo) {
+        //   navigation.replace('AppTabBar')
+        // }else{
+        //   // const chatToken = await AsyncStorage.getItem('chatToken');
+        //   navigation.replace('LoginPage',{
+        //     hidBackBtn:true
+        //   })
+        // };
       };
       time -= 1;
       setTime(time);
@@ -71,7 +72,15 @@ const InitPage = ({AppStore,navigation,route}:any) => {
   const  getUserInfo = useCallback(async ()=>{
     try{
       const result:any = await get_user_info();
+      console.log('result====>>',result);
       if(result) AppStore.setUserInfo(result);
+      if(result) {
+        navigation.replace('AppTabBar')
+      }else{
+        navigation.replace('LoginPage',{
+          hidBackBtn:true
+        })
+      };
     }catch(err:any){
       console.log(err.message)
     }
