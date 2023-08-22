@@ -77,15 +77,13 @@ const Login = (props:any) => {
       console.log('00000---000>>>',result);
       AppStore.setUserInfo(result);
 
-      const sockitIo = SocketIoClient.getInstance();
-      
-      
-
-      if(route.params && route.params.toUrl){
-        props.navigation.replace(route.params.toUrl);
-        return;
-      }
-      props.navigation.replace('AppTabBar',{});
+      const sockitIo = SocketIoClient.getInstance(()=>{
+        if(route.params && route.params.toUrl){
+          props.navigation.replace(route.params.toUrl);
+          return;
+        }
+        props.navigation.replace('AppTabBar',{});
+      });
     }catch(err:any){
       console.log(err.message)
     }

@@ -3,10 +3,15 @@ import config from './config';
 import store from './store/index';
 
 export default class SocketIoClient {
-    static getInstance(){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
+    abc(){
+        console.log('我是abc')
+    }
+    static getInstance(callBack){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
+    console.log('callBack===>>',callBack)
         if(!SocketIoClient.instance){
             SocketIoClient.instance = new SocketIoClient();
         }
+        SocketIoClient.callBack = callBack;
         return SocketIoClient.instance;
     }
 
@@ -14,11 +19,11 @@ export default class SocketIoClient {
         console.log('实例化会触发构造函数');
         this.connect();
     }
-
+    
     connect(){
         console.log('连接socket服务');
         const { userInfo } = store?.AppStore
-        const socket = socket_io_client(`${config.HOST}/test`,{
+        const socket = socket_io_client(`${config.HOST}/chat`,{
             // 实际使用中可以在这里传递参数
             query: {
                 token: userInfo.token
@@ -26,20 +31,23 @@ export default class SocketIoClient {
             transports: ['websocket'],
         });
         SocketIoClient.socketIo = socket;
-        socket.on('connect', () => {
+        socket.on('connect', (res) => {
             const id = socket.id;
           
-            console.log('#connect,', id);
-            console.log('#AppStore-----store', store.AppStore);
+            console.log('#connect,', id,res);
+            // console.log('#AppStore-----store', store.AppStore);
 
-
-          
+            SocketIoClient.callBack && SocketIoClient.callBack();
+            
             // 监听自身 id 以实现 p2p 通讯
             socket.on(id, (msg) => {
               console.log('#receive,', msg);
             });
         });
-          
+        
+        socket.on('res',(res)=>{
+            console.log('连接成功-----》〉》',res)
+        })
         // 系统事件
         socket.on('disconnect', (msg) => {
             console.log('#disconnect', msg);
@@ -52,9 +60,15 @@ export default class SocketIoClient {
         socket.on('error', () => {
             console.log('#error');
         });
+
+        
+
+        socket.on('emitEventError', (res) => {
+            console.log('#emitEventError',res);
+        });
     }
 
-    static getSocketIo(){
+    getSocketIo(){
         return SocketIoClient.socketIo;
     }
 }

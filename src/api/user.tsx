@@ -91,31 +91,10 @@ export function login_out(params?:any) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export function get_user_info(params?:any,text="") {
   return new Promise((resolve, reject) => {
     HttpUtils.post(Api.GET_USER_INFO, params, text).then((res:any) => {
-      console.log('res--->>',res)
+      console.log('res--->>会员信息',res)
       switch (res.error) {
         case 0:
           resolve(res.data);
@@ -127,6 +106,22 @@ export function get_user_info(params?:any,text="") {
     });
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

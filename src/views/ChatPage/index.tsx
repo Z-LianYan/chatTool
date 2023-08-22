@@ -40,6 +40,7 @@ const ChatPage = ({
   navigation,
 }:any) => {
   const sockitIo = SocketIoClient.getInstance();
+  
   const colorScheme = useColorScheme();
   // const navigationState = navigation.getState();
   // const routeName = navigationState.routeNames[navigationState.index]
@@ -77,7 +78,10 @@ const ChatPage = ({
     msg='1234567898765积分个懒人沙发就是浪费的时刻就放假睡懒觉饭都是废话lkl互粉啦放假啦大家福利都放假了就放辣椒来得及放辣椒的费拉达斯见风使舵了人家饿了人家了'
     hasNewMsg={true}
     avatar="https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png"/>
-    <Text>
+    <Text onPress={()=>{
+      sockitIo.getSocketIo().emit('server',{ a: AppStore?.userInfo?.user_name, c: [] });
+      // console.dir(sockitIo.getSocketIo());
+    }}>
       {
         AppStore?.userInfo?.user_name
       }
