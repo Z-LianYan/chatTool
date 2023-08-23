@@ -26,6 +26,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomListRow from '../../component/CustomListRow';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import SocketIoClient from '../../socketIo';
 
 // declare function setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): NodeJS.Timer;
 
@@ -107,16 +108,25 @@ const VerifyCodeLogin = (props:any) => {
         verify_code,
         type: 'verify_code'
       },'');
-      clearIntervalDis();
       
-      delete result.token
+      clearIntervalDis();
       props.AppStore.setUserInfo(result);
+      // delete result.token
+      if(result && result.token){
+        console.log('验证码登录=====》〉',result);
+        await AsyncStorage.setItem('token',result.token);
+        const sockitIo = SocketIoClient.getInstance(()=>{
+          if(route.params && route.params.toUrl){
+            props.navigation.replace(route.params.toUrl);
+            return;
+          }
+          props.navigation.replace('AppTabBar',{});
+        });
 
-      if(route.params && route.params.toUrl){
-        props.navigation.replace(route.params.toUrl);
-        return;
+        
+      }else{
+        Toast.message('服务端未返回token');
       }
-      props.navigation.replace('AppTabBar',{});
     }catch(err:any){
       clearIntervalDis();
       console.log(err.message)

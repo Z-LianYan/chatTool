@@ -107,15 +107,6 @@ function renderStackItems(){
 
 
 function StackNavigators(props:any){
-    // console.log('props----->>',props);
-    // const [token,setToken] = useState<string>();
-    // useEffect(()=>{
-    //     (async ()=>{
-    //         const _token:any = await AsyncStorage.getItem('chatToken');
-    //         setToken(_token)
-    //     })();
-    // },[token])
-    console.log('token=====>>hah111000-😂',props?.token);
     const { MyThemed } = props;
     let navigation:any = useNavigation();
     const colorScheme = useColorScheme();

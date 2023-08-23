@@ -48,7 +48,7 @@ const service = axios.create({
 export default service;
 service.interceptors.request.use(
   async (config:any) => {
-    config.headers['token'] = await AsyncStorage.getItem('chatToken')
+    config.headers['token'] = await AsyncStorage.getItem('token')
     return config;
   },
   (error) => {

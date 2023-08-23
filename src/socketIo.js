@@ -29,7 +29,7 @@ export default class SocketIoClient {
         const socket = socket_io_client(`${config.HOST}/chat`,{
             // 实际使用中可以在这里传递参数
             query: {
-                token: await AsyncStorage.getItem('chatToken')
+                token: await AsyncStorage.getItem('token')
             },
             transports: ['websocket'],
         });
