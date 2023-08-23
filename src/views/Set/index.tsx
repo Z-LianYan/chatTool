@@ -36,6 +36,7 @@ import CustomListRow from '../../component/CustomListRow';
 import NavigationBar from '../../component/NavigationBar';
 import { login_out } from "../../api/user";
 import MyCell from '../../component/MyCell';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -47,7 +48,6 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
   })
 
   async function onLoginOut() {
-
     Alert.alert(
       "您确定退出登录吗？",
       "",
@@ -65,7 +65,7 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
             hidBackBtn: true
           })
           // navigation.popToTop()
-          
+          await AsyncStorage.removeItem('chatToken');
         } }
       ]
     );

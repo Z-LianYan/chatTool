@@ -1,6 +1,7 @@
 import socket_io_client from "socket.io-client";
 import config from './config';
 import store from './store/index';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default class SocketIoClient {
     abc(){
@@ -10,8 +11,10 @@ export default class SocketIoClient {
     console.log('callBack===>>',callBack)
         if(!SocketIoClient.instance){
             SocketIoClient.instance = new SocketIoClient();
+            SocketIoClient.callBack = callBack;
+        }else{
+            callBack && callBack();
         }
-        SocketIoClient.callBack = callBack;
         return SocketIoClient.instance;
     }
 
@@ -20,13 +23,13 @@ export default class SocketIoClient {
         this.connect();
     }
     
-    connect(){
+    async connect(){
         const { userInfo } = store?.AppStore;
         console.log('连接socket服务',userInfo);
         const socket = socket_io_client(`${config.HOST}/chat`,{
             // 实际使用中可以在这里传递参数
             query: {
-                token: userInfo?.token
+                token: await AsyncStorage.getItem('chatToken')
             },
             transports: ['websocket'],
         });

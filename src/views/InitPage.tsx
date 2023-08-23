@@ -72,7 +72,7 @@ const InitPage = ({AppStore,navigation,route}:any) => {
   const  getUserInfo = useCallback(async ()=>{
     try{
       const result:any = await get_user_info();
-      console.log('result====>>',result);
+      console.log('result====>>init',result);
       if(result) AppStore.setUserInfo(result);
       if(result) {
         navigation.replace('AppTabBar')
@@ -82,7 +82,10 @@ const InitPage = ({AppStore,navigation,route}:any) => {
         })
       };
     }catch(err:any){
-      console.log(err.message)
+      console.log('error---init',err.message)
+      navigation.replace('LoginPage',{
+        hidBackBtn:true
+      })
     }
   },[]);
 

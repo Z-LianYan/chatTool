@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/core';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getHeaderTitle } from '@react-navigation/elements';
 import {Image,useColorScheme,TouchableHighlight,TouchableOpacity} from 'react-native';
-import { observer, inject } from 'mobx-react';
+import { observer, inject, PropTypes } from 'mobx-react';
 
 const Stack = createStackNavigator();
 import {
@@ -30,6 +30,7 @@ import VerifyCodeLogin from '../views/Login/VerifyCodeLogin';
 import RegisterPage from '../views/Register/index';
 import VersionPage from '../views/VersionPage/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { any } from 'prop-types';
 
 const routes=[
     { 
@@ -106,14 +107,15 @@ function renderStackItems(){
 
 
 function StackNavigators(props:any){
+    // console.log('props----->>',props);
     // const [token,setToken] = useState<string>();
     // useEffect(()=>{
     //     (async ()=>{
     //         const _token:any = await AsyncStorage.getItem('chatToken');
     //         setToken(_token)
     //     })();
-    // },[])
-    // console.log('token=====>>hah111000',token);
+    // },[token])
+    console.log('token=====>>hah111000-😂',props?.token);
     const { MyThemed } = props;
     let navigation:any = useNavigation();
     const colorScheme = useColorScheme();
@@ -164,11 +166,11 @@ function StackNavigators(props:any){
             // }
             headerBackTitle:' ',//返回键右侧的文字 置为 空，配置了此项 ，ios端显示，android不显示，不配置此项android端会默认显示screen name
         }}
-        initialRouteName={props?.AppStore?.userInfo?"AppTabBar":"InitPage"}
-        // initialRouteName={token?"AppTabBar":"InitPage"}
+        // initialRouteName={props?.AppStore?.userInfo?"AppTabBar":"InitPage"}
+        initialRouteName={props?.token?"AppTabBar":"InitPage"}
         >
         {renderStackItems()}
     </Stack.Navigator>
 }
-
 export default inject("AppStore","MyThemed")(observer(StackNavigators));
+

@@ -5,9 +5,10 @@
  * @format
  */
 
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -35,6 +36,9 @@ import {
 // console.log('DefaultTheme--->>',DefaultTheme)
 
 import NavigationContainerCom from './navigators/NavigationContainer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import SocketIoClient from './socketIo';
+import { get_user_info } from './api/user';
 
 // import socketIo from "socket.io-client";
 // import config from './config';
@@ -79,6 +83,37 @@ function App(): JSX.Element {
   // const navigation:any = useNavigation();
   const navigationRef = useNavigationContainerRef(); // You can also use a regular ref with `React.useRef()`
 
+  const [token,setToken] = useState<string>();
+  const [tokenComplete,setTokenComplete] = useState<boolean>(false);
+  useEffect(()=>{
+      (async ()=>{
+          const _token:any = await AsyncStorage.getItem('chatToken');
+          setToken(_token);
+          if(_token){
+            await getUserInfo();
+            const sockitIo = SocketIoClient.getInstance(()=>{
+            });
+          }
+          setTokenComplete(true);
+      })();
+  },[]);
+
+  const  getUserInfo = useCallback(async ()=>{
+    try{
+      const result:any = await get_user_info();
+      console.log('result====>>',Platform.OS,result);
+      if(result) {
+        store.AppStore.setUserInfo(result);
+      }else{
+        setToken('');
+      }
+    }catch(err:any){
+      console.log('----error',err.message);
+      setToken('');
+    }
+  },[]);
+
+  
   Theme.set({
     primaryColor: store.MyThemed[colorScheme||'light'].primaryColor,
 
@@ -127,7 +162,7 @@ function App(): JSX.Element {
           barStyle={colorScheme=='dark'?'light-content':'dark-content'}
           />
           <NavigationContainerCom>
-            <StackNavigators/>
+            {tokenComplete && <StackNavigators token={token}/>}
           </NavigationContainerCom>
         </TopView>
       </SafeAreaView>

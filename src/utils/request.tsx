@@ -12,6 +12,7 @@ import { useState } from 'react';
 import config from '../config/index';
 import { TopView, Toast,ModalIndicator, Theme } from '../component/teaset/index';
 import app from '../store/AppStore';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // let routerNavigation:any = null;
 let tip:any = null;
@@ -46,8 +47,8 @@ const service = axios.create({
 
 export default service;
 service.interceptors.request.use(
-  (config:any) => {
-    // config.headers['token'] = getToken()
+  async (config:any) => {
+    config.headers['token'] = await AsyncStorage.getItem('chatToken')
     return config;
   },
   (error) => {
