@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useLayoutEffect } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import { observable, action, makeAutoObservable,runInAction } from 'mobx';
@@ -15,7 +15,9 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   Text as Tt,
-  View as Vw
+  View as Vw,
+  Alert,
+  Dimensions
 } from 'react-native';
 
 import { 
@@ -28,8 +30,9 @@ import { View,Text } from '../../component/customThemed';
 import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
-import { NEW_FIREND } from '../../assets/image';
+import { ADD_CIR, NEW_FIREND } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
+import { Menu } from '../../component/teaset';
 // import { 
 //   View,
 //   Text
@@ -42,6 +45,44 @@ const ChatPage = ({
   const sockitIo = SocketIoClient.getInstance();
   
   const colorScheme = useColorScheme();
+
+  // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
+  // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft:'',
+      headerRight: ()=>{
+        return <Vw style={{paddingRight: 10}}>
+          <TouchableOpacity 
+          onPress={()=>{
+            console.log('123456');
+            // fromView.measureInWindow((x:number, y:number, width:number, height:number) => {
+              
+            // });
+            const width = Dimensions.get('window').width;
+            let items = [
+              { title: '添加朋友', 
+                icon: require('../../assets/image/addCir.png'), 
+                onPress: () => {
+                  console.log('Search')
+                  navigation.navigate('AddFriend')
+                }
+              },
+            ];
+            Menu.show({x: width-130, y: 0, width:100, height:100}, items);
+          }}>
+            <Image 
+            style={{
+              width: 25,height:25,
+              tintColor: MyThemed[colorScheme||'light'].ftCr
+            }} 
+            source={ADD_CIR}/>
+          </TouchableOpacity>
+          
+        </Vw>
+      }
+    });
+  });
   // const navigationState = navigation.getState();
   // const routeName = navigationState.routeNames[navigationState.index]
   useEffect(()=>{

@@ -31,6 +31,7 @@ import RegisterPage from '../views/Register/index';
 import VersionPage from '../views/VersionPage/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { any } from 'prop-types';
+import AddFriend from '../views/AddFriend';
 
 const routes=[
     { 
@@ -88,6 +89,15 @@ const routes=[
         options: {
             headerShown:true,
             title:'版本',
+        } 
+    },
+    ,
+    { 
+        component: AddFriend, 
+        name:"AddFriend",
+        options: {
+            headerShown:true,
+            title:'添加朋友',
         } 
     },
     
