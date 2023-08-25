@@ -42,7 +42,7 @@ import { QRCODE } from '../../assets/image';
 
 
 
-const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
+const SearchFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
     
   const colorScheme = useColorScheme();
 
@@ -57,9 +57,13 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
     stickyHeaderIndices={[]}
     onMomentumScrollEnd={(event:any)=>{}}>
       
-      <TouchableOpacity activeOpacity={0.6} style={styles.inputTO} onPress={()=>{
-        navigation.navigate('SearchFriend')
-      }}>
+      <NavigationBar 
+      onBack={()=>{
+        navigation.goBack()
+      }}
+      title={''}/>
+
+      <TouchableOpacity activeOpacity={0.6} style={styles.inputTO}>
         <View style={styles.inputWrapper}>
             <Text style={{
               ...styles.inputeText,
@@ -104,4 +108,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(AddFriend));
+export default inject("AppStore","MyThemed")(observer(SearchFriend));

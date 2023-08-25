@@ -32,6 +32,7 @@ import VersionPage from '../views/VersionPage/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { any } from 'prop-types';
 import AddFriend from '../views/AddFriend';
+import SearchFriend from '../views/SearchFriend';
 
 const routes=[
     { 
@@ -91,7 +92,6 @@ const routes=[
             title:'版本',
         } 
     },
-    ,
     { 
         component: AddFriend, 
         name:"AddFriend",
@@ -100,6 +100,14 @@ const routes=[
             title:'添加朋友',
         } 
     },
+    { 
+        component: SearchFriend, 
+        name: "SearchFriend",
+        options: {
+            headerShown:false,
+            title:'搜索朋友',
+        } 
+    }
     
 ]
 
