@@ -77,6 +77,7 @@ const Login = (props:any) => {
       console.log('00000---000>>>',result);
       AppStore.setUserInfo(result);
       if(result && result.token){
+        await AsyncStorage.setItem('token',result.token);
         const sockitIo = SocketIoClient.getInstance(()=>{
           if(route.params && route.params.toUrl){
             props.navigation.replace(route.params.toUrl);
@@ -84,13 +85,11 @@ const Login = (props:any) => {
           }
           props.navigation.replace('AppTabBar',{});
         });
-
-        await AsyncStorage.setItem('chatToken',result.token);
       }else{
         Toast.message('服务端未返回token');
       }
     }catch(err:any){
-      console.log(err.message)
+      console.log(err.message);
     }
     
   }

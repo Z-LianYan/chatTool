@@ -28,7 +28,6 @@ import { FRIENDCIRCLE } from '../../assets/image';
 //   Text
 // } from '../component/customThemed';
 const FindPage = (props:any) => {
-    console.log('props====>>>',props)
   const colorScheme = useColorScheme();
   const { MyThemed } = props;
 

@@ -51,15 +51,10 @@ const InitPage = ({AppStore,navigation,route}:any) => {
     let timer = setInterval(async () => {
       if(time<=0) {
         clearInterval(timer);
-        getUserInfo();
-        // if(AppStore.userInfo) {
-        //   navigation.replace('AppTabBar')
-        // }else{
-        //   // const chatToken = await AsyncStorage.getItem('chatToken');
-        //   navigation.replace('LoginPage',{
-        //     hidBackBtn:true
-        //   })
-        // };
+        // getUserInfo();
+        navigation.replace('LoginPage',{
+          hidBackBtn:true
+        })
       };
       time -= 1;
       setTime(time);
@@ -69,35 +64,29 @@ const InitPage = ({AppStore,navigation,route}:any) => {
     }
   },[]);
 
-  const  getUserInfo = useCallback(async ()=>{
-    try{
-      const result:any = await get_user_info();
-      console.log('result====>>init',result);
-      if(result) AppStore.setUserInfo(result);
-      if(result) {
-        navigation.replace('AppTabBar')
-      }else{
-        navigation.replace('LoginPage',{
-          hidBackBtn:true
-        })
-      };
-    }catch(err:any){
-      console.log('error---init',err.message)
-      navigation.replace('LoginPage',{
-        hidBackBtn:true
-      })
-    }
-  },[]);
-
-  // const getStorage = useCallback(async()=>{
-  //   let res:string|null = await AsyncStorage.getItem('locationInfo');
-  //   if(!res) return;
-  //   let _res:{city_id:number,city_name:string} = JSON.parse(res)
-  //   AppStore.setLocationInfo({
-  //     city_id: _res.city_id, //默认城市编码
-  //     city_name: _res.city_name, //默认城市广州
-  //   })
-  // },[])
+  // const  getUserInfo = useCallback(async ()=>{
+  //   const token = await AsyncStorage.getItem('token');
+  //   if(!token) return navigation.replace('LoginPage',{
+  //     hidBackBtn:true
+  //   });
+  //   try{
+  //     const result:any = await get_user_info();
+  //     console.log('result====>>init',result);
+  //     if(result) AppStore.setUserInfo(result);
+  //     if(result) {
+  //       navigation.replace('AppTabBar')
+  //     }else{
+  //       navigation.replace('LoginPage',{
+  //         hidBackBtn:true
+  //       })
+  //     };
+  //   }catch(err:any){
+  //     console.log('error---init',err.message)
+  //     navigation.replace('LoginPage',{
+  //       hidBackBtn:true
+  //     })
+  //   }
+  // },[]);
   
   return <View style={styles.container}>
     <Image style={{ 

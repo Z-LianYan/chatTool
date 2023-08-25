@@ -40,44 +40,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import SocketIoClient from './socketIo';
 import { get_user_info } from './api/user';
 
-// import socketIo from "socket.io-client";
-// import config from './config';
-
-// const socket = socketIo(`${config.HOST}/test`,{
-//   transports: ['websocket'],
-// });
-
-// socket.on('connect', () => {
-//   const id = socket.id;
-
-//   console.log('#connect,', id);
-
-//   // 监听自身 id 以实现 p2p 通讯
-//   socket.on(id, (msg) => {
-//     console.log('#receive,', msg);
-//   });
-// });
-
-// // 接收在线用户信息
-// socket.on('online', (msg) => {
-//   console.log('#online,', msg);
-// });
-
-// // 系统事件
-// socket.on('disconnect', (msg) => {
-//   console.log('#disconnect', msg);
-// });
-
-// socket.on('disconnecting', () => {
-//   console.log('#disconnecting');
-// });
-
-// socket.on('error', () => {
-//   console.log('#error');
-// });
-
-
-
 function App(): JSX.Element {
   const colorScheme = useColorScheme();
   // const navigation:any = useNavigation();
@@ -87,12 +49,11 @@ function App(): JSX.Element {
   const [tokenComplete,setTokenComplete] = useState<boolean>(false);
   useEffect(()=>{
       (async ()=>{
-          const _token:any = await AsyncStorage.getItem('chatToken');
-          setToken(_token);
+          const _token:any = await AsyncStorage.getItem('token');
           if(_token){
+            setToken(_token);
             await getUserInfo();
-            const sockitIo = SocketIoClient.getInstance(()=>{
-            });
+            const sockitIo = SocketIoClient.getInstance(()=>{});
           }
           setTokenComplete(true);
       })();
@@ -101,7 +62,6 @@ function App(): JSX.Element {
   const  getUserInfo = useCallback(async ()=>{
     try{
       const result:any = await get_user_info();
-      console.log('result====>>',Platform.OS,result);
       if(result) {
         store.AppStore.setUserInfo(result);
       }else{

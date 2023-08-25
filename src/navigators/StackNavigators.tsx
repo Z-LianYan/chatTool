@@ -31,6 +31,7 @@ import RegisterPage from '../views/Register/index';
 import VersionPage from '../views/VersionPage/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { any } from 'prop-types';
+import AddFriend from '../views/AddFriend';
 
 const routes=[
     { 
@@ -90,6 +91,15 @@ const routes=[
             title:'版本',
         } 
     },
+    ,
+    { 
+        component: AddFriend, 
+        name:"AddFriend",
+        options: {
+            headerShown:true,
+            title:'添加朋友',
+        } 
+    },
     
 ]
 
@@ -107,15 +117,6 @@ function renderStackItems(){
 
 
 function StackNavigators(props:any){
-    // console.log('props----->>',props);
-    // const [token,setToken] = useState<string>();
-    // useEffect(()=>{
-    //     (async ()=>{
-    //         const _token:any = await AsyncStorage.getItem('chatToken');
-    //         setToken(_token)
-    //     })();
-    // },[token])
-    console.log('token=====>>hah111000-😂',props?.token);
     const { MyThemed } = props;
     let navigation:any = useNavigation();
     const colorScheme = useColorScheme();

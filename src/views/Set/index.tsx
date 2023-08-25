@@ -65,7 +65,7 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
             hidBackBtn: true
           })
           // navigation.popToTop()
-          await AsyncStorage.removeItem('chatToken');
+          await AsyncStorage.removeItem('token');
         } }
       ]
     );
