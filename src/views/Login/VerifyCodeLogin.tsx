@@ -119,7 +119,7 @@ const VerifyCodeLogin = (props:any) => {
       props.navigation.replace('AppTabBar',{});
     }catch(err:any){
       clearIntervalDis();
-      console.log(err.message)
+      console.log(err.message);
     }
     
   }
