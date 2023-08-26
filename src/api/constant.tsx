@@ -10,6 +10,9 @@ export const REGISTER_USER = "/chat/register"; //注册
 export const LOGIN_OUT = "/chat/loginOut"; //注册
 export const GET_USER_INFO = "/chat/getUserInfo"; //获取用户信息
 export const GET_FRIENDS_LIST = "/chat/getFriendsList"; //获取通讯录
+export const  SEARCH_FRIENDS = "/chat/searchFriends"; //搜索好友
+
+
 
 
 

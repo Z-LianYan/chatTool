@@ -43,7 +43,6 @@ import PropTypes, { number } from 'prop-types';
 import { BACK_ICON } from './teaset/icons';
 
 
-import { get_film_hot } from '../api/film';
 type TypeProps = {
   title?:number|string|Element,
   style?:object,
@@ -98,7 +97,7 @@ const _NavigationBar = ({
       style={{
         flexDirection:'row',
         alignItems:'center',
-        backgroundColor:MyThemed[colorScheme||'light'].hdBg,
+        backgroundColor: backgroundColor?backgroundColor:MyThemed[colorScheme||'light'].hdBg,
       }}
       >
         <TouchableOpacity onPress={()=>{

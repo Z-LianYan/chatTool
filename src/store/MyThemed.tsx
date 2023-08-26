@@ -48,9 +48,9 @@ class MyThemed {
     btnPrimaryColor: primaryColorDark,// type=‘primary’ 背景颜色
     btnPrimaryTitleColor: '#fff',// type=‘primary’ title颜色
 
-    btnColor: primaryColorDark, // type=‘default’ 背景颜色
-    btnBorderColor: primaryColorDark,//  type=‘default’ 边框颜色
-    btnTitleColor: primaryColorDark,//  type=‘default’ title字体颜色
+    btnColor: 'transparent', // type=‘default’ 背景颜色
+    btnBorderColor: ftCrDark,//  type=‘default’ 边框颜色
+    btnTitleColor: ftCrDark,//  type=‘default’ title字体颜色
 
     btnSecondaryColor: secondaryColorDark, // type='secondary' 背景颜色
     btnSecondaryBorderColor: secondaryColorDark, //type='secondary' 边框颜色
@@ -89,9 +89,9 @@ class MyThemed {
     btnPrimaryColor: primaryColorLight,// type=‘primary’ 背景颜色
     btnPrimaryTitleColor: '#fff',
 
-    btnColor: primaryColorLight, // type=‘default’ 背景颜色
-    btnBorderColor: primaryColorLight,//  type=‘default’ 边框颜色
-    btnTitleColor: '#fff',//  type=‘default’ title字体颜色
+    btnColor: 'transparent', // type=‘default’ 背景颜色
+    btnBorderColor: ftCrLight,//  type=‘default’ 边框颜色
+    btnTitleColor: ftCrLight,//  type=‘default’ title字体颜色
 
     btnSecondaryColor: secondaryColorLight, // type='secondary' 背景颜色
     btnSecondaryBorderColor: secondaryColorLight, //type='secondary' 边框颜色

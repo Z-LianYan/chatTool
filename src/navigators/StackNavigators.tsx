@@ -32,7 +32,7 @@ import VersionPage from '../views/VersionPage/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { any } from 'prop-types';
 import AddFriend from '../views/AddFriend';
-import SearchFriend from '../views/SearchFriend';
+import AddUserInfo from '../views/AddUserInfo';
 
 const routes=[
     { 
@@ -101,18 +101,28 @@ const routes=[
         } 
     },
     { 
-        component: SearchFriend, 
-        name: "SearchFriend",
+        component: AddUserInfo, 
+        name: "AddUserInfo",
         options: {
-            headerShown:false,
-            title:'搜索朋友',
+            headerShown: false,
+            title: '',
+            headerStyle:{
+            }
         } 
     }
     
 ]
 
-function renderStackItems(){
+function renderStackItems(MyThemed:any){
     return routes.map((item:any)=>{
+        if(item.name==='AddUserInfo') item.options = {
+            ...item.options,
+            headerStyle:{
+                ...item.options.headerStyle,
+                backgroundColor: MyThemed?.ctBg,
+            }
+            
+        }
         return <Stack.Screen
             key={item.name} 
             name={item.name}
@@ -178,7 +188,7 @@ function StackNavigators(props:any){
         // initialRouteName={props?.AppStore?.userInfo?"AppTabBar":"InitPage"}
         initialRouteName={props?.token?"AppTabBar":"InitPage"}
         >
-        {renderStackItems()}
+        {renderStackItems(MyThemed[colorScheme||'light'])}
     </Stack.Navigator>
 }
 export default inject("AppStore","MyThemed")(observer(StackNavigators));

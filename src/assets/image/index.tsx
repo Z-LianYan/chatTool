@@ -20,3 +20,4 @@ export const FRIENDCIRCLE = require('./friendCircle.png');
 export const QRCODE = require('./qrCode.png');
 export const SETICON = require('./set.png');
 export const ADD_CIR = require('./addCir.png');
+export const ADD_USER = require('./add-user.png');

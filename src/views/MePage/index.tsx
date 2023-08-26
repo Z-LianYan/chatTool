@@ -28,6 +28,7 @@ import {
 } from '../../component/customThemed';
 const MePage = ({ 
   MyThemed,
+  AppStore,
   navigation
 }:any) => {
     
@@ -38,16 +39,17 @@ const MePage = ({
   return <ScrollView style={styles.container}>
     <View style={{
       ...styles.headContainer,
-      paddingTop: Platform.OS == 'ios'?10:80,
+      paddingTop: Platform.OS == 'ios'?30:80,
+      paddingBottom: 30
     }}>
       <View style={{flexDirection:'row',alignItems:'center'}}>
         <Image style={{
           ...styles.avatarImg,
         }} source={{uri:'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}}/>
         <View style={{flex:1,paddingHorizontal:10}}>
-          <Text style={{paddingBottom: 10,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold'}}>lend</Text>
+          <Text style={{paddingBottom: 10,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold'}}>{AppStore?.userInfo?.user_name}</Text>
           <View style={{flexDirection:'row'}}>
-            <Text style={{flex:1}}>微信号：1234567890</Text>
+            <Text style={{flex:1}}>微信号：{AppStore?.userInfo?.mobile_phone}</Text>
             <View style={{flexDirection:'row'}}>
               <Image 
               style={{

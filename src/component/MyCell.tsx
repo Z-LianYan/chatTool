@@ -59,7 +59,8 @@ const MyCell = ({
   avatarStyle={
     width: 34,
     height: 34
-  }
+  },
+  rightWrapperStyle = {}
 }:any) => {
     
   const colorScheme = useColorScheme();
@@ -67,11 +68,14 @@ const MyCell = ({
   useEffect(()=>{
   })
 
-  let rightWrapper = {}
+  let rightWrapper = {
+    ...rightWrapperStyle
+  }
   if(showBottomBorder) rightWrapper = {
     ...rightWrapper,
     borderBottomWidth: 0.3,
-    borderColor: MyThemed[colorScheme||'light'].ftCr2
+    borderColor: MyThemed[colorScheme||'light'].ftCr2,
+    ...rightWrapperStyle
   }
   
   return <View style={style}>

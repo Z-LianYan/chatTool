@@ -30,7 +30,7 @@ import { View,Text } from '../../component/customThemed';
 import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
-import { ADD_CIR, NEW_FIREND } from '../../assets/image';
+import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
 // import { 
@@ -62,7 +62,7 @@ const ChatPage = ({
             const width = Dimensions.get('window').width;
             let items = [
               { title: '添加朋友', 
-                icon: require('../../assets/image/addCir.png'), 
+                icon: ADD_USER, 
                 onPress: () => {
                   console.log('Search')
                   navigation.navigate('AddFriend')
