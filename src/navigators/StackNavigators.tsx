@@ -34,6 +34,7 @@ import { any } from 'prop-types';
 import AddFriend from '../views/AddFriend';
 import UserDetail from '../views/UserDetail';
 import SetRemarkLabel from '../views/SetRemarkLabel';
+import SetLabel from '../views/SetLabel';
 
 const routes=[
     { 
@@ -110,9 +111,20 @@ const routes=[
             headerStyle:{
             }
         } 
-    },{ 
+    },
+    { 
         component: SetRemarkLabel, 
         name: "SetRemarkLabel",
+        options: {
+            headerShown: false,
+            title: '',
+            headerStyle:{
+            }
+        } 
+    },
+    { 
+        component: SetLabel, 
+        name: "SetLabel",
         options: {
             headerShown: false,
             title: '',

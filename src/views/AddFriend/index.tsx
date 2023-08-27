@@ -166,11 +166,22 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
             </View>
           }
           {
-            keywords && !loadingComplete && <TouchableOpacity activeOpacity={0.6} onPress={()=>{
-              navigation.navigate('UserDetail',searchInfo);
-              setModalVisible(!modalVisible);
-              setLoadingComplete(false)
-              setKeywords('');
+            keywords && !loadingComplete && <TouchableOpacity activeOpacity={0.6} onPress={async()=>{
+              const result:any = await searchFriends({keywords});
+              console.log('result---->>',result);
+              if(result){
+                setSearchInfo(result);
+                console.log('result---->>123',result);
+                navigation.navigate({
+                  name: 'UserDetail',
+                  params:result
+                });
+                setModalVisible(!modalVisible);
+                setLoadingComplete(false)
+                setKeywords('');
+              }else{
+                setLoadingComplete(true)
+              }
             }}>
               <View style={{padding: 10,flexDirection: 'row',alignItems: 'center'}}>
                 <Image style={{

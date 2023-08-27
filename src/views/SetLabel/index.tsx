@@ -29,7 +29,7 @@ import {
 import { Button, Input } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const SetRemarkLabel = ({ 
+const SetLabel = ({ 
   MyThemed,
   AppStore,
   navigation,
@@ -39,75 +39,62 @@ const SetRemarkLabel = ({
   const colorScheme = useColorScheme();
   const { params } = route;
   const { userInfo } = AppStore;
-  const [formData,setFormData] = useState({
-    f_user_name_remark: '',
-    labels: ['朋友','同事'],
-    des: '描述'
-  })
+  const [labels,setLabels] = useState([
+    { label_name: '朋友', label_id: 1},
+    { label_name: '同事', label_id: 2},
+  ]);
+  const [selectLabels,setSelectLabels] = useState<any>([
+    { label_name: '朋友', label_id: 1,selected:true},
+    { label_name: '同事', label_id: 2},
+  ]);
   useEffect(()=>{
-  })
+  },[]);
   return <ScrollView style={{
     ...styles.container,
-    backgroundColor: MyThemed[colorScheme||'light'].ctBg
+    // backgroundColor: MyThemed[colorScheme||'light'].ctBg
   }}>
     <NavigationBar
     backgroundColor={MyThemed[colorScheme||'light'].ctBg}
     onBack={()=>{
       navigation.goBack()
     }}
-    title={''}
+    title={'从全部标签中添加'}
     rightView={<View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
-        await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
+        // await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
         console.log('123456')
       }}>保存</Button>
     </View>}/>
-    <View style={styles.contenWrapper}>
-      <Text style={styles.titleTxt}>设置备注和标签</Text>
-
-      <View style={styles.forWwrapper}>
-        <Text style={styles.labelTxt}>备注</Text>
-        <Input 
-        value={formData.f_user_name_remark}
-        placeholder="新的备注名"
-        style={{
-          ...styles.valueTxt,
-          backgroundColor: MyThemed[colorScheme||'light'].bg,
-          color: MyThemed[colorScheme||'light'].ftCr
-        }}
-        maxLength={16}
-        type='default' 
-        onChangeText={(val:string)=>{
-          setFormData({
-            ...formData,
-            f_user_name_remark: val
-          })
-        }}
-        onSubmitEditing={()=>{
-
-        }}></Input>
-      </View>
-      <View style={styles.forWwrapper}>
-        <Text style={styles.labelTxt}>标签</Text>
-        <TouchableOpacity 
-        style={{
-          ...styles.valueTxt,
-          backgroundColor: MyThemed[colorScheme||'light'].bg,
-          alignItems:'center',
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          paddingHorizontal: 12
-        }}
-        onPress={()=>{
-          navigation.navigate('SetLabel')
-        }}>
-          <Text 
+    <View style={{
+      ...styles.alreadySelectLabelContainer,
+      backgroundColor: MyThemed[colorScheme||'light'].ctBg
+    }}>
+      {
+        selectLabels.map((item:any,index:number)=>{
+          return <TouchableOpacity 
+          activeOpacity={0.6}
+          key={item.label_id+'selectLabel'}
           style={{
-            // paddingLeft: 12
-          }}>{formData.labels.length?formData.labels.join('，'):"添加标签"}</Text>
-          <Image style={styles.rightArrow} source={RIGHT_ARROW}/>
-        </TouchableOpacity>
-      </View>
+            ...styles.labelTxtWrapper,
+            backgroundColor: item.selected? MyThemed[colorScheme||'light'].primaryColor:'#cde9da',
+          }}
+          onPress={()=>{
+            console.log('index',index);
+            selectLabels[index].selected = true;
+            setSelectLabels(selectLabels);
+          }}>
+            <Text style={{
+              ...styles.labelTxt,
+              color: item.selected?'#fff':MyThemed[colorScheme||'light'].primaryColor,
+            }}>
+              {item.label_name} {item.selected?'x':''}
+            </Text>
+          </TouchableOpacity>
+        })
+      }
+    </View>
+    {/* <View style={styles.contenWrapper}>
+      
       <View style={styles.forWwrapper}>
         <Text style={styles.labelTxt}>描述</Text>
         <Input 
@@ -132,7 +119,7 @@ const SetRemarkLabel = ({
 
         }}></Input>
       </View>
-    </View>
+    </View> */}
   </ScrollView>
 };
 
@@ -140,31 +127,20 @@ const styles = StyleSheet.create({
   container:{
     flex:1,
   },
-  contenWrapper:{
-
+  alreadySelectLabelContainer:{
+    flexDirection: 'row',
+    paddingVertical: 20,
+    paddingHorizontal: 10
   },
-  titleTxt:{
-    textAlign: 'center',
-    height: 50,
-    lineHeight: 50,
-    fontWeight: 'bold',
-    fontSize: 18
-  },
-  forWwrapper:{
-    padding: 20,
+  labelTxtWrapper:{
+    paddingHorizontal: 15,
+    paddingTop: 5,
+    paddingBottom: 8,
+    borderRadius: 18,
+    marginRight: 10
   },
   labelTxt:{
-    marginBottom: 10,
-  },
-  valueTxt:{
-    borderWidth: 0,
-    height: 50,
-    borderRadius: 10,
-  },
-  rightArrow:{
-    width: 20,
-    height: 20
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(SetRemarkLabel));
+export default inject("AppStore","MyThemed")(observer(SetLabel));
