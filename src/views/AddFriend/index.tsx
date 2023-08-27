@@ -96,6 +96,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
 
 
       <Modal
+        style={{zIndex: 10}}
         animationType="fade"
         transparent={true}
         visible={modalVisible}
@@ -123,7 +124,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
               setKeywords(val);
             }}
             onSubmitEditing={async ()=>{
-
+              
               const result:any = await searchFriends({keywords});
               console.log('result---->>',result);
               
@@ -131,7 +132,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
                 setSearchInfo(result);
                 console.log('result---->>123',result);
                 navigation.navigate({
-                  name: 'AddUserInfo',
+                  name: 'UserDetail',
                   params:result
                 });
                 setModalVisible(!modalVisible);
@@ -166,7 +167,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
           }
           {
             keywords && !loadingComplete && <TouchableOpacity activeOpacity={0.6} onPress={()=>{
-              navigation.navigate('AddUserInfo',searchInfo);
+              navigation.navigate('UserDetail',searchInfo);
               setModalVisible(!modalVisible);
               setLoadingComplete(false)
               setKeywords('');

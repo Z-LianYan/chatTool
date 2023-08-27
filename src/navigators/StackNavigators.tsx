@@ -32,7 +32,8 @@ import VersionPage from '../views/VersionPage/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { any } from 'prop-types';
 import AddFriend from '../views/AddFriend';
-import AddUserInfo from '../views/AddUserInfo';
+import UserDetail from '../views/UserDetail';
+import SetRemarkLabel from '../views/SetRemarkLabel';
 
 const routes=[
     { 
@@ -101,8 +102,17 @@ const routes=[
         } 
     },
     { 
-        component: AddUserInfo, 
-        name: "AddUserInfo",
+        component: UserDetail, 
+        name: "UserDetail",
+        options: {
+            headerShown: false,
+            title: '',
+            headerStyle:{
+            }
+        } 
+    },{ 
+        component: SetRemarkLabel, 
+        name: "SetRemarkLabel",
         options: {
             headerShown: false,
             title: '',
@@ -115,14 +125,14 @@ const routes=[
 
 function renderStackItems(MyThemed:any){
     return routes.map((item:any)=>{
-        if(item.name==='AddUserInfo') item.options = {
-            ...item.options,
-            headerStyle:{
-                ...item.options.headerStyle,
-                backgroundColor: MyThemed?.ctBg,
-            }
+        // if(item.name==='UserDetail') item.options = {
+        //     ...item.options,
+        //     headerStyle:{
+        //         ...item.options.headerStyle,
+        //         backgroundColor: MyThemed?.ctBg,
+        //     }
             
-        }
+        // }
         return <Stack.Screen
             key={item.name} 
             name={item.name}

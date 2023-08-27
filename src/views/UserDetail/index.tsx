@@ -20,7 +20,7 @@ import {
   DefaultTheme, 
 } from '@react-navigation/native';
 // import { View } from '../../component/customThemed';
-import { FRIENDCIRCLE, QRCODE, RIGHT_ARROW, SETICON } from '../../assets/image';
+import { FRIENDCIRCLE, MAN_AVATAR, QRCODE, RIGHT_ARROW, SETICON, WOMAN_AVATAR } from '../../assets/image';
 import MyCell from '../../component/MyCell';
 import { 
   View,
@@ -28,7 +28,8 @@ import {
 } from '../../component/customThemed';
 import { Button } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
-const AddUserInfo = ({ 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const UserDetail = ({ 
   MyThemed,
   AppStore,
   navigation,
@@ -36,9 +37,17 @@ const AddUserInfo = ({
 }:any) => {
     
   const colorScheme = useColorScheme();
+  const { params } = route;
+  const { userInfo } = AppStore;
 
   useEffect(()=>{
-  })
+    const unsubscribe = navigation.addListener('state', async() => {
+      // 处理路由变化的逻辑
+      const info = await AsyncStorage.getItem('remarkLabel');
+      console.log('处理路由变化的逻辑',info)
+    });
+    return unsubscribe;
+  },[]);
   return <ScrollView style={styles.container}>
     <NavigationBar
     backgroundColor={MyThemed[colorScheme||'light'].ctBg}
@@ -54,13 +63,25 @@ const AddUserInfo = ({
       <View style={{flexDirection:'row',alignItems:'flex-start'}}>
         <Image style={{
           ...styles.avatarImg,
-        }} source={{uri:route?.params?.avatar}}/>
+        }} source={{uri:params?.avatar}}/>
         <View style={{flex:1,paddingLeft:30}}>
-          <Text style={{color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold',fontSize: 20}}>{route?.params?.isFriends?route?.params?.f_user_name_remark:route?.params?.user_name}</Text>
+          <Text style={{marginTop:5,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold',fontSize: 20}}>
+            <Text style={{paddingRight: 10}}>{params?.isFriends?params?.f_user_name_remark:params?.user_name}</Text>
+            <View style={{width:10}}></View>
+            {
+              <Image style={{
+                ...styles.manWomanAvatar,
+              }} source={params?.sex==1?MAN_AVATAR:WOMAN_AVATAR}/>
+            }
+          </Text>
           <View style={{flexDirection:'column'}}>
-            {route?.params?.user_name!=route?.params?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{route?.params?.user_name}</Text>}
-            <Text style={{flex:1,marginTop:5}}>微信号：{route?.params?.chat_no}</Text>
-            <Text style={{flex:1,marginTop:5}}>地区：{route?.params?.area}</Text>
+            {params?.isFriends && params?.user_name!=params?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{params?.user_name}</Text>}
+            {
+              (params?.isFriends || params.user_id===userInfo.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{params?.chat_no}</Text>
+            }
+            
+            <Text style={{flex:1,marginTop:5}}>地区：{params?.area}</Text>
+            
             
           </View>
         </View>
@@ -70,28 +91,29 @@ const AddUserInfo = ({
     <MyCell
     rightWrapperStyle={{paddingVertical: 20}}
     title='设置备注和标签' 
-    showBottomBorder={true}
+    showBottomBorder={params?.isFriends?true:false}
     showRightArrow={true}
-    onPress={()=>{}}
-    />
+    onPress={()=>{
+      navigation.navigate('SetRemarkLabel')
+    }}/>
     {
-      route?.params?.labels && <MyCell
+      params?.labels && <MyCell
         rightWrapperStyle={{paddingVertical: 20}}
         title='标签' 
         showBottomBorder={true}
         showRightArrow={true}
-        rightValue={route?.params?.labels?.join('，')}
+        rightValue={params?.labels?.join('，')}
         onPress={()=>{
           // navigation.navigate('Set')
       }}/>
     }
     {
-      route?.params?.des && <MyCell
+      params?.des && <MyCell
         rightWrapperStyle={{paddingVertical: 20}}
         title='描述' 
         showBottomBorder={false}
         showRightArrow={true}
-        rightValue={route?.params?.des}
+        rightValue={params?.des}
         onPress={()=>{
           // navigation.navigate('Set')
       }}/>
@@ -102,7 +124,7 @@ const AddUserInfo = ({
     title='来源' 
     showBottomBorder={false}
     showRightArrow={false}
-    rightValue="来自手机号搜索"
+    rightValue="来自手机号搜索"//来自账号搜索
     onPress={()=>{
       // navigation.navigate('Set')
     }}/>
@@ -110,7 +132,7 @@ const AddUserInfo = ({
     
 
     {
-      route?.params?.isFriends ?<Button
+      params?.isFriends || params.user_id===userInfo?.user_id ?<Button
         title={'发送消息'}
         type="default"
         disabled={false}
@@ -151,7 +173,10 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     borderRadius: 10,
-
+  },
+  manWomanAvatar:{
+    width: 16,
+    height: 16,
   },
   rightArrow:{
     width: 15,
@@ -159,4 +184,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(AddUserInfo));
+export default inject("AppStore","MyThemed")(observer(UserDetail));
