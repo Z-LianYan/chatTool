@@ -118,6 +118,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
             placeholder='账号手/机号' 
             value={keywords} 
             animated={true}
+            autoFocus={modalVisible}
             keyboardType="default"
             onChangeText={(val:string)=>{
               setLoadingComplete(false)

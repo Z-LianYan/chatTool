@@ -12,6 +12,7 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
+  View as Vw
 } from 'react-native';
 
 import { 
@@ -29,6 +30,8 @@ import {
 import { Button, Input } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { runInAction } from 'mobx';
+import AddEditLabel from './AddEditLabel';
 const SetLabel = ({ 
   MyThemed,
   AppStore,
@@ -39,14 +42,11 @@ const SetLabel = ({
   const colorScheme = useColorScheme();
   const { params } = route;
   const { userInfo } = AppStore;
-  const [labels,setLabels] = useState([
-    { label_name: '朋友', label_id: 1},
+  const [labels,setLabels] = useState<any>([
+    { label_name: '朋友', label_id: 11},
     { label_name: '同事', label_id: 2},
   ]);
-  const [selectLabels,setSelectLabels] = useState<any>([
-    { label_name: '朋友', label_id: 1,selected:true},
-    { label_name: '同事', label_id: 2},
-  ]);
+  const [selectLabels,setSelectLabels] = useState<any>([]);
   useEffect(()=>{
   },[]);
   return <ScrollView style={{
@@ -54,7 +54,7 @@ const SetLabel = ({
     // backgroundColor: MyThemed[colorScheme||'light'].ctBg
   }}>
     <NavigationBar
-    backgroundColor={MyThemed[colorScheme||'light'].ctBg}
+    backgroundColor={MyThemed[colorScheme||'light'].bg}
     onBack={()=>{
       navigation.goBack()
     }}
@@ -62,26 +62,34 @@ const SetLabel = ({
     rightView={<View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
         // await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
-        console.log('123456')
+        navigation.goBack();
       }}>保存</Button>
     </View>}/>
     <View style={{
       ...styles.alreadySelectLabelContainer,
-      backgroundColor: MyThemed[colorScheme||'light'].ctBg
+      backgroundColor: MyThemed[colorScheme||'light'].ctBg,
+      flexWrap: 'wrap'
     }}>
       {
         selectLabels.map((item:any,index:number)=>{
           return <TouchableOpacity 
           activeOpacity={0.6}
-          key={item.label_id+'selectLabel'}
+          key={item.label_id+'selectLabel'+Math.random()}
           style={{
             ...styles.labelTxtWrapper,
             backgroundColor: item.selected? MyThemed[colorScheme||'light'].primaryColor:'#cde9da',
           }}
           onPress={()=>{
-            console.log('index',index);
-            selectLabels[index].selected = true;
-            setSelectLabels(selectLabels);
+            let idx = selectLabels.findIndex((it:any)=>it.selected==true);
+            if(idx!==-1 && idx!==index)  delete selectLabels[idx].selected;
+            if(selectLabels[index].selected){
+              selectLabels.splice(index,1);
+            }else{
+              selectLabels[index].selected = true;
+            }
+            setSelectLabels(JSON.parse(JSON.stringify([
+              ...selectLabels
+            ])));
           }}>
             <Text style={{
               ...styles.labelTxt,
@@ -92,34 +100,65 @@ const SetLabel = ({
           </TouchableOpacity>
         })
       }
+      <Text style={{
+        ...styles.labelTxtWrapper,
+        color: MyThemed[colorScheme||'light'].ftCr2
+      }}>选择标签</Text>
     </View>
-    {/* <View style={styles.contenWrapper}>
-      
-      <View style={styles.forWwrapper}>
-        <Text style={styles.labelTxt}>描述</Text>
-        <Input 
-        multiline={true}
-        maxLength={255}
-        value={formData.des}
-        placeholder="添加文字"
-        style={{
-          ...styles.valueTxt,
-          backgroundColor: MyThemed[colorScheme||'light'].bg,
-          color: MyThemed[colorScheme||'light'].ftCr,
-          textAlignVertical: "top"
-        }}
-        type='default' 
-        onChangeText={(val:string)=>{
-          setFormData({
-            ...formData,
-            des: val
-          })
-        }}
-        onSubmitEditing={()=>{
 
-        }}></Input>
-      </View>
-    </View> */}
+    <Vw style={{flexDirection:'row',justifyContent:'space-between',paddingVertical: 20, paddingHorizontal: 10}}>
+      <Text>全部标签</Text>
+      {/* <Text onPress={()=>{
+        console.log('99999==>>')
+      }}>
+        编辑
+        <Image style={styles.rightArrow} source={RIGHT_ARROW}/>
+      </Text> */}
+    </Vw>
+
+    <Vw style={{
+      ...styles.alreadySelectLabelContainer,
+      flexWrap: 'wrap'
+    }}>
+      {
+        labels.map((item:any,index:number)=>{
+          return <TouchableOpacity 
+          activeOpacity={0.6}
+          key={item.label_id+'selectLabel'}
+          style={{
+            ...styles.labelTxtWrapper,
+            backgroundColor: selectLabels.some((it:any)=>it.label_id==item.label_id)? MyThemed[colorScheme||'light'].primaryColor:MyThemed[colorScheme||'light'].ctBg,
+          }}
+          onPress={()=>{
+            let idx = selectLabels.findIndex((it:any)=>item.label_id==it.label_id);
+            if(idx===-1){
+              selectLabels.push(item);
+            }else{
+              selectLabels.splice(idx,1);
+            }
+            setSelectLabels(JSON.parse(JSON.stringify([
+              ...selectLabels
+            ])));
+          }}>
+            <Text style={{
+              ...styles.labelTxt,
+              color: selectLabels.some((it:any)=>it.label_id==item.label_id)?'#fff':MyThemed[colorScheme||'light'].ftCr2,
+            }}>
+              {item.label_name}
+            </Text>
+          </TouchableOpacity>
+        })
+      }
+    </Vw>
+    <Button 
+    title="新建标签" 
+    type="default" 
+    style={{width: 100,height: 40,marginTop: 30,borderWidth: 0}}
+    onPress={()=>{
+      console.log('123456')
+    }}/>
+
+    <AddEditLabel/>
   </ScrollView>
 };
 
@@ -135,11 +174,16 @@ const styles = StyleSheet.create({
   labelTxtWrapper:{
     paddingHorizontal: 15,
     paddingTop: 5,
-    paddingBottom: 8,
+    paddingBottom: 5,
     borderRadius: 18,
-    marginRight: 10
+    marginRight: 10,
+    marginBottom: 10
   },
   labelTxt:{
+  },
+  rightArrow:{
+    width: 15,
+    height: 15,
   }
 });
 

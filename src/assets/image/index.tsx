@@ -23,3 +23,5 @@ export const ADD_CIR = require('./addCir.png');
 export const ADD_USER = require('./add-user.png');
 export const MAN_AVATAR = require('./man-avatar.png');
 export const WOMAN_AVATAR = require('./woman-avatar.png');
+
+export const CLOSE_CIRCLE_ICON = require('./close-circle.png');

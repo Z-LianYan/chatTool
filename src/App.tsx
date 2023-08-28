@@ -110,10 +110,11 @@ function App(): JSX.Element {
   });
 
   return <Provider {...store}>
-      <SafeAreaView style={{
+      {/* <SafeAreaView 
+      style={{
         flex:1, 
         backgroundColor: store.MyThemed[colorScheme||'light'].bg
-        }}>
+      }}> */}
         <TopView style={{flex:1}}>
           <StatusBar 
           hidden={false} 
@@ -125,7 +126,7 @@ function App(): JSX.Element {
             {tokenComplete && <StackNavigators token={token}/>}
           </NavigationContainerCom>
         </TopView>
-      </SafeAreaView>
+      {/* </SafeAreaView> */}
   </Provider>;
 }
 

@@ -29,6 +29,7 @@ import {
 import { Button, Input } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { runInAction } from 'mobx';
 const SetRemarkLabel = ({ 
   MyThemed,
   AppStore,
@@ -45,6 +46,9 @@ const SetRemarkLabel = ({
     des: '描述'
   })
   useEffect(()=>{
+    return ()=>{
+      
+    }
   })
   return <ScrollView style={{
     ...styles.container,

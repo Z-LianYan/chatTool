@@ -20,7 +20,9 @@ const secondaryColorLight = '#76c79d';
 
 const defaultTextColorDark = ftCrDark;
 const defaultTextColorLight = ftCrLight;
- 
+
+const bgDark = '#111111';
+const bgLight = '#ededed';
 
 class MyThemed {
   constructor() {
@@ -31,13 +33,13 @@ class MyThemed {
   mgDotCr='#fe514d'//有消息显示的小点颜色
   mgDotFtCr= '#ffffff'//有消息显示的小点字体颜色
   dark = {//深色模式
-    bg:'#111111',//屏幕背景底色
+    bg: bgDark,//屏幕背景底色
     tbBg:'#1e1e1e',//tabbar 背景色
     ctBg: '#181818',//内容背景颜色,
     ftCr: ftCrDark,//字体颜色
     ftCr2: ftCr2Dark,//字体颜色2
     ftCr3: ftCr3Dark,//朋友圈会员名称字体
-    hdBg: '#111111',//头部导航栏背景色
+    hdBg: bgDark,//头部导航栏背景色
     hdbrBmCr: '#ccc',//头部导航栏底部边框颜色 
 
     primaryColor: primaryColorDark,//主题色
@@ -70,15 +72,17 @@ class MyThemed {
     labelTextTitleColor: defaultTextColorDark,
     labelTextDetailColor: '#989898', 
     labelTextDangerColor: '#a94442',
+
+    safeAreaViewBg: bgDark, // ios 组件 SafeAreaView  背景色
   }
   light = {//高亮模式
-    bg:'#ededed',//屏幕背景底色
+    bg: bgLight,//屏幕背景底色
     tbBg:'#f7f7f7',//tabbar 背景色
     ctBg: '#ffffff',//内容背景颜色,
     ftCr: ftCrLight,//字体颜色
     ftCr2: ftCr2Light,//字体颜色2
     ftCr3: ftCr3Light,//朋友圈会员名称字体
-    hdBg: '#ededed',//头部导航栏背景色
+    hdBg: bgLight,//头部导航栏背景色
     hdbrBmCr: '#ccc',//头部导航栏底部边框颜色,
 
     primaryColor: primaryColorLight,//主题色
@@ -111,6 +115,8 @@ class MyThemed {
     labelTextTitleColor: defaultTextColorLight, 
     labelTextDetailColor: '#989898',
     labelTextDangerColor: '#a94442',
+
+    safeAreaViewBg: bgLight, // ios 组件 SafeAreaView  背景色
   }
 }
 const app = new MyThemed()
