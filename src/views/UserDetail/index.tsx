@@ -29,6 +29,7 @@ import {
 import { Button } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { searchFriends } from '../../api/friends';
 const UserDetail = ({ 
   MyThemed,
   AppStore,
@@ -39,12 +40,31 @@ const UserDetail = ({
   const colorScheme = useColorScheme();
   const { params } = route;
   const { userInfo } = AppStore;
+  const [remarkLabel,setRemarkLabel] = useState({
+    f_user_name_remark: '',
+    labels: [],
+    des: ''
+  });
 
+  const [user_info,set_user_info] = useState<any>({});
   useEffect(()=>{
     const unsubscribe = navigation.addListener('state', async() => {
       // 处理路由变化的逻辑
-      const info = await AsyncStorage.getItem('remarkLabel');
-      console.log('处理路由变化的逻辑',info)
+      // const info:any = await AsyncStorage.getItem('remarkLabel');
+      // const _info = JSON.parse(info);
+      // console.log('处理路由变化的逻辑');
+      // if(_info){
+      //   setRemarkLabel({
+      //     f_user_name_remark: _info?.f_user_name_remark,
+      //     labels: _info?.labels?_info?.labels:[],
+      //     des: _info.des
+      //   });
+      // }
+
+      const info:any = await searchFriends({keywords:params.keywords});
+      set_user_info({
+        ...info
+      });
     });
     return unsubscribe;
   },[]);
@@ -63,24 +83,24 @@ const UserDetail = ({
       <View style={{flexDirection:'row',alignItems:'flex-start'}}>
         <Image style={{
           ...styles.avatarImg,
-        }} source={{uri:params?.avatar}}/>
+        }} source={{uri:user_info?.avatar}}/>
         <View style={{flex:1,paddingLeft:30}}>
           <Text style={{marginTop:5,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold',fontSize: 20}}>
-            <Text style={{paddingRight: 10}}>{params?.isFriends?params?.f_user_name_remark:params?.user_name}</Text>
+            <Text style={{paddingRight: 10}}>{user_info?.f_user_name_remar||user_info?.user_name}</Text>
             <View style={{width:10}}></View>
             {
               <Image style={{
                 ...styles.manWomanAvatar,
-              }} source={params?.sex==1?MAN_AVATAR:WOMAN_AVATAR}/>
+              }} source={user_info?.sex==1?MAN_AVATAR:WOMAN_AVATAR}/>
             }
           </Text>
           <View style={{flexDirection:'column'}}>
-            {params?.isFriends && params?.user_name!=params?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{params?.user_name}</Text>}
+            {user_info?.isFriends && user_info?.user_name!=user_info?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{user_info?.user_name}</Text>}
             {
-              (params?.isFriends || params?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{params?.chat_no}</Text>
+              (user_info?.isFriends || user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{user_info?.chat_no}</Text>
             }
             
-            <Text style={{flex:1,marginTop:5}}>地区：{params?.area}</Text>
+            <Text style={{flex:1,marginTop:5}}>地区：{user_info?.area}</Text>
             
             
           </View>
@@ -88,34 +108,36 @@ const UserDetail = ({
       </View>
     </View>
 
-    <MyCell
-    rightWrapperStyle={{paddingVertical: 20}}
-    title='设置备注和标签' 
-    showBottomBorder={params?.isFriends?true:false}
-    showRightArrow={true}
-    onPress={()=>{
-      navigation.navigate('SetRemarkLabel')
-    }}/>
     {
-      params?.labels && <MyCell
+      (!user_info?.isFriends && user_info.user_id!=userInfo.user_id) && <MyCell
+      rightWrapperStyle={{paddingVertical: 20}}
+      title='设置备注和标签' 
+      showBottomBorder={user_info?.isFriends?true:false}
+      showRightArrow={true}
+      onPress={()=>{
+        navigation.navigate('SetRemarkLabel')
+      }}/>
+    }
+    {
+      user_info?.labels?.length ? <MyCell
         rightWrapperStyle={{paddingVertical: 20}}
         title='标签' 
         showBottomBorder={true}
         showRightArrow={true}
-        rightValue={params?.labels?.join('，')}
+        rightValue={Array.isArray(user_info?.labels) && user_info?.labels.map((item:any)=>item.label_name).join('，')}
         onPress={()=>{
-          // navigation.navigate('Set')
-      }}/>
+          navigation.navigate('SetRemarkLabel')
+      }}/>: null
     }
     {
-      params?.des && <MyCell
+      user_info?.des && <MyCell
         rightWrapperStyle={{paddingVertical: 20}}
         title='描述' 
         showBottomBorder={false}
         showRightArrow={true}
-        rightValue={params?.des}
+        rightValue={user_info?.des}
         onPress={()=>{
-          // navigation.navigate('Set')
+          navigation.navigate('SetRemarkLabel')
       }}/>
     }
     <MyCell
@@ -132,7 +154,7 @@ const UserDetail = ({
     
 
     {
-      params?.isFriends || params.user_id===userInfo?.user_id ?<Button
+      user_info?.isFriends || user_info.user_id===userInfo?.user_id ?<Button
         title={'发送消息'}
         type="default"
         disabled={false}

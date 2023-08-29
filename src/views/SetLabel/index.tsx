@@ -109,10 +109,13 @@ const SetLabel = ({
           </TouchableOpacity>
         })
       }
-      <Text style={{
-        ...styles.labelTxtWrapper,
-        color: MyThemed[colorScheme||'light'].ftCr2
-      }}>选择标签</Text>
+      
+      {
+        !selectLabels.length && <Text style={{
+          ...styles.labelTxtWrapper,
+          color: MyThemed[colorScheme||'light'].ftCr2
+        }}>选择标签</Text>
+      }
     </View>
 
     <Vw style={{flexDirection:'row',justifyContent:'space-between',paddingVertical: 20, paddingHorizontal: 10}}>
@@ -146,6 +149,7 @@ const SetLabel = ({
           onPress={()=>{
             const handlerSelectLabels = ()=>{
               let idx = selectLabels.findIndex((it:any)=>item.label_id==it.label_id);
+              console.log('idx=======>>',idx);
               if(idx===-1){
                 selectLabels.push(item);
               }else{

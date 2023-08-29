@@ -83,7 +83,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
         </View>
       </TouchableOpacity>
       <Text style={styles.inputBom}>
-        我的微信号：{AppStore?.userInfo?.mobile_phone}
+        我的微信号：{AppStore?.userInfo?.chat_no}
         <View style={{width: 20}}></View>
         <Image 
         style={{
@@ -134,7 +134,9 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
                 console.log('result---->>123',result);
                 navigation.navigate({
                   name: 'UserDetail',
-                  params:result
+                  params: {
+                    keywords
+                  }
                 });
                 setModalVisible(!modalVisible);
                 setLoadingComplete(false)
@@ -175,7 +177,9 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
                 console.log('result---->>123',result);
                 navigation.navigate({
                   name: 'UserDetail',
-                  params:result
+                  params:{
+                    keywords
+                  }
                 });
                 setModalVisible(!modalVisible);
                 setLoadingComplete(false)
