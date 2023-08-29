@@ -77,7 +77,7 @@ const UserDetail = ({
           <View style={{flexDirection:'column'}}>
             {params?.isFriends && params?.user_name!=params?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{params?.user_name}</Text>}
             {
-              (params?.isFriends || params.user_id===userInfo.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{params?.chat_no}</Text>
+              (params?.isFriends || params?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{params?.chat_no}</Text>
             }
             
             <Text style={{flex:1,marginTop:5}}>地区：{params?.area}</Text>

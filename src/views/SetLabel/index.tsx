@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useRef, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import {
@@ -12,7 +12,8 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
-  View as Vw
+  View as Vw,
+  Alert
 } from 'react-native';
 
 import { 
@@ -21,7 +22,7 @@ import {
   DefaultTheme, 
 } from '@react-navigation/native';
 // import { View } from '../../component/customThemed';
-import { FRIENDCIRCLE, MAN_AVATAR, QRCODE, RIGHT_ARROW, SETICON, WOMAN_AVATAR } from '../../assets/image';
+import { ADD_ICON, FRIENDCIRCLE, MAN_AVATAR, QRCODE, RIGHT_ARROW, SETICON, WOMAN_AVATAR } from '../../assets/image';
 import MyCell from '../../component/MyCell';
 import { 
   View,
@@ -32,6 +33,7 @@ import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
 import AddEditLabel from './AddEditLabel';
+import { delFriendsLabel, getFriendsLabelList } from '../../api/friendsLabel';
 const SetLabel = ({ 
   MyThemed,
   AppStore,
@@ -42,13 +44,20 @@ const SetLabel = ({
   const colorScheme = useColorScheme();
   const { params } = route;
   const { userInfo } = AppStore;
-  const [labels,setLabels] = useState<any>([
-    { label_name: '朋友', label_id: 11},
-    { label_name: '同事', label_id: 2},
-  ]);
+  const [labels,setLabels] = useState<any>([]);
   const [selectLabels,setSelectLabels] = useState<any>([]);
+  const addEditLabelRef:{current:any} = useRef();
   useEffect(()=>{
+    getLabelList();
   },[]);
+  const getLabelList = useCallback(async ()=>{
+    const result:any = await getFriendsLabelList({});
+    console.log('label---',result);
+    setLabels([
+      ...result.rows
+    ]);
+  },[])
+  
   return <ScrollView style={{
     ...styles.container,
     // backgroundColor: MyThemed[colorScheme||'light'].ctBg
@@ -93,7 +102,7 @@ const SetLabel = ({
           }}>
             <Text style={{
               ...styles.labelTxt,
-              color: item.selected?'#fff':MyThemed[colorScheme||'light'].primaryColor,
+              color: item.selected?'#fff': MyThemed[colorScheme||'light'].primaryColor,
             }}>
               {item.label_name} {item.selected?'x':''}
             </Text>
@@ -107,7 +116,7 @@ const SetLabel = ({
     </View>
 
     <Vw style={{flexDirection:'row',justifyContent:'space-between',paddingVertical: 20, paddingHorizontal: 10}}>
-      <Text>全部标签</Text>
+      <Text>全部标签<Text style={{fontSize: 10}}>(双击删除标签，长按编辑)</Text></Text>
       {/* <Text onPress={()=>{
         console.log('99999==>>')
       }}>
@@ -115,7 +124,12 @@ const SetLabel = ({
         <Image style={styles.rightArrow} source={RIGHT_ARROW}/>
       </Text> */}
     </Vw>
-
+    {
+      !labels.length && <Vw style={{}}>
+        <Text style={{height:100,lineHeight: 100,textAlign:'center',color: MyThemed[colorScheme||'light'].ftCr2}}>没有标签</Text>
+      </Vw>
+    }
+    
     <Vw style={{
       ...styles.alreadySelectLabelContainer,
       flexWrap: 'wrap'
@@ -130,16 +144,51 @@ const SetLabel = ({
             backgroundColor: selectLabels.some((it:any)=>it.label_id==item.label_id)? MyThemed[colorScheme||'light'].primaryColor:MyThemed[colorScheme||'light'].ctBg,
           }}
           onPress={()=>{
-            let idx = selectLabels.findIndex((it:any)=>item.label_id==it.label_id);
-            if(idx===-1){
-              selectLabels.push(item);
-            }else{
-              selectLabels.splice(idx,1);
+            const handlerSelectLabels = ()=>{
+              let idx = selectLabels.findIndex((it:any)=>item.label_id==it.label_id);
+              if(idx===-1){
+                selectLabels.push(item);
+              }else{
+                selectLabels.splice(idx,1);
+              };
+              setSelectLabels(JSON.parse(JSON.stringify([
+                ...selectLabels
+              ])));
+              (this as any).isTimer = '';
             }
-            setSelectLabels(JSON.parse(JSON.stringify([
-              ...selectLabels
-            ])));
-          }}>
+            if(!(this as any).isTimer){
+              (this as any).timer = setTimeout(() => {
+                handlerSelectLabels();
+              }, 300);
+              (this as any).isTimer = 'duble';
+            }else{
+              clearTimeout((this as any).timer);
+              (this as any).isTimer = '';
+              Alert.alert(
+                `你确定删除"${item.label_name}"标签吗？`,
+                "",
+                [
+                  {
+                    text: "取消",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "确定", onPress: async () => {
+                    await delFriendsLabel({label_id:item.label_id});
+                    await getLabelList();
+                    handlerSelectLabels();
+                  }}
+                ]
+              );
+            }
+
+          }}
+          onLongPress={()=>{
+            addEditLabelRef?.current.open(async ()=>{
+              await getLabelList()
+            },item,'edit');
+          }}
+          >
             <Text style={{
               ...styles.labelTxt,
               color: selectLabels.some((it:any)=>it.label_id==item.label_id)?'#fff':MyThemed[colorScheme||'light'].ftCr2,
@@ -150,15 +199,33 @@ const SetLabel = ({
         })
       }
     </Vw>
-    <Button 
-    title="新建标签" 
-    type="default" 
-    style={{width: 100,height: 40,marginTop: 30,borderWidth: 0}}
-    onPress={()=>{
-      console.log('123456')
-    }}/>
+    <Vw style={{
+      ...styles.alreadySelectLabelContainer,
+    }}>
+      <Button 
+      title={<Text style={{
+        color: MyThemed[colorScheme||'light'].ftCr2,
+      }}>
+        <Image 
+        style={{
+          width: 14,
+          height: 14,
+          tintColor: MyThemed[colorScheme||'light'].ftCr2
+        }} 
+        source={ADD_ICON}/>
+        新建标签
+      </Text>} 
+      type="default" 
+      style={{width: 100,height: 40,marginTop: 30,borderRadius: 20,borderColor: MyThemed[colorScheme||'light'].ftCr2}}
+      onPress={()=>{
+        addEditLabelRef?.current.open(async ()=>{
+          await getLabelList()
+        });
+      }}/>
+    </Vw>
+    
 
-    <AddEditLabel/>
+    <AddEditLabel ref={addEditLabelRef}/>
   </ScrollView>
 };
 

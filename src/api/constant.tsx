@@ -11,6 +11,10 @@ export const LOGIN_OUT = "/chat/loginOut"; //注册
 export const GET_USER_INFO = "/chat/getUserInfo"; //获取用户信息
 export const GET_FRIENDS_LIST = "/chat/getFriendsList"; //获取通讯录
 export const  SEARCH_FRIENDS = "/chat/searchFriends"; //搜索好友
+export const  GET_FRIENDS_LABEL_LIST = "/chat/friendsLabel/getList"; //获取标签列表
+export const  ADD_FRIENDS_LABEL = "/chat/friendsLabel/add"; //添加标签
+export const  EDIT_FRIENDS_LABEL = "/chat/friendsLabel/edit"; //编辑标签
+export const  DEL_FRIENDS_LABEL = "/chat/friendsLabel/del"; //删除标签
 
 
 
