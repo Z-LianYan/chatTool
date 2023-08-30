@@ -135,7 +135,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
                 navigation.navigate({
                   name: 'UserDetail',
                   params: {
-                    keywords
+                    userInfo: result,
                   }
                 });
                 setModalVisible(!modalVisible);
@@ -177,8 +177,8 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
                 console.log('result---->>123',result);
                 navigation.navigate({
                   name: 'UserDetail',
-                  params:{
-                    keywords
+                  params: {
+                    userInfo: result,
                   }
                 });
                 setModalVisible(!modalVisible);

@@ -40,30 +40,33 @@ const UserDetail = ({
   const colorScheme = useColorScheme();
   const { params } = route;
   const { userInfo } = AppStore;
-  const [remarkLabel,setRemarkLabel] = useState({
-    f_user_name_remark: '',
-    labels: [],
-    des: ''
-  });
+  // const [remarkLabel,setRemarkLabel] = useState({
+  //   f_user_name_remark: '',
+  //   labels: [],
+  //   des: ''
+  // });
 
-  const [user_info,set_user_info] = useState<any>({});
+  const [search_user_info,set_search_user_info] = useState<any>({});
   useEffect(()=>{
+    
     const unsubscribe = navigation.addListener('state', async() => {
       // 处理路由变化的逻辑
-      // const info:any = await AsyncStorage.getItem('remarkLabel');
-      // const _info = JSON.parse(info);
-      // console.log('处理路由变化的逻辑');
-      // if(_info){
-      //   setRemarkLabel({
-      //     f_user_name_remark: _info?.f_user_name_remark,
-      //     labels: _info?.labels?_info?.labels:[],
-      //     des: _info.des
-      //   });
-      // }
-
-      const info:any = await searchFriends({keywords:params.keywords});
-      set_user_info({
-        ...info
+      let info:any = await AsyncStorage.getItem('remarkLabel');
+      info = JSON.parse(info)
+      const user_info = {
+        ...params.userInfo
+      }
+      if(!params?.userInfo?.f_user_name_remark && info && info[params?.userInfo?.user_id]){
+        user_info.f_user_name_remark = info[params?.userInfo?.user_id].f_user_name_remark;
+      }
+      if(!params?.userInfo?.labels && info && info[params?.userInfo?.user_id]){
+        user_info.labels = info[params?.userInfo?.user_id].labels ? info[params?.userInfo?.user_id].labels:[];
+      }
+      if(!params?.userInfo?.des && info && info[params?.userInfo?.user_id]){
+        user_info.des = info[params?.userInfo?.user_id].des;
+      }
+      set_search_user_info({
+        ...user_info
       });
     });
     return unsubscribe;
@@ -83,24 +86,24 @@ const UserDetail = ({
       <View style={{flexDirection:'row',alignItems:'flex-start'}}>
         <Image style={{
           ...styles.avatarImg,
-        }} source={{uri:user_info?.avatar}}/>
+        }} source={{uri:search_user_info?.avatar}}/>
         <View style={{flex:1,paddingLeft:30}}>
           <Text style={{marginTop:5,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold',fontSize: 20}}>
-            <Text style={{paddingRight: 10}}>{user_info?.f_user_name_remar||user_info?.user_name}</Text>
+            <Text style={{paddingRight: 10}}>{search_user_info?.f_user_name_remark||search_user_info?.user_name}</Text>
             <View style={{width:10}}></View>
             {
               <Image style={{
                 ...styles.manWomanAvatar,
-              }} source={user_info?.sex==1?MAN_AVATAR:WOMAN_AVATAR}/>
+              }} source={search_user_info?.sex==1?MAN_AVATAR:WOMAN_AVATAR}/>
             }
           </Text>
           <View style={{flexDirection:'column'}}>
-            {user_info?.isFriends && user_info?.user_name!=user_info?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{user_info?.user_name}</Text>}
+            {search_user_info?.isFriends && search_user_info?.user_name!=search_user_info?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{search_user_info?.user_name}</Text>}
             {
-              (user_info?.isFriends || user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{user_info?.chat_no}</Text>
+              (search_user_info?.isFriends || search_user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{search_user_info?.chat_no}</Text>
             }
             
-            <Text style={{flex:1,marginTop:5}}>地区：{user_info?.area}</Text>
+            <Text style={{flex:1,marginTop:5}}>地区：{search_user_info?.area}</Text>
             
             
           </View>
@@ -109,35 +112,41 @@ const UserDetail = ({
     </View>
 
     {
-      (!user_info?.isFriends && user_info.user_id!=userInfo.user_id) && <MyCell
+      (!search_user_info?.isFriends && search_user_info?.user_id!=userInfo?.user_id) && <MyCell
       rightWrapperStyle={{paddingVertical: 20}}
       title='设置备注和标签' 
-      showBottomBorder={user_info?.isFriends?true:false}
+      showBottomBorder={search_user_info?.isFriends?true:false}
       showRightArrow={true}
       onPress={()=>{
-        navigation.navigate('SetRemarkLabel')
+        navigation.navigate('SetRemarkLabel',{
+          search_user_id: search_user_info.user_id
+        })
       }}/>
     }
     {
-      user_info?.labels?.length ? <MyCell
+      search_user_info?.labels?.length ? <MyCell
         rightWrapperStyle={{paddingVertical: 20}}
         title='标签' 
         showBottomBorder={true}
         showRightArrow={true}
-        rightValue={Array.isArray(user_info?.labels) && user_info?.labels.map((item:any)=>item.label_name).join('，')}
+        rightValue={Array.isArray(search_user_info?.labels) && search_user_info?.labels.map((item:any)=>item.label_name).join('，')}
         onPress={()=>{
-          navigation.navigate('SetRemarkLabel')
+          navigation.navigate('SetRemarkLabel',{
+            search_user_id: search_user_info.user_id
+          })
       }}/>: null
     }
     {
-      user_info?.des && <MyCell
+      search_user_info?.des && <MyCell
         rightWrapperStyle={{paddingVertical: 20}}
         title='描述' 
         showBottomBorder={false}
         showRightArrow={true}
-        rightValue={user_info?.des}
+        rightValue={search_user_info?.des}
         onPress={()=>{
-          navigation.navigate('SetRemarkLabel')
+          navigation.navigate('SetRemarkLabel',{
+            search_user_id: search_user_info.user_id
+          });
       }}/>
     }
     <MyCell
@@ -154,7 +163,7 @@ const UserDetail = ({
     
 
     {
-      user_info?.isFriends || user_info.user_id===userInfo?.user_id ?<Button
+      search_user_info?.isFriends || search_user_info.user_id===userInfo?.user_id ?<Button
         title={'发送消息'}
         type="default"
         disabled={false}

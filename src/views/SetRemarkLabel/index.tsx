@@ -39,17 +39,31 @@ const SetRemarkLabel = ({
     
   const colorScheme = useColorScheme();
   const { params } = route;
+  const { search_user_id } = params;
   const { userInfo } = AppStore;
-  const [formData,setFormData] = useState({
-    f_user_name_remark: '',
-    labels: ['朋友','同事'],
-    des: '描述'
-  })
+  const [formData,setFormData] = useState({})
+  // {
+  //   f_user_name_remark: '',
+  //   labels: ['朋友','同事'],
+  //   des: '描述'
+  // }
   useEffect(()=>{
-    return ()=>{
-      
-    }
-  })
+
+    const unsubscribe = navigation.addListener('state', async() => {
+      // 处理路由变化的逻辑
+      let info:any = await AsyncStorage.getItem('remarkLabel');
+      info = JSON.parse(info);
+      formData[search_user_id] = {
+        f_user_name_remark: info && info[search_user_id]?.f_user_name_remark,
+        labels: (info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[],
+        des: info && info[search_user_id]?.des,
+      };
+      setFormData({
+        ...formData
+      })
+    });
+    return unsubscribe;
+  },[]);
   return <ScrollView style={{
     ...styles.container,
     backgroundColor: MyThemed[colorScheme||'light'].ctBg
@@ -63,7 +77,7 @@ const SetRemarkLabel = ({
     rightView={<View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
         await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
-        console.log('123456')
+        navigation.goBack();
       }}>保存</Button>
     </View>}/>
     <View style={styles.contenWrapper}>
@@ -72,7 +86,7 @@ const SetRemarkLabel = ({
       <View style={styles.forWwrapper}>
         <Text style={styles.labelTxt}>备注</Text>
         <Input 
-        value={formData.f_user_name_remark}
+        value={formData[search_user_id]?.f_user_name_remark}
         placeholder="新的备注名"
         style={{
           ...styles.valueTxt,
@@ -82,9 +96,12 @@ const SetRemarkLabel = ({
         maxLength={16}
         type='default' 
         onChangeText={(val:string)=>{
+          formData[search_user_id] =  {
+            ...formData[search_user_id],
+            f_user_name_remark:val
+          }
           setFormData({
             ...formData,
-            f_user_name_remark: val
           })
         }}
         onSubmitEditing={()=>{
@@ -103,12 +120,14 @@ const SetRemarkLabel = ({
           paddingHorizontal: 12
         }}
         onPress={()=>{
-          navigation.navigate('SetLabel')
+          navigation.navigate('SetLabel',{
+            search_user_id
+          })
         }}>
           <Text 
           style={{
             // paddingLeft: 12
-          }}>{formData.labels.length?formData.labels.join('，'):"添加标签"}</Text>
+          }}>{formData[search_user_id]?.labels?.length?formData[search_user_id]?.labels?.map((item:any)=>item.label_name).join('，'):"添加标签"}</Text>
           <Image style={styles.rightArrow} source={RIGHT_ARROW}/>
         </TouchableOpacity>
       </View>
@@ -117,7 +136,7 @@ const SetRemarkLabel = ({
         <Input 
         multiline={true}
         maxLength={255}
-        value={formData.des}
+        value={formData[search_user_id]?.des}
         placeholder="添加文字"
         style={{
           ...styles.valueTxt,
@@ -127,10 +146,13 @@ const SetRemarkLabel = ({
         }}
         type='default' 
         onChangeText={(val:string)=>{
+          formData[search_user_id] = {
+            ...formData[search_user_id],
+            des: val,
+          }
           setFormData({
-            ...formData,
-            des: val
-          })
+            ...formData
+          });
         }}
         onSubmitEditing={()=>{
 

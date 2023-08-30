@@ -43,12 +43,29 @@ const SetLabel = ({
     
   const colorScheme = useColorScheme();
   const { params } = route;
+  const { search_user_id } = params;
   const { userInfo } = AppStore;
   const [labels,setLabels] = useState<any>([]);
   const [selectLabels,setSelectLabels] = useState<any>([]);
   const addEditLabelRef:{current:any} = useRef();
+  const [formData,setFormData] = useState({})
   useEffect(()=>{
     getLabelList();
+    const unsubscribe = navigation.addListener('state', async() => {
+      // 处理路由变化的逻辑
+      let info:any = await AsyncStorage.getItem('remarkLabel');
+      info = JSON.parse(info)
+      formData[search_user_id] = {
+        f_user_name_remark: info && info[search_user_id]?.f_user_name_remark,
+        labels: (info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[],
+        des: info && info[search_user_id]?.des,
+      };
+      setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
+      setFormData({
+        ...formData
+      })
+    });
+    return unsubscribe;
   },[]);
   const getLabelList = useCallback(async ()=>{
     const result:any = await getFriendsLabelList({});
@@ -70,7 +87,11 @@ const SetLabel = ({
     title={'从全部标签中添加'}
     rightView={<View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
-        // await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
+        formData[search_user_id] = {
+          ...formData[search_user_id],
+          labels: selectLabels,
+        }
+        await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
         navigation.goBack();
       }}>保存</Button>
     </View>}/>
