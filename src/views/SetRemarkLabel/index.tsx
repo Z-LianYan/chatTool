@@ -39,14 +39,15 @@ const SetRemarkLabel = ({
     
   const colorScheme = useColorScheme();
   const { params } = route;
-  const { search_user_id } = params;
+  const { search_user_id,search_user_info } = params;
   const { userInfo } = AppStore;
   const [formData,setFormData] = useState({})
   // {
   //   f_user_name_remark: '',
-  //   labels: ['朋友','同事'],
+  //   labels: [{label_id:'',label_name:''}],
   //   des: '描述'
   // }
+  console.log('search_user_info------->>search_user_info',search_user_info)
   useEffect(()=>{
 
     const unsubscribe = navigation.addListener('state', async() => {
@@ -54,9 +55,9 @@ const SetRemarkLabel = ({
       let info:any = await AsyncStorage.getItem('remarkLabel');
       info = JSON.parse(info);
       formData[search_user_id] = {
-        f_user_name_remark: info && info[search_user_id]?.f_user_name_remark,
-        labels: (info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[],
-        des: info && info[search_user_id]?.des,
+        f_user_name_remark: search_user_info?.isFriends ? search_user_info?.f_user_name_remark:info && info[search_user_id]?.f_user_name_remark,
+        labels: search_user_info?.isFriends ? search_user_info?.labels:(info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[],
+        des: search_user_info?.isFriends ? search_user_info?.des : info && info[search_user_id]?.des,
       };
       setFormData({
         ...formData

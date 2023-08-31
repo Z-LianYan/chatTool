@@ -45,6 +45,7 @@ const UserDetail = ({
   //   labels: [],
   //   des: ''
   // });
+  console.log('navigation========>>',navigation)
 
   const [search_user_info,set_search_user_info] = useState<any>({});
   useEffect(()=>{
@@ -112,14 +113,15 @@ const UserDetail = ({
     </View>
 
     {
-      (!search_user_info?.isFriends && search_user_info?.user_id!=userInfo?.user_id) && <MyCell
+      (search_user_info?.user_id!=userInfo?.user_id) && <MyCell
       rightWrapperStyle={{paddingVertical: 20}}
       title='设置备注和标签' 
       showBottomBorder={search_user_info?.isFriends?true:false}
       showRightArrow={true}
       onPress={()=>{
         navigation.navigate('SetRemarkLabel',{
-          search_user_id: search_user_info.user_id
+          search_user_id: search_user_info.user_id,
+          search_user_info: search_user_info
         })
       }}/>
     }
@@ -132,7 +134,8 @@ const UserDetail = ({
         rightValue={Array.isArray(search_user_info?.labels) && search_user_info?.labels.map((item:any)=>item.label_name).join('，')}
         onPress={()=>{
           navigation.navigate('SetRemarkLabel',{
-            search_user_id: search_user_info.user_id
+            search_user_id: search_user_info.user_id,
+            search_user_info: search_user_info
           })
       }}/>: null
     }
@@ -145,7 +148,8 @@ const UserDetail = ({
         rightValue={search_user_info?.des}
         onPress={()=>{
           navigation.navigate('SetRemarkLabel',{
-            search_user_id: search_user_info.user_id
+            search_user_id: search_user_info.user_id,
+            search_user_info: search_user_info
           });
       }}/>
     }
