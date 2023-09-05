@@ -56,33 +56,27 @@ const SetLabel = ({
     
     (async function(){
       await getLabelList();
-
+    })()
+    const unsubscribe = navigation.addListener('state', async() => {
+      // 处理路由变化的逻辑
       let info:any = await AsyncStorage.getItem('remarkLabel');
       info = JSON.parse(info);
+      // setFormData({
+      //   ...info
+      // })
       formData[search_user_id] = {
         labels: search_user_info.labels||((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[]),
+        f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
+        des: search_user_info?.des || (info && info[search_user_id]?.des),
       };
+      
       // setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
-      setSelectLabels(formData[search_user_id]?.labels ? formData[search_user_id]?.labels:[])
+      setSelectLabels(formData[search_user_id]?.labels ? JSON.parse(JSON.stringify(formData[search_user_id]?.labels)):[])
       setFormData({
         ...formData
       })
-    })()
-    // const unsubscribe = navigation.addListener('state', async() => {
-    //   // 处理路由变化的逻辑
-    //   let info:any = await AsyncStorage.getItem('remarkLabel');
-    //   info = JSON.parse(info)
-    //   formData[search_user_id] = {
-    //     f_user_name_remark: info && info[search_user_id]?.f_user_name_remark,
-    //     labels: (info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[],
-    //     des: info && info[search_user_id]?.des,
-    //   };
-    //   setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
-    //   setFormData({
-    //     ...formData
-    //   })
-    // });
-    // return unsubscribe;
+    });
+    return unsubscribe;
   },[route?.params?.search_user_info]);
   const getLabelList = useCallback(async ()=>{
     const result:any = await getFriendsLabelList({});
@@ -104,8 +98,10 @@ const SetLabel = ({
     title={'从全部标签中添加'}
     rightView={<View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
-        formData[search_user_id] = {
-          ...formData[search_user_id],
+        let info:any = await AsyncStorage.getItem('remarkLabel');
+        info = JSON.parse(info);
+        info[search_user_id] = {
+          ...info[search_user_id],
           labels: selectLabels,
         }
         if(search_user_info?.isFriends){
@@ -114,14 +110,19 @@ const SetLabel = ({
             friends_id: search_user_info?.friends_id
           });
         }else{
-          await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
+          await AsyncStorage.setItem('remarkLabel',JSON.stringify(info));
+        }
+        info[search_user_id] = {
+          ...info[search_user_id],
+          des: formData[search_user_id].des,
+          f_user_name_remark: formData[search_user_id].f_user_name_remark,
         }
         navigation.navigate({//向上一个页面传递参数
           name: 'SetRemarkLabel',
           params:{
             search_user_info: {
               ...search_user_info,
-              ...formData[search_user_id],
+              ...info[search_user_id],
             },
           },
           merge: true,

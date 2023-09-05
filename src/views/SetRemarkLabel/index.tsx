@@ -163,8 +163,17 @@ const SetRemarkLabel = ({
           paddingHorizontal: 12
         }}
         onPress={()=>{
+          // console.log(search_user_info.des,formData[search_user_info.user_id].des);
+          // return;
+          // if(!search_user_info.f_user_name_remark) search_user_info.f_user_name_remark = formData[search_user_info.user_id].f_user_name_remark;
+          // if(!search_user_info.labels || (search_user_info.labels && !search_user_info.labels.length)) search_user_info.labels = formData[search_user_info.user_id].labels;
+          if(!search_user_info.des) search_user_info.des = formData[search_user_info.user_id].des;
           navigation.navigate('SetLabel',{
-            search_user_info
+            search_user_info:{
+              ...search_user_info,
+              des: formData[search_user_info.user_id].des,
+              f_user_name_remark: formData[search_user_info.user_id].f_user_name_remark,
+            },
           })
         }}>
           <Text 

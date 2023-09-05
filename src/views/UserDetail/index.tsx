@@ -51,47 +51,35 @@ const UserDetail = ({
   const [search_user_info,set_search_user_info] = useState<any>({});
   useEffect(()=>{
 
-    (async function(){
-      // let info:any = await AsyncStorage.getItem('remarkLabel');
-      // info = JSON.parse(info)
+    // (async function(){
+      
+    // })()
+    
+    const unsubscribe = navigation.addListener('state', async() => {
+      // 处理路由变化的逻辑
+      let info:any = await AsyncStorage.getItem('remarkLabel');
+      info = JSON.parse(info);
+      console.log('========>>>info',info);
+      console.log('========>>>info123456',info[params?.userInfo?.user_id]);
       const user_info = {
         ...params.userInfo
       }
-      // if(!params?.userInfo?.f_user_name_remark && info && info[params?.userInfo?.user_id]){
-      //   user_info.f_user_name_remark = info[params?.userInfo?.user_id].f_user_name_remark;
-      // }
-      // if(!params?.userInfo?.labels && info && info[params?.userInfo?.user_id]){
-      //   user_info.labels = info[params?.userInfo?.user_id].labels ? info[params?.userInfo?.user_id].labels:[];
-      // }
-      // if(!params?.userInfo?.des && info && info[params?.userInfo?.user_id]){
-      //   user_info.des = info[params?.userInfo?.user_id].des;
-      // }
+      if(!params?.userInfo?.f_user_name_remark && info && info[params?.userInfo?.user_id]){
+        console.log('333333')
+        user_info.f_user_name_remark = info[params?.userInfo?.user_id].f_user_name_remark;
+      }
+      if(!params?.userInfo?.labels && info && info[params?.userInfo?.user_id]){
+        user_info.labels = info[params?.userInfo?.user_id].labels ? info[params?.userInfo?.user_id].labels:[];
+      }
+      if(!params?.userInfo?.des && info && info[params?.userInfo?.user_id]){
+        user_info.des = info[params?.userInfo?.user_id].des;
+      }
+      console.log('=======user_info',user_info);
       set_search_user_info({
         ...user_info
       });
-    })()
-    
-    // const unsubscribe = navigation.addListener('state', async() => {
-    //   // 处理路由变化的逻辑
-    //   let info:any = await AsyncStorage.getItem('remarkLabel');
-    //   info = JSON.parse(info)
-    //   const user_info = {
-    //     ...params.userInfo
-    //   }
-    //   if(!params?.userInfo?.f_user_name_remark && info && info[params?.userInfo?.user_id]){
-    //     user_info.f_user_name_remark = info[params?.userInfo?.user_id].f_user_name_remark;
-    //   }
-    //   if(!params?.userInfo?.labels && info && info[params?.userInfo?.user_id]){
-    //     user_info.labels = info[params?.userInfo?.user_id].labels ? info[params?.userInfo?.user_id].labels:[];
-    //   }
-    //   if(!params?.userInfo?.des && info && info[params?.userInfo?.user_id]){
-    //     user_info.des = info[params?.userInfo?.user_id].des;
-    //   }
-    //   set_search_user_info({
-    //     ...user_info
-    //   });
-    // });
-    // return unsubscribe;
+    });
+    return unsubscribe;
   },[params.userInfo]);
 
   return <ScrollView style={styles.container}>
@@ -152,7 +140,7 @@ const UserDetail = ({
       search_user_info?.labels?.length ? <MyCell
         rightWrapperStyle={{paddingVertical: 20}}
         title='标签' 
-        showBottomBorder={true}
+        showBottomBorder={search_user_info?.des?true:false}
         showRightArrow={true}
         rightValue={Array.isArray(search_user_info?.labels) && search_user_info?.labels.map((item:any)=>item.label_name).join('，')}
         onPress={()=>{
