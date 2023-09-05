@@ -34,6 +34,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
 import AddEditLabel from './AddEditLabel';
 import { delFriendsLabel, getFriendsLabelList } from '../../api/friendsLabel';
+import { editFriends } from '../../api/friends';
 const SetLabel = ({ 
   MyThemed,
   AppStore,
@@ -43,30 +44,46 @@ const SetLabel = ({
     
   const colorScheme = useColorScheme();
   const { params } = route;
-  const { search_user_id } = params;
+  const { search_user_info } = params;
+  const search_user_id = search_user_info?.user_id;
   const { userInfo } = AppStore;
   const [labels,setLabels] = useState<any>([]);
   const [selectLabels,setSelectLabels] = useState<any>([]);
   const addEditLabelRef:{current:any} = useRef();
   const [formData,setFormData] = useState({})
+  console.log('search_user_info====>>',search_user_info);
   useEffect(()=>{
-    getLabelList();
-    const unsubscribe = navigation.addListener('state', async() => {
-      // 处理路由变化的逻辑
+    
+    (async function(){
+      await getLabelList();
+
       let info:any = await AsyncStorage.getItem('remarkLabel');
-      info = JSON.parse(info)
+      info = JSON.parse(info);
       formData[search_user_id] = {
-        f_user_name_remark: info && info[search_user_id]?.f_user_name_remark,
-        labels: (info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[],
-        des: info && info[search_user_id]?.des,
+        labels: search_user_info.labels||((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[]),
       };
-      setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
+      // setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
+      setSelectLabels(formData[search_user_id]?.labels ? formData[search_user_id]?.labels:[])
       setFormData({
         ...formData
       })
-    });
-    return unsubscribe;
-  },[]);
+    })()
+    // const unsubscribe = navigation.addListener('state', async() => {
+    //   // 处理路由变化的逻辑
+    //   let info:any = await AsyncStorage.getItem('remarkLabel');
+    //   info = JSON.parse(info)
+    //   formData[search_user_id] = {
+    //     f_user_name_remark: info && info[search_user_id]?.f_user_name_remark,
+    //     labels: (info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[],
+    //     des: info && info[search_user_id]?.des,
+    //   };
+    //   setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
+    //   setFormData({
+    //     ...formData
+    //   })
+    // });
+    // return unsubscribe;
+  },[route?.params?.search_user_info]);
   const getLabelList = useCallback(async ()=>{
     const result:any = await getFriendsLabelList({});
     console.log('label---',result);
@@ -91,8 +108,25 @@ const SetLabel = ({
           ...formData[search_user_id],
           labels: selectLabels,
         }
-        await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
-        navigation.goBack();
+        if(search_user_info?.isFriends){
+          await editFriends({
+            label_ids: selectLabels.map((item:any)=>item.label_id),
+            friends_id: search_user_info?.friends_id
+          });
+        }else{
+          await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
+        }
+        navigation.navigate({//向上一个页面传递参数
+          name: 'SetRemarkLabel',
+          params:{
+            search_user_info: {
+              ...search_user_info,
+              ...formData[search_user_id],
+            },
+          },
+          merge: true,
+        })
+        // navigation.goBack();
       }}>保存</Button>
     </View>}/>
     <View style={{

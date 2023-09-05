@@ -46,3 +46,24 @@ export function searchFriends(params?:any,text='加载中...') {
   });
 }
 
+export function editFriends(params?:any,text='编辑中...') {
+  return new Promise((resolve, reject) => {
+    HttpUtils.post(Api.EDIT_FRIENDS, params, text).then((res:any)=> {
+      switch (res.error) {
+        case 0:
+          resolve(res.data);
+          Toast.show({
+            icon: 'success',
+            duration: 2000,
+            text: res.message,
+          });
+          break;
+        default:
+          Toast.fail(res.message);
+          reject(res);
+          break;
+      }
+    });
+  });
+}
+

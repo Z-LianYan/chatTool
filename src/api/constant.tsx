@@ -16,6 +16,8 @@ export const  ADD_FRIENDS_LABEL = "/chat/friendsLabel/add"; //添加标签
 export const  EDIT_FRIENDS_LABEL = "/chat/friendsLabel/edit"; //编辑标签
 export const  DEL_FRIENDS_LABEL = "/chat/friendsLabel/del"; //删除标签
 
+export const  EDIT_FRIENDS = "/chat/friends/edit"; //编辑朋友
+
 
 
 

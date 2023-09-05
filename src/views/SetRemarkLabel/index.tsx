@@ -30,6 +30,7 @@ import { Button, Input } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
+import { editFriends } from '../../api/friends';
 const SetRemarkLabel = ({ 
   MyThemed,
   AppStore,
@@ -39,7 +40,8 @@ const SetRemarkLabel = ({
     
   const colorScheme = useColorScheme();
   const { params } = route;
-  const { search_user_id,search_user_info } = params;
+  const { search_user_info } = params;
+  const search_user_id = search_user_info?.user_id;
   const { userInfo } = AppStore;
   const [formData,setFormData] = useState({})
   // {
@@ -47,24 +49,41 @@ const SetRemarkLabel = ({
   //   labels: [{label_id:'',label_name:''}],
   //   des: '描述'
   // }
-  console.log('search_user_info------->>search_user_info',search_user_info)
-  useEffect(()=>{
+  console.log('search_user_info====>>1234',search_user_info);
 
-    const unsubscribe = navigation.addListener('state', async() => {
-      // 处理路由变化的逻辑
+  useEffect(()=>{
+    (async function(){
       let info:any = await AsyncStorage.getItem('remarkLabel');
       info = JSON.parse(info);
       formData[search_user_id] = {
-        f_user_name_remark: search_user_info?.isFriends ? search_user_info?.f_user_name_remark:info && info[search_user_id]?.f_user_name_remark,
-        labels: search_user_info?.isFriends ? search_user_info?.labels:(info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[],
-        des: search_user_info?.isFriends ? search_user_info?.des : info && info[search_user_id]?.des,
+        f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
+        labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
+        des: search_user_info?.des || (info && info[search_user_id]?.des),
       };
       setFormData({
         ...formData
       })
-    });
-    return unsubscribe;
-  },[]);
+
+      // let abc:any = await AsyncStorage.getItem('remarkLabel');
+      // abc = JSON.parse(abc);
+      // console.log('abc=======>>',abc)
+    })()
+    
+    // const unsubscribe = navigation.addListener('state', async() => {
+    //   // 处理路由变化的逻辑
+    //   let info:any = await AsyncStorage.getItem('remarkLabel');
+    //   info = JSON.parse(info);
+    //   formData[search_user_id] = {
+    //     f_user_name_remark: search_user_info?.isFriends ? search_user_info?.f_user_name_remark:info && info[search_user_id]?.f_user_name_remark,
+    //     labels: search_user_info?.isFriends ? search_user_info?.labels:(info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[],
+    //     des: search_user_info?.isFriends ? search_user_info?.des : info && info[search_user_id]?.des,
+    //   };
+    //   setFormData({
+    //     ...formData
+    //   })
+    // });
+    // return unsubscribe;
+  },[route?.params?.search_user_info]);
   return <ScrollView style={{
     ...styles.container,
     backgroundColor: MyThemed[colorScheme||'light'].ctBg
@@ -77,8 +96,31 @@ const SetRemarkLabel = ({
     title={''}
     rightView={<View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
-        await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
-        navigation.goBack();
+        if(search_user_info?.isFriends){
+          await editFriends({
+            ...formData[search_user_id],
+            label_ids: formData[search_user_id]?.labels?.map((item:any)=>item.label_id),
+            friends_id: search_user_info?.friends_id
+          });
+          let infoObj:any = await AsyncStorage.getItem('remarkLabel');
+          infoObj = JSON.parse(infoObj);
+          if(infoObj[search_user_id]){
+            delete infoObj[search_user_id];
+            await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
+          }
+        }else{
+          await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
+        }
+        navigation.navigate({
+          name: 'UserDetail',
+          params:{
+            userInfo: {
+              ...search_user_info,
+              ...formData[search_user_id]
+            },
+          },
+          merge: true,
+        })
       }}>保存</Button>
     </View>}/>
     <View style={styles.contenWrapper}>
@@ -122,7 +164,7 @@ const SetRemarkLabel = ({
         }}
         onPress={()=>{
           navigation.navigate('SetLabel',{
-            search_user_id
+            search_user_info
           })
         }}>
           <Text 

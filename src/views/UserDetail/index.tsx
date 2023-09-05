@@ -46,32 +46,54 @@ const UserDetail = ({
   //   des: ''
   // });
   console.log('navigation========>>',navigation)
+  console.log('params.userInfo========>>123',params.userInfo)
 
   const [search_user_info,set_search_user_info] = useState<any>({});
   useEffect(()=>{
-    
-    const unsubscribe = navigation.addListener('state', async() => {
-      // 处理路由变化的逻辑
-      let info:any = await AsyncStorage.getItem('remarkLabel');
-      info = JSON.parse(info)
+
+    (async function(){
+      // let info:any = await AsyncStorage.getItem('remarkLabel');
+      // info = JSON.parse(info)
       const user_info = {
         ...params.userInfo
       }
-      if(!params?.userInfo?.f_user_name_remark && info && info[params?.userInfo?.user_id]){
-        user_info.f_user_name_remark = info[params?.userInfo?.user_id].f_user_name_remark;
-      }
-      if(!params?.userInfo?.labels && info && info[params?.userInfo?.user_id]){
-        user_info.labels = info[params?.userInfo?.user_id].labels ? info[params?.userInfo?.user_id].labels:[];
-      }
-      if(!params?.userInfo?.des && info && info[params?.userInfo?.user_id]){
-        user_info.des = info[params?.userInfo?.user_id].des;
-      }
+      // if(!params?.userInfo?.f_user_name_remark && info && info[params?.userInfo?.user_id]){
+      //   user_info.f_user_name_remark = info[params?.userInfo?.user_id].f_user_name_remark;
+      // }
+      // if(!params?.userInfo?.labels && info && info[params?.userInfo?.user_id]){
+      //   user_info.labels = info[params?.userInfo?.user_id].labels ? info[params?.userInfo?.user_id].labels:[];
+      // }
+      // if(!params?.userInfo?.des && info && info[params?.userInfo?.user_id]){
+      //   user_info.des = info[params?.userInfo?.user_id].des;
+      // }
       set_search_user_info({
         ...user_info
       });
-    });
-    return unsubscribe;
-  },[]);
+    })()
+    
+    // const unsubscribe = navigation.addListener('state', async() => {
+    //   // 处理路由变化的逻辑
+    //   let info:any = await AsyncStorage.getItem('remarkLabel');
+    //   info = JSON.parse(info)
+    //   const user_info = {
+    //     ...params.userInfo
+    //   }
+    //   if(!params?.userInfo?.f_user_name_remark && info && info[params?.userInfo?.user_id]){
+    //     user_info.f_user_name_remark = info[params?.userInfo?.user_id].f_user_name_remark;
+    //   }
+    //   if(!params?.userInfo?.labels && info && info[params?.userInfo?.user_id]){
+    //     user_info.labels = info[params?.userInfo?.user_id].labels ? info[params?.userInfo?.user_id].labels:[];
+    //   }
+    //   if(!params?.userInfo?.des && info && info[params?.userInfo?.user_id]){
+    //     user_info.des = info[params?.userInfo?.user_id].des;
+    //   }
+    //   set_search_user_info({
+    //     ...user_info
+    //   });
+    // });
+    // return unsubscribe;
+  },[params.userInfo]);
+
   return <ScrollView style={styles.container}>
     <NavigationBar
     backgroundColor={MyThemed[colorScheme||'light'].ctBg}
@@ -85,9 +107,11 @@ const UserDetail = ({
       paddingBottom: 30,
     }}>
       <View style={{flexDirection:'row',alignItems:'flex-start'}}>
-        <Image style={{
-          ...styles.avatarImg,
-        }} source={{uri:search_user_info?.avatar}}/>
+        {
+          search_user_info?.avatar && <Image style={{
+            ...styles.avatarImg,
+          }} source={{uri:search_user_info?.avatar}}/>
+        }
         <View style={{flex:1,paddingLeft:30}}>
           <Text style={{marginTop:5,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold',fontSize: 20}}>
             <Text style={{paddingRight: 10}}>{search_user_info?.f_user_name_remark||search_user_info?.user_name}</Text>
@@ -99,7 +123,7 @@ const UserDetail = ({
             }
           </Text>
           <View style={{flexDirection:'column'}}>
-            {search_user_info?.isFriends && search_user_info?.user_name!=search_user_info?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{search_user_info?.user_name}</Text>}
+            {search_user_info?.f_user_name_remark && search_user_info?.user_name!=search_user_info?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{search_user_info?.user_name}</Text>}
             {
               (search_user_info?.isFriends || search_user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{search_user_info?.chat_no}</Text>
             }
@@ -120,9 +144,8 @@ const UserDetail = ({
       showRightArrow={true}
       onPress={()=>{
         navigation.navigate('SetRemarkLabel',{
-          search_user_id: search_user_info.user_id,
           search_user_info: search_user_info
-        })
+        });
       }}/>
     }
     {
@@ -134,7 +157,6 @@ const UserDetail = ({
         rightValue={Array.isArray(search_user_info?.labels) && search_user_info?.labels.map((item:any)=>item.label_name).join('，')}
         onPress={()=>{
           navigation.navigate('SetRemarkLabel',{
-            search_user_id: search_user_info.user_id,
             search_user_info: search_user_info
           })
       }}/>: null
@@ -148,7 +170,6 @@ const UserDetail = ({
         rightValue={search_user_info?.des}
         onPress={()=>{
           navigation.navigate('SetRemarkLabel',{
-            search_user_id: search_user_info.user_id,
             search_user_info: search_user_info
           });
       }}/>
