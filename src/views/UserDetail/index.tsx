@@ -45,36 +45,26 @@ const UserDetail = ({
   //   labels: [],
   //   des: ''
   // });
-  console.log('navigation========>>',navigation)
   console.log('params.userInfo========>>123',params.userInfo)
 
   const [search_user_info,set_search_user_info] = useState<any>({});
   useEffect(()=>{
 
-    // (async function(){
-      
-    // })()
     
+
+    // (async function(){
+    // })()
+
     const unsubscribe = navigation.addListener('state', async() => {
       // 处理路由变化的逻辑
       let info:any = await AsyncStorage.getItem('remarkLabel');
-      info = JSON.parse(info);
-      console.log('========>>>info',info);
-      console.log('========>>>info123456',info[params?.userInfo?.user_id]);
+      info = info?JSON.parse(info):{};
       const user_info = {
-        ...params.userInfo
+        ...params.userInfo,
+        f_user_name_remark:(info[params?.userInfo?.user_id] && info[params?.userInfo?.user_id]?.f_user_name_remark) ? info[params?.userInfo?.user_id]?.f_user_name_remark: params?.userInfo?.f_user_name_remark,
+        labels: info[params?.userInfo?.user_id]?.labels ? (info[params?.userInfo?.user_id]?.labels||[]): (params?.userInfo?.labels||[]),
+        des: info[params?.userInfo?.user_id]?.des? info[params?.userInfo?.user_id]?.des:params?.userInfo?.des
       }
-      if(!params?.userInfo?.f_user_name_remark && info && info[params?.userInfo?.user_id]){
-        console.log('333333')
-        user_info.f_user_name_remark = info[params?.userInfo?.user_id].f_user_name_remark;
-      }
-      if(!params?.userInfo?.labels && info && info[params?.userInfo?.user_id]){
-        user_info.labels = info[params?.userInfo?.user_id].labels ? info[params?.userInfo?.user_id].labels:[];
-      }
-      if(!params?.userInfo?.des && info && info[params?.userInfo?.user_id]){
-        user_info.des = info[params?.userInfo?.user_id].des;
-      }
-      console.log('=======user_info',user_info);
       set_search_user_info({
         ...user_info
       });
@@ -168,7 +158,7 @@ const UserDetail = ({
     title='来源' 
     showBottomBorder={false}
     showRightArrow={false}
-    rightValue="来自手机号搜索"//来自账号搜索
+    rightValue={search_user_info.searchSource}//来自手机号搜索,来自账号搜索
     onPress={()=>{
       // navigation.navigate('Set')
     }}/>

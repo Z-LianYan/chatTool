@@ -60,14 +60,14 @@ const SetLabel = ({
     const unsubscribe = navigation.addListener('state', async() => {
       // 处理路由变化的逻辑
       let info:any = await AsyncStorage.getItem('remarkLabel');
-      info = JSON.parse(info);
+      info = info?JSON.parse(info):{};
       // setFormData({
       //   ...info
       // })
       formData[search_user_id] = {
-        labels: search_user_info.labels||((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[]),
-        f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
-        des: search_user_info?.des || (info && info[search_user_id]?.des),
+        labels: search_user_info.labels||(info[search_user_id]?.labels ? info[search_user_id]?.labels:[]),
+        f_user_name_remark: search_user_info?.f_user_name_remark||info[search_user_id]?.f_user_name_remark,
+        des: search_user_info?.des || info[search_user_id]?.des,
       };
       
       // setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
@@ -99,7 +99,8 @@ const SetLabel = ({
     rightView={<View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
         let info:any = await AsyncStorage.getItem('remarkLabel');
-        info = JSON.parse(info);
+        console.log('info===>>>',info)
+        info = info?JSON.parse(info):{};
         info[search_user_id] = {
           ...info[search_user_id],
           labels: selectLabels,
@@ -109,9 +110,10 @@ const SetLabel = ({
             label_ids: selectLabels.map((item:any)=>item.label_id),
             friends_id: search_user_info?.friends_id
           });
-        }else{
-          await AsyncStorage.setItem('remarkLabel',JSON.stringify(info));
         }
+        
+        await AsyncStorage.setItem('remarkLabel',JSON.stringify(info));
+        
         info[search_user_id] = {
           ...info[search_user_id],
           des: formData[search_user_id].des,
@@ -128,7 +130,7 @@ const SetLabel = ({
           merge: true,
         })
         // navigation.goBack();
-      }}>保存</Button>
+      }}/>
     </View>}/>
     <View style={{
       ...styles.alreadySelectLabelContainer,

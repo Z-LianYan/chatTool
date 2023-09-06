@@ -58,6 +58,13 @@ class AppStore {
     upload_token:''
   }; //七牛上传配置
 
+
+  searchUserRemarkLabel = {
+    f_user_name_remark:'',
+    labels:[],
+    des:'',
+  } 
+
   
 }
 const app = new AppStore()

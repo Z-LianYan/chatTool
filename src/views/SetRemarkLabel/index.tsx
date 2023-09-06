@@ -12,6 +12,7 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
+  Alert,
 } from 'react-native';
 
 import { 
@@ -49,8 +50,6 @@ const SetRemarkLabel = ({
   //   labels: [{label_id:'',label_name:''}],
   //   des: '描述'
   // }
-  console.log('search_user_info====>>1234',search_user_info);
-
   useEffect(()=>{
     (async function(){
       let info:any = await AsyncStorage.getItem('remarkLabel');
@@ -64,25 +63,7 @@ const SetRemarkLabel = ({
         ...formData
       })
 
-      // let abc:any = await AsyncStorage.getItem('remarkLabel');
-      // abc = JSON.parse(abc);
-      // console.log('abc=======>>',abc)
     })()
-    
-    // const unsubscribe = navigation.addListener('state', async() => {
-    //   // 处理路由变化的逻辑
-    //   let info:any = await AsyncStorage.getItem('remarkLabel');
-    //   info = JSON.parse(info);
-    //   formData[search_user_id] = {
-    //     f_user_name_remark: search_user_info?.isFriends ? search_user_info?.f_user_name_remark:info && info[search_user_id]?.f_user_name_remark,
-    //     labels: search_user_info?.isFriends ? search_user_info?.labels:(info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[],
-    //     des: search_user_info?.isFriends ? search_user_info?.des : info && info[search_user_id]?.des,
-    //   };
-    //   setFormData({
-    //     ...formData
-    //   })
-    // });
-    // return unsubscribe;
   },[route?.params?.search_user_info]);
   return <ScrollView style={{
     ...styles.container,
@@ -163,17 +144,11 @@ const SetRemarkLabel = ({
           paddingHorizontal: 12
         }}
         onPress={()=>{
-          // console.log(search_user_info.des,formData[search_user_info.user_id].des);
-          // return;
-          // if(!search_user_info.f_user_name_remark) search_user_info.f_user_name_remark = formData[search_user_info.user_id].f_user_name_remark;
-          // if(!search_user_info.labels || (search_user_info.labels && !search_user_info.labels.length)) search_user_info.labels = formData[search_user_info.user_id].labels;
-          if(!search_user_info.des) search_user_info.des = formData[search_user_info.user_id].des;
           navigation.navigate('SetLabel',{
             search_user_info:{
               ...search_user_info,
-              des: formData[search_user_info.user_id].des,
-              f_user_name_remark: formData[search_user_info.user_id].f_user_name_remark,
-            },
+              ...formData[search_user_id]
+            }
           })
         }}>
           <Text 

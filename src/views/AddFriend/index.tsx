@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useCallback } from 'react';
+import React, { useState,useEffect, useCallback, useRef } from 'react';
 import { useNavigation,StackActions } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import {
@@ -46,6 +46,7 @@ import { ADD_USER, NEW_FIREND, QRCODE } from '../../assets/image';
 // import SearchFriend from '../SearchFriend';
 import config from '../../config';
 import { searchFriends } from '../../api/friends';
+import { TextInput } from 'react-native-gesture-handler';
 
 
 
@@ -57,6 +58,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [searchInfo, setSearchInfo] = useState(false);
+  const inputRef:{current:any} = useRef();
 
   // const _navigation = useNavigation();
   useEffect(()=>{
@@ -103,6 +105,9 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}
+        onShow={()=>{
+          console.log('inputRef===>>',inputRef.current)
+        }}
       >
         <Vw style={{height: Platform.OS == 'ios'?config.STATUS_BAR_HEIGHT:0,width: '100%'}}></Vw>
         <View style={{
@@ -112,26 +117,24 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
         }}>
           
           <Vw style={{flexDirection:'row',alignItems:'center',padding: 10}}>
-            <Input 
+            <TextInput 
             clearButtonMode={'always'}
             style={{flex:1,backgroundColor: MyThemed[colorScheme||'light'].ctBg,borderWidth: 0,height: 50,borderRadius: 10,color:MyThemed[colorScheme||'light'].ftCr}}
             placeholder='账号手/机号' 
             value={keywords} 
-            animated={true}
-            autoFocus={modalVisible}
+            // animated={true}
+            autoFocus={true}//只聚焦，没有自动弹出键盘
+            ref={inputRef}
+            onLayout={()=> inputRef.current.focus()}//只聚焦，没有自动弹出键盘
             keyboardType="default"
             onChangeText={(val:string)=>{
               setLoadingComplete(false)
               setKeywords(val);
             }}
             onSubmitEditing={async ()=>{
-              
               const result:any = await searchFriends({keywords});
-              console.log('result---->>',result);
-              
               if(result){
                 setSearchInfo(result);
-                console.log('result---->>123',result);
                 navigation.navigate({
                   name: 'UserDetail',
                   params: {
