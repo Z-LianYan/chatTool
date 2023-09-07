@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import {
@@ -45,26 +45,62 @@ const SetRemarkLabel = ({
   const search_user_id = search_user_info?.user_id;
   const { userInfo } = AppStore;
   const [formData,setFormData] = useState({})
+  // const [isAlready,setIsAlready] = useState(false)
   // {
   //   f_user_name_remark: '',
   //   labels: [{label_id:'',label_name:''}],
   //   des: '描述'
   // }
   useEffect(()=>{
-    (async function(){
-      let info:any = await AsyncStorage.getItem('remarkLabel');
-      info = JSON.parse(info);
-      formData[search_user_id] = {
-        f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
-        labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
-        des: search_user_info?.des || (info && info[search_user_id]?.des),
-      };
-      setFormData({
-        ...formData
-      })
+    if(!Object.keys(formData).length){
+      (async function(){
+        let info:any = await AsyncStorage.getItem('remarkLabel');
+        info = JSON.parse(info);
+        formData[search_user_id] = {
+          f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
+          labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
+          des: search_user_info?.des || (info && info[search_user_id]?.des),
+        };
+        setFormData({
+          ...formData
+        })
+  
+      })()
+    }
+  },[route?.params?.search_user_info,formData]);
 
-    })()
-  },[route?.params?.search_user_info]);
+  // const navigationBeforeRemove = useCallback(()=>{
+  //   navigation.addListener('beforeRemove', (e:any) => {
+  //     if (search_user_info.f_user_name_remark===formData[search_user_id]?.f_user_name_remark && search_user_info.des===formData[search_user_id]?.des) {
+  //       // If we don't have unsaved changes, then we don't need to do anything
+  //       return;
+  //     }
+  //     // setIsAlready(true);
+  
+  //     // Prevent default behavior of leaving the screen
+  //     e.preventDefault();
+  
+  //     // Prompt the user before leaving the screen
+  //     Alert.alert(
+  //       '保存本次编辑？',
+  //       '',
+  //       [
+  //         { text: "不保存", style: 'cancel', onPress: () => navigation.dispatch(e.data.action) },
+  //         {
+  //           text: '保存',
+  //           style: 'destructive',
+  //           // If the user confirmed, then we dispatch the action we blocked earlier
+  //           // This will continue the action that had triggered the removal of the screen
+  //           onPress: () => {
+
+  //           },
+  //         },
+  //       ]
+  //     );
+  //   })
+  // },[formData])
+  
+
   return <ScrollView style={{
     ...styles.container,
     backgroundColor: MyThemed[colorScheme||'light'].ctBg
@@ -126,7 +162,7 @@ const SetRemarkLabel = ({
           }
           setFormData({
             ...formData,
-          })
+          });
         }}
         onSubmitEditing={()=>{
 
