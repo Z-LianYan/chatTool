@@ -41,7 +41,7 @@ const SetRemarkLabel = ({
     
   const colorScheme = useColorScheme();
   const { params } = route;
-  const { search_user_info } = params;
+  const { search_user_info,op_type } = params;
   const search_user_id = search_user_info?.user_id;
   const { userInfo } = AppStore;
   const [formData,setFormData] = useState({})
@@ -51,6 +51,7 @@ const SetRemarkLabel = ({
   //   labels: [{label_id:'',label_name:''}],
   //   des: '描述'
   // }
+  console.log('op_type======>>>',op_type)
   useEffect(()=>{
     if(!Object.keys(formData).length){
       (async function(){
@@ -110,8 +111,8 @@ const SetRemarkLabel = ({
     onBack={()=>{
       navigation.goBack()
     }}
-    title={''}
-    rightView={<View  style={{paddingRight:10}}>
+    title={['addUser'].includes(op_type) && '申请添加朋友'}
+    rightView={!['addUser'].includes(op_type) && <View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
         if(search_user_info?.isFriends){
           await editFriends({
@@ -141,7 +142,37 @@ const SetRemarkLabel = ({
       }}>保存</Button>
     </View>}/>
     <View style={styles.contenWrapper}>
-      <Text style={styles.titleTxt}>设置备注和标签</Text>
+      {!['addUser'].includes(op_type) && <Text style={styles.titleTxt}>设置备注和标签</Text>
+}
+      <View style={styles.forWwrapper}>
+        <Text style={styles.labelTxt}>发送添加朋友申请</Text>
+        <Input 
+        multiline={true}
+        numberOfLines={5}
+        value={formData[search_user_id]?.f_user_name_remark}
+        placeholder="请输入内容"
+        style={{
+          ...styles.valueTxt,
+          height: 100,
+          textAlignVertical: 'top',
+          backgroundColor: MyThemed[colorScheme||'light'].bg,
+          color: MyThemed[colorScheme||'light'].ftCr
+        }}
+        maxLength={16}
+        type='default' 
+        onChangeText={(val:string)=>{
+          formData[search_user_id] =  {
+            ...formData[search_user_id],
+            f_user_name_remark:val
+          }
+          setFormData({
+            ...formData,
+          });
+        }}
+        onSubmitEditing={()=>{
+
+        }}></Input>
+      </View>
 
       <View style={styles.forWwrapper}>
         <Text style={styles.labelTxt}>备注</Text>
@@ -150,6 +181,7 @@ const SetRemarkLabel = ({
         placeholder="新的备注名"
         style={{
           ...styles.valueTxt,
+          height: 50,
           backgroundColor: MyThemed[colorScheme||'light'].bg,
           color: MyThemed[colorScheme||'light'].ftCr
         }}
@@ -173,6 +205,7 @@ const SetRemarkLabel = ({
         <TouchableOpacity 
         style={{
           ...styles.valueTxt,
+          height: 50,
           backgroundColor: MyThemed[colorScheme||'light'].bg,
           alignItems:'center',
           justifyContent: 'space-between',
@@ -203,6 +236,7 @@ const SetRemarkLabel = ({
         placeholder="添加文字"
         style={{
           ...styles.valueTxt,
+          height: 50,
           backgroundColor: MyThemed[colorScheme||'light'].bg,
           color: MyThemed[colorScheme||'light'].ftCr,
           textAlignVertical: "top"
@@ -221,6 +255,26 @@ const SetRemarkLabel = ({
 
         }}></Input>
       </View>
+
+      {
+       ['addUser'].includes(op_type) && <Button
+        title={'发送'}
+        type="default"
+        disabled={false}
+        activeOpacity={0.6}
+        titleStyle={{color: '#fff'}}
+        style={{
+          marginTop:10,
+          marginHorizontal: 30,
+          height: 55,
+          borderWidth:0, 
+          backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
+        }}
+        onPress={() => {
+          
+        }}
+      />
+      }
     </View>
   </ScrollView>
 };
@@ -230,7 +284,7 @@ const styles = StyleSheet.create({
     flex:1,
   },
   contenWrapper:{
-
+    
   },
   titleTxt:{
     textAlign: 'center',
@@ -247,7 +301,7 @@ const styles = StyleSheet.create({
   },
   valueTxt:{
     borderWidth: 0,
-    height: 50,
+    // height: 50,
     borderRadius: 10,
   },
   rightArrow:{

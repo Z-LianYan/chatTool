@@ -186,6 +186,10 @@ const UserDetail = ({
       titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
       style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
       onPress={() => {
+        navigation.navigate('SetRemarkLabel',{
+          search_user_info: search_user_info,
+          op_type: 'addUser'
+        });
       }}
     />
     }
