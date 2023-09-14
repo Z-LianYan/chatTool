@@ -53,8 +53,12 @@ const SetRemarkLabel = ({
   // }
   console.log('op_type======>>>',op_type)
   useEffect(()=>{
+
+    console.log('op_type======>>>1234567--',op_type,!Object.keys(formData).length,formData);
+    console.log('search_user_info?.labels======>>>',search_user_info?.labels);
     if(!Object.keys(formData).length){
       (async function(){
+        console.log('我有执行吗=-----------------》〉》〉');
         let info:any = await AsyncStorage.getItem('remarkLabel');
         info = JSON.parse(info);
         formData[search_user_id] = {
@@ -62,6 +66,8 @@ const SetRemarkLabel = ({
           labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
           des: search_user_info?.des || (info && info[search_user_id]?.des),
         };
+
+        console.log('formData[search_user_id]===>>',formData[search_user_id])
         setFormData({
           ...formData
         })
@@ -111,7 +117,7 @@ const SetRemarkLabel = ({
     onBack={()=>{
       navigation.goBack()
     }}
-    title={['addUser'].includes(op_type) && '申请添加朋友'}
+    title={['addUser'].includes(op_type) ? '申请添加朋友': ''}
     rightView={!['addUser'].includes(op_type) && <View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
         if(search_user_info?.isFriends){
