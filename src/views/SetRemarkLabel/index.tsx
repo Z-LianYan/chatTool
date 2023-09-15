@@ -31,7 +31,7 @@ import { Button, Input } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
-import { editFriends } from '../../api/friends';
+import { ADD_FRIENDS_APPLY, editFriends } from '../../api/friends';
 const SetRemarkLabel = ({ 
   MyThemed,
   AppStore,
@@ -44,41 +44,32 @@ const SetRemarkLabel = ({
   const { search_user_info,op_type } = params;
   const search_user_id = search_user_info?.user_id;
   const { userInfo } = AppStore;
-  const [formData,setFormData] = useState({})
+  let [formData,setFormData] = useState<any>({})
   // const [isAlready,setIsAlready] = useState(false)
   // {
   //   f_user_name_remark: '',
   //   labels: [{label_id:'',label_name:''}],
   //   des: '描述'
   // }
-  console.log('op_type======>>>',op_type)
   useEffect(()=>{
+    (async function(){
+      let info:any = await AsyncStorage.getItem('remarkLabel');
+      info = JSON.parse(info);
+      formData = {
+        f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
+        labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
+        des: search_user_info?.des || (info && info[search_user_id]?.des),
+      };
+      setFormData({
+        ...formData
+      })
 
-    console.log('op_type======>>>1234567--',op_type,!Object.keys(formData).length,formData);
-    console.log('search_user_info?.labels======>>>',search_user_info?.labels);
-    if(!Object.keys(formData).length){
-      (async function(){
-        console.log('我有执行吗=-----------------》〉》〉');
-        let info:any = await AsyncStorage.getItem('remarkLabel');
-        info = JSON.parse(info);
-        formData[search_user_id] = {
-          f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
-          labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
-          des: search_user_info?.des || (info && info[search_user_id]?.des),
-        };
-
-        console.log('formData[search_user_id]===>>',formData[search_user_id])
-        setFormData({
-          ...formData
-        })
-  
-      })()
-    }
-  },[route?.params?.search_user_info,formData]);
+    })()
+  },[route?.params?.search_user_info]);
 
   // const navigationBeforeRemove = useCallback(()=>{
   //   navigation.addListener('beforeRemove', (e:any) => {
-  //     if (search_user_info.f_user_name_remark===formData[search_user_id]?.f_user_name_remark && search_user_info.des===formData[search_user_id]?.des) {
+  //     if (search_user_info.f_user_name_remark===formData?.f_user_name_remark && search_user_info.des===formData?.des) {
   //       // If we don't have unsaved changes, then we don't need to do anything
   //       return;
   //     }
@@ -106,6 +97,14 @@ const SetRemarkLabel = ({
   //     );
   //   })
   // },[formData])
+
+  const addFriendApply = useCallback(async ()=>{
+    ADD_FRIENDS_APPLY({
+      ...formData,
+      labels: formData.labels.join(','),
+      f_user_id: search_user_info.user_id,
+    });
+  },[formData])
   
 
   return <ScrollView style={{
@@ -122,8 +121,8 @@ const SetRemarkLabel = ({
       <Button title="保存" type="primary" onPress={async ()=>{
         if(search_user_info?.isFriends){
           await editFriends({
-            ...formData[search_user_id],
-            label_ids: formData[search_user_id]?.labels?.map((item:any)=>item.label_id),
+            ...formData,
+            label_ids: formData?.labels?.map((item:any)=>item.label_id),
             friends_id: search_user_info?.friends_id
           });
           let infoObj:any = await AsyncStorage.getItem('remarkLabel');
@@ -140,7 +139,7 @@ const SetRemarkLabel = ({
           params:{
             userInfo: {
               ...search_user_info,
-              ...formData[search_user_id]
+              ...formData
             },
           },
           merge: true,
@@ -148,42 +147,40 @@ const SetRemarkLabel = ({
       }}>保存</Button>
     </View>}/>
     <View style={styles.contenWrapper}>
-      {!['addUser'].includes(op_type) && <Text style={styles.titleTxt}>设置备注和标签</Text>
-}
-      <View style={styles.forWwrapper}>
-        <Text style={styles.labelTxt}>发送添加朋友申请</Text>
-        <Input 
-        multiline={true}
-        numberOfLines={5}
-        value={formData[search_user_id]?.f_user_name_remark}
-        placeholder="请输入内容"
-        style={{
-          ...styles.valueTxt,
-          height: 100,
-          textAlignVertical: 'top',
-          backgroundColor: MyThemed[colorScheme||'light'].bg,
-          color: MyThemed[colorScheme||'light'].ftCr
-        }}
-        maxLength={16}
-        type='default' 
-        onChangeText={(val:string)=>{
-          formData[search_user_id] =  {
-            ...formData[search_user_id],
-            f_user_name_remark:val
-          }
-          setFormData({
-            ...formData,
-          });
-        }}
-        onSubmitEditing={()=>{
+      {!['addUser'].includes(op_type) && <Text style={styles.titleTxt}>设置备注和标签</Text>}
+      {
+        ['addUser'].includes(op_type) && <View style={styles.forWwrapper}>
+          <Text style={styles.labelTxt}>发送添加朋友申请</Text>
+          <Input 
+          multiline={true}
+          numberOfLines={5}
+          value={formData?.msg}
+          placeholder="请输入内容"
+          style={{
+            ...styles.valueTxt,
+            height: 100,
+            textAlignVertical: 'top',
+            backgroundColor: MyThemed[colorScheme||'light'].bg,
+            color: MyThemed[colorScheme||'light'].ftCr
+          }}
+          maxLength={16}
+          type='default' 
+          onChangeText={(val:string)=>{
+            setFormData({
+              ...formData,
+              msg:val
+            });
+          }}
+          onSubmitEditing={()=>{
 
-        }}></Input>
-      </View>
+          }}></Input>
+        </View>
+      }
 
       <View style={styles.forWwrapper}>
         <Text style={styles.labelTxt}>备注</Text>
         <Input 
-        value={formData[search_user_id]?.f_user_name_remark}
+        value={formData?.f_user_name_remark}
         placeholder="新的备注名"
         style={{
           ...styles.valueTxt,
@@ -194,8 +191,8 @@ const SetRemarkLabel = ({
         maxLength={16}
         type='default' 
         onChangeText={(val:string)=>{
-          formData[search_user_id] =  {
-            ...formData[search_user_id],
+          formData =  {
+            ...formData,
             f_user_name_remark:val
           }
           setFormData({
@@ -222,14 +219,14 @@ const SetRemarkLabel = ({
           navigation.navigate('SetLabel',{
             search_user_info:{
               ...search_user_info,
-              ...formData[search_user_id]
+              ...formData
             }
           })
         }}>
           <Text 
           style={{
             // paddingLeft: 12
-          }}>{formData[search_user_id]?.labels?.length?formData[search_user_id]?.labels?.map((item:any)=>item.label_name).join('，'):"添加标签"}</Text>
+          }}>{formData?.labels?.length?formData?.labels?.map((item:any)=>item.label_name).join('，'):"添加标签"}</Text>
           <Image style={styles.rightArrow} source={RIGHT_ARROW}/>
         </TouchableOpacity>
       </View>
@@ -238,7 +235,7 @@ const SetRemarkLabel = ({
         <Input 
         multiline={true}
         maxLength={255}
-        value={formData[search_user_id]?.des}
+        value={formData?.des}
         placeholder="添加文字"
         style={{
           ...styles.valueTxt,
@@ -249,8 +246,8 @@ const SetRemarkLabel = ({
         }}
         type='default' 
         onChangeText={(val:string)=>{
-          formData[search_user_id] = {
-            ...formData[search_user_id],
+          formData = {
+            ...formData,
             des: val,
           }
           setFormData({
@@ -272,12 +269,12 @@ const SetRemarkLabel = ({
         style={{
           marginTop:10,
           marginHorizontal: 30,
-          height: 55,
+          height: 50,
           borderWidth:0, 
           backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
         }}
         onPress={() => {
-          
+          addFriendApply();
         }}
       />
       }

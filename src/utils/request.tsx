@@ -48,6 +48,7 @@ const service = axios.create({
 export default service;
 service.interceptors.request.use(
   async (config:any) => {
+    console.log('url:',config.url);
     config.headers['token'] = await AsyncStorage.getItem('token')
     return config;
   },

@@ -79,6 +79,7 @@ const Login = (props:any) => {
       if(result && result.token){
         await AsyncStorage.setItem('token',result.token);
         const sockitIo = SocketIoClient.getInstance(()=>{
+          console.log('链接回调了吗？？？？=========》〉》〉')
           if(route.params && route.params.toUrl){
             props.navigation.replace(route.params.toUrl);
             return;

@@ -37,10 +37,12 @@ import NavigationBar from '../../component/NavigationBar';
 import { login_out } from "../../api/user";
 import MyCell from '../../component/MyCell';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SocketIoClient from '../../socketIo';
 
 
 
 const SetPage = ({AppStore,navigation,AppVersions}:any) => {
+  const sockitIo = SocketIoClient.getInstance();
     
   const colorScheme = useColorScheme();
 
@@ -66,6 +68,7 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
           })
           // navigation.popToTop()
           await AsyncStorage.removeItem('token');
+          sockitIo.getSocketIo()?.disconnect();
         } }
       ]
     );

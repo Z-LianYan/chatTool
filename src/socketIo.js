@@ -4,11 +4,7 @@ import store from './store/index';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default class SocketIoClient {
-    abc(){
-        console.log('我是abc')
-    }
     static getInstance(callBack){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
-    console.log('callBack===>>',callBack)
         if(!SocketIoClient.instance){
             SocketIoClient.instance = new SocketIoClient();
             SocketIoClient.callBack = callBack;
@@ -36,12 +32,8 @@ export default class SocketIoClient {
         SocketIoClient.socketIo = socket;
         socket.on('connect', (res) => {
             const id = socket.id;
-          
             console.log('#connect,', id,res);
-            // console.log('#AppStore-----store', store.AppStore);
-
             SocketIoClient.callBack && SocketIoClient.callBack();
-            
             // 监听自身 id 以实现 p2p 通讯
             socket.on(id, (msg) => {
               console.log('#receive,', msg);
@@ -54,6 +46,7 @@ export default class SocketIoClient {
         // 系统事件
         socket.on('disconnect', (msg) => {
             console.log('#disconnect', msg);
+            delete SocketIoClient.instance;
         });
           
         socket.on('disconnecting', () => {
