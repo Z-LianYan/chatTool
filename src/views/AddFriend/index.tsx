@@ -174,10 +174,8 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
           {
             keywords && !loadingComplete && <TouchableOpacity activeOpacity={0.6} onPress={async()=>{
               const result:any = await searchFriends({keywords});
-              console.log('result---->>',result);
               if(result){
                 setSearchInfo(result);
-                console.log('result---->>123',result);
                 navigation.navigate({
                   name: 'UserDetail',
                   params: {

@@ -35,6 +35,7 @@ import AddFriend from '../views/AddFriend';
 import UserDetail from '../views/UserDetail';
 import SetRemarkLabel from '../views/SetRemarkLabel';
 import SetLabel from '../views/SetLabel';
+import NewFriendsList from '../views/NewFriendsList';
 
 const routes=[
     { 
@@ -128,6 +129,16 @@ const routes=[
         options: {
             headerShown: false,
             title: '',
+            headerStyle:{
+            }
+        } 
+    },
+    { 
+        component: NewFriendsList, 
+        name: "NewFriendsList",
+        options: {
+            headerShown: true,
+            title: '新朋友',
             headerStyle:{
             }
         } 

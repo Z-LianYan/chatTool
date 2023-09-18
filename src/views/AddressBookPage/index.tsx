@@ -30,7 +30,8 @@ import { getFriendList } from '../../api/friends';
 //   Text
 // } from '../component/customThemed';
 const AddressBookPage = ({
-  MyThemed
+  MyThemed,
+  navigation
 }:any) => {
     
   const colorScheme = useColorScheme();
@@ -63,7 +64,10 @@ const AddressBookPage = ({
     title='新的朋友' 
     avatar={NEW_FIREND}
     showBottomBorder={true}
-    showRightArrow={false} />
+    showRightArrow={false} 
+    onPress={()=>{
+      navigation.navigate('NewFriendsList')
+    }}/>
     <MyCell
     title='仅聊天的朋友' 
     avatar={NEW_FIREND}

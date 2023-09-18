@@ -45,7 +45,7 @@ const MePage = ({
       <View style={{flexDirection:'row',alignItems:'center'}}>
         <Image style={{
           ...styles.avatarImg,
-        }} source={{uri:'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}}/>
+        }} source={{uri:AppStore?.userInfo?.avatar}}/>
         <View style={{flex:1,paddingHorizontal:10}}>
           <Text style={{paddingBottom: 10,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold'}}>{AppStore?.userInfo?.user_name}</Text>
           <View style={{flexDirection:'row'}}>

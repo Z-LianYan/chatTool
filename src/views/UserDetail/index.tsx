@@ -158,7 +158,7 @@ const UserDetail = ({
     title='来源' 
     showBottomBorder={false}
     showRightArrow={false}
-    rightValue={search_user_info.searchSource}//来自手机号搜索,来自账号搜索
+    rightValue={search_user_info.sourceName}//来自手机号搜索,来自账号搜索
     onPress={()=>{
       // navigation.navigate('Set')
     }}/>

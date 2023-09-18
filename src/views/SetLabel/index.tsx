@@ -125,6 +125,7 @@ const SetLabel = ({
             search_user_info: {
               ...search_user_info,
               ...info[search_user_id],
+              msg: search_user_info.msg
             },
           },
           merge: true,

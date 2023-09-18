@@ -60,6 +60,10 @@ const SetRemarkLabel = ({
         labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
         des: search_user_info?.des || (info && info[search_user_id]?.des),
       };
+      
+      if(['addUser'].includes(op_type)){
+        formData.msg = `我是${search_user_info.msg||search_user_info.user_name}`
+      }
       setFormData({
         ...formData
       })
@@ -99,11 +103,16 @@ const SetRemarkLabel = ({
   // },[formData])
 
   const addFriendApply = useCallback(async ()=>{
-    ADD_FRIENDS_APPLY({
-      ...formData,
-      labels: formData.labels.join(','),
-      f_user_id: search_user_info.user_id,
-    });
+    try{
+      await ADD_FRIENDS_APPLY({
+        ...formData,
+        labels: formData.labels.map((it:any)=>it.label_id).join(','),
+        f_user_id: search_user_info.user_id,
+      });
+      navigation.goBack();
+    }catch(err:any){
+      console.log('err======>>>',err.message);
+    };
   },[formData])
   
 

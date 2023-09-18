@@ -59,9 +59,15 @@ export default class SocketIoClient {
 
         
 
-        socket.on('emitEventError', (res) => {
-            console.log('#emitEventError',res);
-        });
+        // socket.on('emitEventError', (res) => {
+        //     console.log('#emitEventError',res);
+        // });
+
+        socket.on('addFirendsApply',(data)=>{
+            console.log(`addFirendsApply=============>>>${userInfo.user_name}`,data)
+        })
+
+
     }
 
     getSocketIo(){
