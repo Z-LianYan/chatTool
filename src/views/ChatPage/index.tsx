@@ -33,6 +33,7 @@ import MyCell from '../../component/MyCell';
 import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
+import { TextInput } from 'react-native-gesture-handler';
 // import { 
 //   View,
 //   Text
@@ -45,42 +46,17 @@ const ChatPage = ({
   const sockitIo = SocketIoClient.getInstance();
   
   const colorScheme = useColorScheme();
+  const [msgContent,setMsgContent] = useState<string>();
+
+  
 
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft:'',
-      headerRight: ()=>{
-        return <Vw style={{paddingRight: 10}}>
-          <TouchableOpacity 
-          onPress={()=>{
-            console.log('123456');
-            // fromView.measureInWindow((x:number, y:number, width:number, height:number) => {
-              
-            // });
-            const width = Dimensions.get('window').width;
-            let items = [
-              { title: '添加朋友', 
-                icon: ADD_USER, 
-                onPress: () => {
-                  console.log('Search')
-                  navigation.navigate('AddFriend')
-                }
-              },
-            ];
-            Menu.show({x: width-130, y: 0, width:100, height:100}, items);
-          }}>
-            <Image 
-            style={{
-              width: 25,height:25,
-              tintColor: MyThemed[colorScheme||'light'].ftCr
-            }} 
-            source={ADD_CIR}/>
-          </TouchableOpacity>
-          
-        </Vw>
-      }
+      // headerLeft:'',
+      headerRight: '',
+      title:'张三'
     });
   });
   // const navigationState = navigation.getState();
@@ -90,48 +66,75 @@ const ChatPage = ({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
   })
-  return <ScrollView>
-    <MyCell 
-    time='12:59'
-    title='标题' 
-    avatarStyle={{
-      width: 44,
-      height:44
-    }}
-    showDisNotice={true}
-    showRightArrow={true}
-    rightValue="12345"
-    msg='1234567898765积分个懒人沙发就是浪费的时刻就放假睡懒觉饭都是废话lkl互粉啦放假啦大家福利都放假了就放辣椒来得及放辣椒的费拉达斯见风使舵了人家饿了人家了'
-    hasNewMsg={true}
-    showBottomBorder={true}
-    avatar={'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}
-    onPress={()=>{
-      console.log('123456')
-    }}/>
-    <MyCell 
-    time='12:59'
-    title='标题' 
-    avatarStyle={{
-      width: 44,
-      height: 44
-    }}
-    showDisNotice={true}
-    msg='1234567898765积分个懒人沙发就是浪费的时刻就放假睡懒觉饭都是废话lkl互粉啦放假啦大家福利都放假了就放辣椒来得及放辣椒的费拉达斯见风使舵了人家饿了人家了'
-    hasNewMsg={true}
-    avatar="http://zly.imgresource.com.cn/public/chat/commonAvatar.png"/>
-    <Text onPress={()=>{
-      sockitIo.getSocketIo().emit('server',{ a: AppStore?.userInfo?.user_name, c: [] });
-      // console.dir(sockitIo.getSocketIo());
+  return <View style={styles.container}>
+    <ScrollView style={styles.scroll_view}></ScrollView>
+    <View style={{
+      ...styles.bottomInputWrapper,
+      borderTopColor: MyThemed[colorScheme||'light'].ftCr2
     }}>
-      {
-        AppStore?.userInfo?.user_name
-      }
-    </Text>
-    
-  </ScrollView>;
+      <TextInput 
+      multiline={true}
+      clearButtonMode={'always'}
+      style={{
+        ...styles.msgContentInput,
+        flex:1,
+        // backgroundColor: MyThemed[colorScheme||'light'].ctBg,borderWidth: 0,height: 50,borderRadius: 10,color:MyThemed[colorScheme||'light'].ftCr
+      }}
+      placeholder='' 
+      value={msgContent} 
+      // animated={true}
+      autoFocus={false}//只聚焦，没有自动弹出键盘
+      keyboardType="default"
+      onChangeText={(val:string)=>{
+        console.log('val===',val)
+        setMsgContent(val)
+      }}
+      onSubmitEditing={async ()=>{}}/>
+      <TouchableOpacity 
+      style={styles.add_cir_icon}
+      onPress={()=>{
+        console.log('123456');
+        
+      }}>
+        <Image 
+        style={{
+          width: 25,height:25,
+          tintColor: MyThemed[colorScheme||'light'].ftCr
+        }} 
+        source={ADD_CIR}/>
+      </TouchableOpacity>
+    </View>
+  </View>;
 };
 
 const styles = StyleSheet.create({
+  container:{
+    flex:1,
+    position: 'relative',
+    
+  },
+  scroll_view:{
+    flex:1,
+  },
+  bottomInputWrapper:{
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+  },
+  msgContentInput:{
+    backgroundColor: '#cccccc',
+    borderRadius: 10,
+    height: 40
+  },
+  add_cir_icon:{
+    marginLeft: 20,
+  }
 });
 
 export default inject("AppStore","MyThemed")(observer(ChatPage));

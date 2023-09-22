@@ -16,14 +16,14 @@ import {
 } from '../component/teaset/index';
 
 import MyTabBar from '../component/TabBar';
-import ChatPage from '../views/ChatPage';
+import ChatListPage from '../views/ChatListPage';
 import AddressBookPage from '../views/AddressBookPage';
 import FindPage from '../views/FindPage';
 import MePage from '../views/MePage';
 const routes=[
   {
-    component: ChatPage, 
-    name: "ChatPage", 
+    component: ChatListPage, 
+    name: "ChatListPage", 
     options: {
       // title:'聊天',
       headerTitle:'聊天',
@@ -86,7 +86,7 @@ function BottomTabNavigator(props:any) {//AppStore
   const colorScheme = useColorScheme();
   return (
     <Tab.Navigator
-    initialRouteName="ChatPage"
+    initialRouteName="ChatListPage"
     tabBar={_props => <MyTabBar {..._props} />}
     screenOptions={({ route }) => ({
       // headerShown:true,//是否隐藏头部导航

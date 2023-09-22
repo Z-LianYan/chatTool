@@ -44,7 +44,10 @@ const AddressBookPage = ({
 
   const getAddressBookList = useCallback(async()=>{
     try{
-      const result:any = await getFriendList();
+      const result:any = await getFriendList({
+        page: 1,
+        limit: 100
+      });
       console.log('result------>>',result);
       setList(result.rows);
       setCount(result.count);

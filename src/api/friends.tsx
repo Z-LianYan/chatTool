@@ -88,4 +88,18 @@ export function ADD_FRIENDS_APPLY(params?:any,text='编辑中...') {
     });
   });
 }
-
+export function GET_NEW_FRIENDS_LIST(params?:any,text='加载中...') {
+  return new Promise((resolve, reject) => {
+    HttpUtils.post(Api.GET_NEW_FRIENDS_LIST, params, text).then((res:any)=> {
+      switch (res.error) {
+        case 0:
+          resolve(res.data);
+          break;
+        default:
+          Toast.fail(res.message);
+          reject(res);
+          break;
+      }
+    });
+  });
+}

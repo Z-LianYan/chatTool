@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import {
@@ -40,37 +40,76 @@ const UserDetail = ({
   const colorScheme = useColorScheme();
   const { params } = route;
   const { userInfo } = AppStore;
-  // const [remarkLabel,setRemarkLabel] = useState({
-  //   f_user_name_remark: '',
-  //   labels: [],
-  //   des: ''
-  // });
-  console.log('params.userInfo========>>123',params.userInfo)
 
   const [search_user_info,set_search_user_info] = useState<any>({});
   useEffect(()=>{
-
-    
-
-    // (async function(){
-    // })()
-
     const unsubscribe = navigation.addListener('state', async() => {
       // 处理路由变化的逻辑
-      let info:any = await AsyncStorage.getItem('remarkLabel');
-      info = info?JSON.parse(info):{};
-      const user_info = {
-        ...params.userInfo,
-        f_user_name_remark:(info[params?.userInfo?.user_id] && info[params?.userInfo?.user_id]?.f_user_name_remark) ? info[params?.userInfo?.user_id]?.f_user_name_remark: params?.userInfo?.f_user_name_remark,
-        labels: info[params?.userInfo?.user_id]?.labels ? (info[params?.userInfo?.user_id]?.labels||[]): (params?.userInfo?.labels||[]),
-        des: info[params?.userInfo?.user_id]?.des? info[params?.userInfo?.user_id]?.des:params?.userInfo?.des
-      }
-      set_search_user_info({
-        ...user_info
-      });
+      handerSearchUserInfo();
     });
     return unsubscribe;
   },[params.userInfo]);
+  const handerSearchUserInfo = useCallback(async ()=>{
+    let info:any = await AsyncStorage.getItem('remarkLabel');
+    info = info?JSON.parse(info):{};
+    const user_info = {
+      ...params.userInfo,
+      f_user_name_remark:(info[params?.userInfo?.user_id] && info[params?.userInfo?.user_id]?.f_user_name_remark) ? info[params?.userInfo?.user_id]?.f_user_name_remark: params?.userInfo?.f_user_name_remark,
+      labels: info[params?.userInfo?.user_id]?.labels ? (info[params?.userInfo?.user_id]?.labels||[]): (params?.userInfo?.labels||[]),
+      des: info[params?.userInfo?.user_id]?.des? info[params?.userInfo?.user_id]?.des:params?.userInfo?.des
+    }
+    set_search_user_info({
+      ...user_info
+    });
+  },[params.userInfo]);
+
+  const handerShowBtn = useCallback(()=>{
+    if(search_user_info.f_status===0) return <Button
+    title={'前往验证'}
+    type="default"
+    disabled={search_user_info.f_is_apply?true:false}
+    titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
+    style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
+    onPress={() => {
+      navigation.navigate('SetRemarkLabel',{
+        search_user_info: search_user_info,
+        op_type: 'addUser'
+      });
+    }}
+  />
+  if(search_user_info?.isFriends || search_user_info.user_id===userInfo?.user_id){
+    return <Button
+      title={'发送消息'}
+      type="default"
+      disabled={false}
+      titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
+      style={{
+        marginTop:10,
+        height: 55,
+        borderWidth:0,
+        backgroundColor: MyThemed[colorScheme||'light'].ctBg,
+      }}
+      onPress={() => {
+        navigation.navigate('ChatPage',{});
+      }}
+    />
+  }else{
+    return <Button
+      title={'添加到通讯录'}
+      type="default"
+      disabled={false}
+      titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
+      style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
+      onPress={() => {
+        navigation.navigate('SetRemarkLabel',{
+          search_user_info: search_user_info,
+          op_type: 'addUser'
+        });
+      }}
+    />
+  }
+
+  },[search_user_info]);
 
   return <ScrollView style={styles.container}>
     <NavigationBar
@@ -113,6 +152,8 @@ const UserDetail = ({
         </View>
       </View>
     </View>
+
+    
 
     {
       (search_user_info?.user_id!=userInfo?.user_id) && <MyCell
@@ -166,33 +207,11 @@ const UserDetail = ({
     
 
     {
-      search_user_info?.isFriends || search_user_info.user_id===userInfo?.user_id ?<Button
-        title={'发送消息'}
-        type="default"
-        disabled={false}
-        titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
-        style={{
-          marginTop:10,
-          height: 55,
-          borderWidth:0,
-          backgroundColor: MyThemed[colorScheme||'light'].ctBg,
-        }}
-        onPress={() => {
-        }}
-      />:<Button
-      title={'添加到通讯录'}
-      type="default"
-      disabled={false}
-      titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
-      style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
-      onPress={() => {
-        navigation.navigate('SetRemarkLabel',{
-          search_user_info: search_user_info,
-          op_type: 'addUser'
-        });
-      }}
-    />
+      handerShowBtn()
     }
+
+    
+
 
   </ScrollView>
   

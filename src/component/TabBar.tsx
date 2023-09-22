@@ -81,7 +81,7 @@ const TabBar = ({
     const isFocused = state.index === index;
 
     let iconName; 
-    if (route.name === 'ChatPage') {
+    if (route.name === 'ChatListPage') {
       iconName = isFocused ? CHAT_ACTIVATE_ICON : CHAT_ICON;
     } else if (route.name === 'AddressBookPage') {
       iconName = isFocused ? ADDRESS_BOOK_ACTIVATE_ICON : ADDRESS_BOOK_ICON;

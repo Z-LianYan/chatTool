@@ -71,12 +71,12 @@ const MyCell = ({
   let rightWrapper = {
     ...rightWrapperStyle
   }
-  if(showBottomBorder) rightWrapper = {
-    ...rightWrapper,
-    borderBottomWidth: 0.3,
-    borderColor: MyThemed[colorScheme||'light'].ftCr2,
-    ...rightWrapperStyle
-  }
+  // if(showBottomBorder) rightWrapper = {
+  //   // ...rightWrapper,
+  //   // borderBottomWidth: 0.5,
+  //   // borderColor: MyThemed[colorScheme||'light'].ftCr2,
+  //   // ...rightWrapperStyle
+  // }
   
   return <View style={style}>
     <TouchableOpacity style={styles.container} activeOpacity={0.6} onPress={()=>{
@@ -105,6 +105,7 @@ const MyCell = ({
       <View style={{
         ...styles.rightWrapper,
         ...rightWrapper,
+        position: 'relative'
       }}>
         <View style={{
           ...styles.titleMsgWrapper,
@@ -151,8 +152,13 @@ const MyCell = ({
           }} 
           source={RIGHT_ARROW}/>
         }
+
+        {
+          showBottomBorder && <View style={{
+            position: "absolute",left:0,right:0,bottom:1,height:0.6,backgroundColor: MyThemed[colorScheme||'light'].ftCr2,zIndex:1000,
+          }}></View>
+        }
       </View>
-      
     </TouchableOpacity>
   </View>;
 };

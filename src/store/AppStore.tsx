@@ -8,7 +8,7 @@ class AppStore {
   }
 
   tabBar = {
-    ChatPage: {
+    ChatListPage: {
       msgCnt: 10123,//消息数量
       isShowDot: false//tabbar是否显示有消息小点 （如果 isShowDot 为 true 消息数量msgCnt 就不会显示 ）
     },

@@ -36,6 +36,7 @@ import UserDetail from '../views/UserDetail';
 import SetRemarkLabel from '../views/SetRemarkLabel';
 import SetLabel from '../views/SetLabel';
 import NewFriendsList from '../views/NewFriendsList';
+import ChatPage from '../views/ChatPage';
 
 const routes=[
     { 
@@ -139,6 +140,16 @@ const routes=[
         options: {
             headerShown: true,
             title: '新朋友',
+            headerStyle:{
+            }
+        } 
+    },
+    { 
+        component: ChatPage, 
+        name: "ChatPage",
+        options: {
+            headerShown: true,
+            title: '',
             headerStyle:{
             }
         } 

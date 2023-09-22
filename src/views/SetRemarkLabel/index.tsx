@@ -62,7 +62,7 @@ const SetRemarkLabel = ({
       };
       
       if(['addUser'].includes(op_type)){
-        formData.msg = `我是${search_user_info.msg||search_user_info.user_name}`
+        formData.msg = `我是${search_user_info.msg||AppStore.userInfo.user_name}`
       }
       setFormData({
         ...formData
@@ -128,20 +128,21 @@ const SetRemarkLabel = ({
     title={['addUser'].includes(op_type) ? '申请添加朋友': ''}
     rightView={!['addUser'].includes(op_type) && <View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
+        let infoObj:any = await AsyncStorage.getItem('remarkLabel');
+        infoObj = JSON.parse(infoObj);
         if(search_user_info?.isFriends){
           await editFriends({
             ...formData,
             label_ids: formData?.labels?.map((item:any)=>item.label_id),
             friends_id: search_user_info?.friends_id
           });
-          let infoObj:any = await AsyncStorage.getItem('remarkLabel');
-          infoObj = JSON.parse(infoObj);
           if(infoObj[search_user_id]){
             delete infoObj[search_user_id];
             await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
           }
         }else{
-          await AsyncStorage.setItem('remarkLabel',JSON.stringify(formData));
+          infoObj[search_user_id] = formData;
+          await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
         }
         navigation.navigate({
           name: 'UserDetail',
