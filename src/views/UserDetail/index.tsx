@@ -30,6 +30,7 @@ import { Button } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { searchFriends } from '../../api/friends';
+import dayjs from 'dayjs';
 const UserDetail = ({ 
   MyThemed,
   AppStore,
@@ -64,19 +65,27 @@ const UserDetail = ({
   },[params.userInfo]);
 
   const handerShowBtn = useCallback(()=>{
+    if(search_user_info.f_status===0 && !search_user_info.expire && dayjs(search_user_info.expire).unix() < dayjs().unix()) return <Button
+      title={'已过期'}
+      type="default"
+      disabled={true}
+      titleStyle={{color: search_user_info.f_is_apply?MyThemed[colorScheme||'light'].ftCr2:MyThemed[colorScheme||'light'].ftCr3}}
+      style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
+      onPress={() => {}}
+    />
     if(search_user_info.f_status===0) return <Button
-    title={'前往验证'}
-    type="default"
-    disabled={search_user_info.f_is_apply?true:false}
-    titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
-    style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
-    onPress={() => {
-      navigation.navigate('SetRemarkLabel',{
-        search_user_info: search_user_info,
-        op_type: 'addUser'
-      });
-    }}
-  />
+      title={'前往验证'}
+      type="default"
+      disabled={search_user_info.f_is_apply?true:false}
+      titleStyle={{color: search_user_info.f_is_apply?MyThemed[colorScheme||'light'].ftCr2:MyThemed[colorScheme||'light'].ftCr3}}
+      style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
+      onPress={() => {
+        navigation.navigate('SetRemarkLabel',{
+          search_user_info: search_user_info,
+          op_type: 'addUser'
+        });
+      }}
+    />
   if(search_user_info?.isFriends || search_user_info.user_id===userInfo?.user_id){
     return <Button
       title={'发送消息'}

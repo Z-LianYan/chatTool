@@ -30,12 +30,13 @@ import { View,Text } from '../../component/customThemed';
 import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
-import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
+import { ADD_CIR, ADD_USER, NEW_FIREND, RIGHT_UP_ARROW } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
-import { Menu,Button } from '../../component/teaset';
+import { Menu,Button, Label } from '../../component/teaset';
 import SearchModal from '../AddFriend/SearchModal';
 import { GET_NEW_FRIENDS_LIST, getFriendList, searchFriends } from '../../api/friends';
 import { isIndexed } from 'immutable';
+import dayjs from 'dayjs';
 // import { 
 //   View,
 //   Text
@@ -60,9 +61,14 @@ const NewFriendsList = ({
   // const navigationState = navigation.getState();
   // const routeName = navigationState.routeNames[navigationState.index]
   useEffect(()=>{
-    // navigation.setOptions({
-    //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
-    // });
+    navigation.setOptions({
+      // headerTitle: "聊天",
+      headerRight: ()=>{
+        return <Label text="添加朋友" style={{marginRight: 10}} size="md" onPress={()=>{
+          search_modal_ref.current.open()
+        }}></Label>;
+      }
+    });
     getAddressBookList();
   },[]);
 
@@ -75,6 +81,29 @@ const NewFriendsList = ({
     }
     
   },[])
+
+  const handerRightShow = useCallback((item:any)=>{
+    if(![0].includes(item.status)) return <Text>已添加</Text>
+    if(dayjs(item.expire).unix()<dayjs().unix() || !item.expire) return <Text>已过期</Text>
+    
+    if([0].includes(item.is_apply)) {
+      return <Button 
+        title='接受' 
+        type="primary"
+        onPress={async ()=>{
+          const friends:any = await searchFriends({user_id: item.f_user_id});
+          console.log('friends===>>',friends)
+          navigation.navigate('SetRemarkLabel',{
+            search_user_info: friends,
+            op_type: 'addUser'
+          });
+        }}
+      ></Button>
+    }else {
+      return <Text>等待验证</Text>
+    }
+
+  },[]);
   return <ScrollView>
 
     <TouchableOpacity activeOpacity={0.6} style={styles.inputTO} onPress={()=>{
@@ -88,9 +117,11 @@ const NewFriendsList = ({
       </View>
     </TouchableOpacity>
     
-    <Vw style={styles.labelWrapper}>
-      <Text>近三天</Text>
-    </Vw>
+    {
+      recentlyThreeDays.length?<Vw style={styles.labelWrapper}>
+        <Text>近三天</Text>
+      </Vw>:''
+    }
     {
       recentlyThreeDays.map((item:any,index)=>{
         return <MyCell 
@@ -121,25 +152,26 @@ const NewFriendsList = ({
     }
     
 
-    <Vw style={styles.labelWrapper}>
-      <Text>三天前</Text>
-    </Vw>
+    {
+      threeDaysBefore.length?<Vw style={styles.labelWrapper}>
+        <Text>三天前</Text>
+      </Vw>:''
+    }
     {
       threeDaysBefore.map((item:any,index)=>{
         return <MyCell 
           key={'threeDaysBefore'+index}
-          time={[0].includes(item.status)?([0].includes(item.is_apply)?<Button 
-            title='接受' 
-            type="primary"
-            onPress={async ()=>{
-              const friends:any = await searchFriends({user_id: item.f_user_id});
-              console.log('friends===>>',friends)
-              navigation.navigate('SetRemarkLabel',{
-                search_user_info: friends,
-                op_type: 'addUser'
-              });
-            }}
-          ></Button>:'等待验证'):'已添加'}
+          time={<Text>
+            {
+              [1].includes(item.is_apply) && <Image style={{
+                ...styles.right_up_arrow,
+                tintColor: MyThemed[colorScheme||'light'].ftCr2
+              }} source={RIGHT_UP_ARROW}/>
+            }
+            {
+              handerRightShow(item)
+            }
+          </Text>}
           title={item.f_user_name}
           avatarStyle={{
             width: 44,
@@ -182,10 +214,14 @@ const styles = StyleSheet.create({
     marginHorizontal:20,
   },
   inputeText:{
-    height: 50,
+    height: 40,
     lineHeight: 50,
     textAlign: 'center',
   },
+  right_up_arrow:{
+    width: 18,
+    height: 18
+  }
 });
 
 export default inject("AppStore","MyThemed")(observer(NewFriendsList));
