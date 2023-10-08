@@ -105,7 +105,7 @@ const SetLabel = ({
           ...info[search_user_id],
           labels: selectLabels,
         }
-        if(search_user_info?.isFriends){
+        if([1].includes(search_user_info?.f_status)){
           await editFriends({
             label_ids: selectLabels.map((item:any)=>item.label_id),
             friends_id: search_user_info?.friends_id

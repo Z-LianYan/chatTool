@@ -31,7 +31,10 @@ import { Button, Input } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
-import { ADD_FRIENDS_APPLY, editFriends } from '../../api/friends';
+import { ACCEPT_ADD_FRIENDS, ADD_FRIENDS_APPLY, editFriends } from '../../api/friends';
+import { StackActions } from '@react-navigation/core';
+import dayjs from 'dayjs';
+
 const SetRemarkLabel = ({ 
   MyThemed,
   AppStore,
@@ -108,12 +111,38 @@ const SetRemarkLabel = ({
         ...formData,
         labels: formData.labels.map((it:any)=>it.label_id).join(','),
         f_user_id: search_user_info.user_id,
+        source: search_user_info.source
       });
       navigation.goBack();
     }catch(err:any){
       console.log('err======>>>',err.message);
     };
   },[formData])
+
+  const expireHander = useCallback(()=>{
+    Alert.alert(
+      "提示",
+      "朋友请求已过期，请主动添加对方",
+      [
+        {
+          text: "取消",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "添加", onPress: async () => {
+
+          navigation.pop();
+          navigation.navigate({
+            name: 'SetRemarkLabel',
+            params:{
+              search_user_info,
+              op_type: 'addUser'
+            }
+          })
+        } }
+      ]
+    );
+  },[]);
   
 
   return <ScrollView style={{
@@ -126,11 +155,11 @@ const SetRemarkLabel = ({
       navigation.goBack()
     }}
     title={['addUser'].includes(op_type) ? '申请添加朋友': ''}
-    rightView={!['addUser'].includes(op_type) && <View  style={{paddingRight:10}}>
+    rightView={['editUser'].includes(op_type) && <View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
         let infoObj:any = await AsyncStorage.getItem('remarkLabel');
         infoObj = JSON.parse(infoObj);
-        if(search_user_info?.isFriends){
+        if([1].includes(search_user_info?.f_status)){
           await editFriends({
             ...formData,
             label_ids: formData?.labels?.map((item:any)=>item.label_id),
@@ -157,7 +186,7 @@ const SetRemarkLabel = ({
       }}>保存</Button>
     </View>}/>
     <View style={styles.contenWrapper}>
-      {!['addUser'].includes(op_type) && <Text style={styles.titleTxt}>设置备注和标签</Text>}
+      {['editUser'].includes(op_type) && <Text style={styles.titleTxt}>设置备注和标签</Text>}
       {
         ['addUser'].includes(op_type) && <View style={styles.forWwrapper}>
           <Text style={styles.labelTxt}>发送添加朋友申请</Text>
@@ -269,27 +298,67 @@ const SetRemarkLabel = ({
         }}></Input>
       </View>
 
+      
+
       {
        ['addUser'].includes(op_type) && <Button
-        title={'发送'}
-        type="default"
-        disabled={false}
-        activeOpacity={0.6}
-        titleStyle={{color: '#fff'}}
-        style={{
-          marginTop:10,
-          marginHorizontal: 30,
-          height: 50,
-          borderWidth:0, 
-          backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
-        }}
-        onPress={() => {
-          addFriendApply();
-        }}
-      />
+          title={'发送'}
+          type="default"
+          disabled={false}
+          activeOpacity={0.6}
+          titleStyle={{color: '#fff'}}
+          style={{
+            marginTop:10,
+            marginHorizontal: 30,
+            height: 50,
+            borderWidth:0, 
+            backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
+          }}
+          onPress={() => {
+            console.log('search_user_info===>>>',search_user_info);
+            console.log('search_user_info===>>>111',AppStore.userInfo);
+            addFriendApply();
+          }}
+        />
+      }
+      {
+       ['toVerify'].includes(op_type) && <Button
+          title={'完成'}
+          type="default"
+          disabled={false}
+          activeOpacity={0.6}
+          titleStyle={{color: '#fff'}}
+          style={{
+            marginTop:10,
+            marginHorizontal: 30,
+            height: 50,
+            borderWidth:0, 
+            backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
+          }}
+          onPress={async () => {
+            
+            // navigation.dispatch(navigation.pop());//清除内部导航堆栈
+
+            if(search_user_info?.expire<=dayjs().format('YYYY-MM-DD HH:mm:ss')){
+              expireHander()
+            }else{
+              await ACCEPT_ADD_FRIENDS({
+                ...formData,
+                label_ids: (formData.labels && formData.labels.length)?formData.labels.map((item:any)=>item.label_id).join(','):null,
+                f_user_id: search_user_info.user_id,
+              });
+            }
+
+            console.log('search_user_info===>>>',search_user_info)
+            
+
+          }}
+        />
       }
     </View>
   </ScrollView>
+
+  
 };
 
 const styles = StyleSheet.create({

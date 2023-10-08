@@ -68,7 +68,7 @@ export function editFriends(params?:any,text='编辑中...') {
 }
 
 
-export function ADD_FRIENDS_APPLY(params?:any,text='编辑中...') {
+export function ADD_FRIENDS_APPLY(params?:any,text='添加中...') {
   return new Promise((resolve, reject) => {
     HttpUtils.post(Api.ADD_FRIENDS_APPLY, params, text).then((res:any)=> {
       switch (res.error) {
@@ -88,6 +88,28 @@ export function ADD_FRIENDS_APPLY(params?:any,text='编辑中...') {
     });
   });
 }
+export function ACCEPT_ADD_FRIENDS(params?:any,text='操作中...') {
+  return new Promise((resolve, reject) => {
+    HttpUtils.post(Api.ACCEPT_ADD_FRIENDS, params, text).then((res:any)=> {
+      switch (res.error) {
+        case 0:
+          resolve(res.data);
+          Toast.show({
+            icon: 'success',
+            duration: 2000,
+            text: res.message,
+          });
+          break;
+        default:
+          Toast.fail(res.message);
+          reject(res);
+          break;
+      }
+    });
+  });
+}
+
+
 export function GET_NEW_FRIENDS_LIST(params?:any,text='加载中...') {
   return new Promise((resolve, reject) => {
     HttpUtils.post(Api.GET_NEW_FRIENDS_LIST, params, text).then((res:any)=> {

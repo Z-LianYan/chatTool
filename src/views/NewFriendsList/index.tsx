@@ -95,7 +95,7 @@ const NewFriendsList = ({
           console.log('friends===>>',friends)
           navigation.navigate('SetRemarkLabel',{
             search_user_info: friends,
-            op_type: 'addUser'
+            op_type: 'toVerify'
           });
         }}
       ></Button>
@@ -126,7 +126,17 @@ const NewFriendsList = ({
       recentlyThreeDays.map((item:any,index)=>{
         return <MyCell 
           key={'recentlyThreeDays'+index}
-          time={[0].includes(item.status)?([0].includes(item.is_apply)?<Button title='接受'></Button>:'等待验证'):'已添加'}
+          time={<Text>
+            {
+              [1].includes(item.is_apply) && <Image style={{
+                ...styles.right_up_arrow,
+                tintColor: MyThemed[colorScheme||'light'].ftCr2
+              }} source={RIGHT_UP_ARROW}/>
+            }
+            {
+              handerRightShow(item)
+            }
+          </Text>}
           title={item.f_user_name}
           avatarStyle={{
             width: 44,
@@ -186,7 +196,6 @@ const NewFriendsList = ({
           avatar={item.f_avatar}
           onPress={async ()=>{
             const friends:any = await searchFriends({user_id: item.f_user_id});
-            console.log('friends===>>',friends)
             navigation.navigate({
               name: 'UserDetail',
               params: {
@@ -215,7 +224,7 @@ const styles = StyleSheet.create({
   },
   inputeText:{
     height: 40,
-    lineHeight: 50,
+    lineHeight: 40,
     textAlign: 'center',
   },
   right_up_arrow:{

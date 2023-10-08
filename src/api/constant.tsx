@@ -17,8 +17,10 @@ export const  EDIT_FRIENDS_LABEL = "/chat/friendsLabel/edit"; //编辑标签
 export const  DEL_FRIENDS_LABEL = "/chat/friendsLabel/del"; //删除标签
 
 export const  EDIT_FRIENDS = "/chat/friends/edit"; //编辑朋友
-export const  ADD_FRIENDS_APPLY = "/chat/friends/addApply"; //编辑朋友
+export const  ADD_FRIENDS_APPLY = "/chat/friends/addApply"; //添加朋友
+export const  ACCEPT_ADD_FRIENDS = "/chat/friends/acceptAddFriends"; //接受申请添加为朋友
 export const  GET_NEW_FRIENDS_LIST = "/chat/friends/getNewFriendsList"; //获取新朋友
+
 
 
 

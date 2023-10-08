@@ -87,11 +87,11 @@ const UserDetail = ({
       onPress={() => {
         navigation.navigate('SetRemarkLabel',{
           search_user_info: search_user_info,
-          op_type: 'addUser'
+          op_type: 'toVerify'
         });
       }}
     />
-    if(search_user_info?.isFriends || search_user_info.user_id===userInfo?.user_id){
+    if([1].includes(search_user_info?.f_status) || search_user_info.user_id===userInfo?.user_id){
       return <Button
         title={'发送消息'}
         type="default"
@@ -156,7 +156,7 @@ const UserDetail = ({
           <View style={{flexDirection:'column'}}>
             {search_user_info?.f_user_name_remark && search_user_info?.user_name!=search_user_info?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{search_user_info?.user_name}</Text>}
             {
-              (search_user_info?.isFriends || search_user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{search_user_info?.chat_no}</Text>
+              ([1].includes(search_user_info?.f_status) || search_user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{search_user_info?.chat_no}</Text>
             }
             
             <Text style={{flex:1,marginTop:5}}>地区：{search_user_info?.area}</Text>
@@ -173,11 +173,12 @@ const UserDetail = ({
       (search_user_info?.user_id!=userInfo?.user_id) && <MyCell
       rightWrapperStyle={{paddingVertical: 20}}
       title='设置备注和标签' 
-      showBottomBorder={search_user_info?.isFriends?true:false}
+      showBottomBorder={[1].includes(search_user_info?.f_status)}
       showRightArrow={true}
       onPress={()=>{
         navigation.navigate('SetRemarkLabel',{
-          search_user_info: search_user_info
+          search_user_info: search_user_info,
+          op_type: 'editUser'
         });
       }}/>
     }
@@ -190,7 +191,8 @@ const UserDetail = ({
         rightValue={Array.isArray(search_user_info?.labels) && search_user_info?.labels.map((item:any)=>item.label_name).join('，')}
         onPress={()=>{
           navigation.navigate('SetRemarkLabel',{
-            search_user_info: search_user_info
+            search_user_info: search_user_info,
+            op_type: 'editUser'
           })
       }}/>: null
     }
@@ -203,7 +205,8 @@ const UserDetail = ({
         rightValue={search_user_info?.des}
         onPress={()=>{
           navigation.navigate('SetRemarkLabel',{
-            search_user_info: search_user_info
+            search_user_info: search_user_info,
+            op_type: 'editUser'
           });
       }}/>
     }
