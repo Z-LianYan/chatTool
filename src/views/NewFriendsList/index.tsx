@@ -31,7 +31,6 @@ import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
 import { ADD_CIR, ADD_USER, NEW_FIREND, RIGHT_UP_ARROW } from '../../assets/image';
-import SocketIoClient from '../../socketIo';
 import { Menu,Button, Label } from '../../component/teaset';
 import SearchModal from '../AddFriend/SearchModal';
 import { GET_NEW_FRIENDS_LIST, getFriendList, searchFriends } from '../../api/friends';
@@ -47,7 +46,6 @@ const NewFriendsList = ({
   navigation,
 }:any) => {
   const search_modal_ref:{current:any} = useRef();
-  const sockitIo = SocketIoClient.getInstance();
   
   const colorScheme = useColorScheme();
   const [recentlyThreeDays,setRecentlyThreeDays] = useState([]);

@@ -31,7 +31,7 @@ import { Button, Input } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
-import { ACCEPT_ADD_FRIENDS, ADD_FRIENDS_APPLY, editFriends } from '../../api/friends';
+import { ACCEPT_ADD_FRIENDS, ADD_FRIENDS_APPLY, editFriends, searchFriends } from '../../api/friends';
 import { StackActions } from '@react-navigation/core';
 import dayjs from 'dayjs';
 
@@ -109,11 +109,27 @@ const SetRemarkLabel = ({
     try{
       await ADD_FRIENDS_APPLY({
         ...formData,
-        labels: formData.labels.map((it:any)=>it.label_id).join(','),
+        label_ids: (formData.labels && formData.labels.length)?formData.labels.map((it:any)=>it.label_id).join(','):null,
         f_user_id: search_user_info.user_id,
         source: search_user_info.source
       });
-      navigation.goBack();
+
+      //清除缓存
+      let infoObj:any = await AsyncStorage.getItem('remarkLabel');
+      infoObj = JSON.parse(infoObj);
+      if(infoObj[search_user_id]){
+        delete infoObj[search_user_id];
+        await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
+      }
+
+      navigation.dispatch(navigation.pop(2));//清除内部导航堆栈
+      navigation.navigate({
+        name: 'UserDetail',
+        params: {
+          // userInfo: friends,
+          user_id: search_user_info.user_id
+        }
+      });
     }catch(err:any){
       console.log('err======>>>',err.message);
     };
@@ -159,7 +175,7 @@ const SetRemarkLabel = ({
       <Button title="保存" type="primary" onPress={async ()=>{
         let infoObj:any = await AsyncStorage.getItem('remarkLabel');
         infoObj = JSON.parse(infoObj);
-        if([1].includes(search_user_info?.f_status)){
+        if([1].includes(search_user_info?.f_status)){//f_status  是friends 表的status 1:已添加为好友
           await editFriends({
             ...formData,
             label_ids: formData?.labels?.map((item:any)=>item.label_id),
@@ -220,7 +236,7 @@ const SetRemarkLabel = ({
         <Text style={styles.labelTxt}>备注</Text>
         <Input 
         value={formData?.f_user_name_remark}
-        placeholder="新的备注名"
+        placeholder="备注名"
         style={{
           ...styles.valueTxt,
           height: 50,
@@ -314,9 +330,7 @@ const SetRemarkLabel = ({
             borderWidth:0, 
             backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
           }}
-          onPress={() => {
-            console.log('search_user_info===>>>',search_user_info);
-            console.log('search_user_info===>>>111',AppStore.userInfo);
+          onPress={async () => {
             addFriendApply();
           }}
         />
@@ -337,7 +351,6 @@ const SetRemarkLabel = ({
           }}
           onPress={async () => {
             
-            // navigation.dispatch(navigation.pop());//清除内部导航堆栈
 
             if(search_user_info?.expire<=dayjs().format('YYYY-MM-DD HH:mm:ss')){
               expireHander()
@@ -346,6 +359,23 @@ const SetRemarkLabel = ({
                 ...formData,
                 label_ids: (formData.labels && formData.labels.length)?formData.labels.map((item:any)=>item.label_id).join(','):null,
                 f_user_id: search_user_info.user_id,
+              });
+
+              //清除缓存
+              let infoObj:any = await AsyncStorage.getItem('remarkLabel');
+              infoObj = JSON.parse(infoObj);
+              if(infoObj[search_user_id]){
+                delete infoObj[search_user_id];
+                await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
+              }
+
+              const friends:any = await searchFriends({user_id: search_user_info.user_id});
+              navigation.dispatch(navigation.pop());//清除内部导航堆栈
+              navigation.navigate({
+                name: 'UserDetail',
+                params: {
+                  userInfo: friends,
+                }
               });
             }
 

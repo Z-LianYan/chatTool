@@ -60,7 +60,7 @@ const MyCell = ({
     width: 34,
     height: 34
   },
-  rightWrapperStyle = {}
+  rightWrapperStyle = {},
 }:any) => {
     
   const colorScheme = useColorScheme();
@@ -152,6 +152,7 @@ const MyCell = ({
           }} 
           source={RIGHT_ARROW}/>
         }
+
 
         {
           showBottomBorder && <View style={{

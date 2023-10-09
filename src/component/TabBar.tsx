@@ -50,8 +50,8 @@ import {
   MINE_ICON,
   MINE_ACTIVATE_ICON,
 } from '../assets/image/index';
+import { runInAction } from 'mobx';
 
-import { get_film_hot } from '../api/film';
 // type TypeProps = {
 //   index?: number
 // }
@@ -106,6 +106,12 @@ const TabBar = ({
         //   return;
         // }
         navigation.navigate({ name: route.name, merge: true });
+        AppStore.curRouteName = route.name;
+        if(route.name=='AddressBookPage'){
+          runInAction(()=>{
+            AppStore.tabBar.AddressBookPage.msgCnt = 0;
+          });
+        }
       }
     };
 

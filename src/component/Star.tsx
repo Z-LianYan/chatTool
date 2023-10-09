@@ -45,7 +45,6 @@ import {
 import PropTypes, { number } from 'prop-types';
 
 
-import { get_film_hot } from '../api/film';
 type TypeProps = {
   size?:number,
   value?:number,
@@ -82,11 +81,11 @@ const Star = ({
           height:size,
           width:size
         }}>
-        <Ionicons
+        {/* <Ionicons
         name={isHalf?'star-half-sharp':(i+1)<=value?'star-sharp':'md-star-outline'} 
         size={isHalf?size:(i+1)<=value?size:size-3} 
         color={((i+1)<=value || isHalf)?Theme.primaryColor:Theme.primaryColor}
-        style={{marginTop:isHalf?0:(i+1)<=value?0:1.5,marginLeft:isHalf?0:(i+1)<=value?0:-1.55}}/>
+        style={{marginTop:isHalf?0:(i+1)<=value?0:1.5,marginLeft:isHalf?0:(i+1)<=value?0:-1.55}}/> */}
         <TouchableOpacity 
         style={styles.leftWrapper} 
         activeOpacity={0.9}

@@ -25,13 +25,15 @@ import MyCell from '../../component/MyCell';
 import { NEW_FIREND } from '../../assets/image';
 import { View } from '../../component/customThemed';
 import { getFriendList } from '../../api/friends';
+import { runInAction } from 'mobx';
 // import { 
 //   View,
 //   Text
 // } from '../component/customThemed';
 const AddressBookPage = ({
   MyThemed,
-  navigation
+  navigation,
+  AppStore
 }:any) => {
     
   const colorScheme = useColorScheme();
@@ -54,7 +56,6 @@ const AddressBookPage = ({
     }catch(err:any){
       console.log('err------>>',err.message)
     }
-    
   },[])
   type itemType = {
     user_name: string,
@@ -64,12 +65,22 @@ const AddressBookPage = ({
   
   return <ScrollView>
     <MyCell
-    title='新的朋友' 
-    avatar={NEW_FIREND}
+    title={AppStore.addFirendsApply?AppStore.addFirendsApply.user_name:'新的朋友'} 
+    avatar={AppStore.addFirendsApply?AppStore.addFirendsApply.avatar:NEW_FIREND}
+    msg={AppStore.addFirendsApply?AppStore.addFirendsApply.msg:''}
     showBottomBorder={true}
     showRightArrow={false} 
+    isAvatarTintColor={false}
+    rightValue={AppStore.addFirendsApply ? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
+      <Text style={{width: 18,height: 18,lineHeight:18,color: '#fff',fontSize: 10,textAlign:'center'}}>{AppStore.tabBar.AddressBookPage.msgCnt2}</Text>
+    </View>:null}
     onPress={()=>{
       navigation.navigate('NewFriendsList')
+      runInAction(()=>{
+        AppStore.addFirendsApply = null;
+        AppStore.tabBar.AddressBookPage.msgCnt = 0;
+        AppStore.tabBar.AddressBookPage.msgCnt2 = 0;
+      });
     }}/>
     <MyCell
     title='仅聊天的朋友' 
@@ -77,6 +88,7 @@ const AddressBookPage = ({
     showBottomBorder={false}
     showRightArrow={false}/>
     <Vw style={styles.separator}></Vw>
+
     {
       list.map((item:itemType,index)=>{
         return <MyCell

@@ -49,27 +49,32 @@ const UserDetail = ({
       handerSearchUserInfo();
     });
     return unsubscribe;
-  },[params.userInfo]);
+  },[params.userInfo,params.user_id]);
   const handerSearchUserInfo = useCallback(async ()=>{
     let info:any = await AsyncStorage.getItem('remarkLabel');
     info = info?JSON.parse(info):{};
-    const user_info = {
+
+    if(params.user_id){
+      route.params.userInfo = await searchFriends({user_id: params.user_id});
+    }
+    let user_info = {
       ...params.userInfo,
-      f_user_name_remark:(info[params?.userInfo?.user_id] && info[params?.userInfo?.user_id]?.f_user_name_remark) ? info[params?.userInfo?.user_id]?.f_user_name_remark: params?.userInfo?.f_user_name_remark,
+      f_user_name_remark:info[params?.userInfo?.user_id]?.f_user_name_remark ? info[params?.userInfo?.user_id]?.f_user_name_remark: params?.userInfo?.f_user_name_remark,
       labels: info[params?.userInfo?.user_id]?.labels ? (info[params?.userInfo?.user_id]?.labels||[]): (params?.userInfo?.labels||[]),
       des: info[params?.userInfo?.user_id]?.des? info[params?.userInfo?.user_id]?.des:params?.userInfo?.des
     }
     set_search_user_info({
       ...user_info
     });
-  },[params.userInfo]);
+  },[params.userInfo,params.user_id]);
 
   const footerShowBtn = useCallback(()=>{
-    if(search_user_info.f_status===0 && (!search_user_info.expire || dayjs(search_user_info.expire).unix() < dayjs().unix()) && [1].includes(search_user_info.f_is_apply)) return <Button
+    // !search_user_info.expire || (dayjs(search_user_info.expire).unix() < dayjs().unix()) && 
+    if(search_user_info.f_status==0 && [1].includes(search_user_info.f_is_apply)) return <Button
       title={'添加到通讯录'}
       type="default"
       disabled={false}
-      titleStyle={{color: search_user_info.f_is_apply?MyThemed[colorScheme||'light'].ftCr2:MyThemed[colorScheme||'light'].ftCr3}}
+      titleStyle={{color: search_user_info.f_is_apply?MyThemed[colorScheme||'light'].ftCr3:MyThemed[colorScheme||'light'].ftCr3}}
       style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
       onPress={() => {
         navigation.navigate('SetRemarkLabel',{

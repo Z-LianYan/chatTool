@@ -2,6 +2,7 @@ import socket_io_client from "socket.io-client";
 import config from './config';
 import store from './store/index';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { runInAction } from "mobx";
 
 export default class SocketIoClient {
     static getInstance(callBack){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
@@ -63,8 +64,15 @@ export default class SocketIoClient {
         //     console.log('#emitEventError',res);
         // });
 
-        socket.on('addFirendsApply',(data)=>{
+        socket.on('addFirendsApply',(data)=>{//添加好友申请消息通知
             console.log(`addFirendsApply=============>>>${userInfo.user_name}`,data)
+            runInAction(()=>{
+                if(store.AppStore.addFirendsApply?.user_id != data.applyFriends.user_id) {
+                    store.AppStore.tabBar.AddressBookPage.msgCnt2 += 1;
+                    if(!['AddressBookPage'].includes(store.AppStore.curRouteName))store.AppStore.tabBar.AddressBookPage.msgCnt += 1;
+                };
+                store.AppStore.addFirendsApply = data.applyFriends;
+            });
         })
 
 
