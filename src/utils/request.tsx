@@ -71,6 +71,7 @@ service.interceptors.response.use(
 );
 export function post(url:string, data?:any, text?:string,headers={}) {
   return new Promise((resolve, reject) => {
+    hideLoading();
     if (text) isLoading(text);
     service({
       url: url,
@@ -95,6 +96,7 @@ export function post(url:string, data?:any, text?:string,headers={}) {
 
 export function get(url:string, params?:any, text?:string, headers={}) {
   return new Promise((resolve, reject) => {
+    hideLoading();
     if (text) isLoading(text);
     service({
       url: url,

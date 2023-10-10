@@ -57,7 +57,7 @@ const SetRemarkLabel = ({
   useEffect(()=>{
     (async function(){
       let info:any = await AsyncStorage.getItem('remarkLabel');
-      info = JSON.parse(info);
+      info = info? JSON.parse(info) : {};
       formData = {
         f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
         labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
@@ -65,8 +65,9 @@ const SetRemarkLabel = ({
       };
       
       if(['addUser'].includes(op_type)){
-        formData.msg = `我是${search_user_info.msg||AppStore.userInfo.user_name}`
+        formData.msg = `我是${search_user_info.msg||AppStore?.userInfo?.user_name}`
       }
+
       setFormData({
         ...formData
       })
@@ -113,15 +114,16 @@ const SetRemarkLabel = ({
         f_user_id: search_user_info.user_id,
         source: search_user_info.source
       });
-
+      
       //清除缓存
       let infoObj:any = await AsyncStorage.getItem('remarkLabel');
-      infoObj = JSON.parse(infoObj);
+      
+      infoObj = infoObj? JSON.parse(infoObj) : {};
       if(infoObj[search_user_id]){
         delete infoObj[search_user_id];
         await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
       }
-
+      
       navigation.dispatch(navigation.pop(2));//清除内部导航堆栈
       navigation.navigate({
         name: 'UserDetail',
@@ -174,7 +176,7 @@ const SetRemarkLabel = ({
     rightView={['editUser'].includes(op_type) && <View  style={{paddingRight:10}}>
       <Button title="保存" type="primary" onPress={async ()=>{
         let infoObj:any = await AsyncStorage.getItem('remarkLabel');
-        infoObj = JSON.parse(infoObj);
+        infoObj = infoObj?JSON.parse(infoObj):{};
         if([1].includes(search_user_info?.f_status)){//f_status  是friends 表的status 1:已添加为好友
           await editFriends({
             ...formData,
@@ -363,7 +365,7 @@ const SetRemarkLabel = ({
 
               //清除缓存
               let infoObj:any = await AsyncStorage.getItem('remarkLabel');
-              infoObj = JSON.parse(infoObj);
+              infoObj = infoObj?JSON.parse(infoObj):{};
               if(infoObj[search_user_id]){
                 delete infoObj[search_user_id];
                 await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));

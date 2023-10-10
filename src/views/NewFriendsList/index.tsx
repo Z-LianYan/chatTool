@@ -68,6 +68,14 @@ const NewFriendsList = ({
       }
     });
     getAddressBookList();
+    return ()=>{
+      runInAction(()=>{
+        console.log('销毁======》〉》')
+        AppStore.addFirendsApply = [];
+        AppStore.tabBar.AddressBookPage.msgCnt =  0;
+        AppStore.tabBar.AddressBookPage.msgCnt2 =  0;
+      });
+    }
   },[]);
 
   const getAddressBookList = useCallback(async()=>{

@@ -156,7 +156,7 @@ const MyCell = ({
 
         {
           showBottomBorder && <View style={{
-            position: "absolute",left:0,right:0,bottom:1,height:0.6,backgroundColor: MyThemed[colorScheme||'light'].ftCr2,zIndex:1000,
+            position: "absolute",left:0,right:0,bottom:0.5,height:0.6,backgroundColor: MyThemed[colorScheme||'light'].ftCr2,zIndex:1000,
           }}></View>
         }
       </View>

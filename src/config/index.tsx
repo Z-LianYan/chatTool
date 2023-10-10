@@ -16,7 +16,7 @@ let config = {
   ...dev,
 }
 
-process.env.NODE_ENV=='development'?config = {
+process.env.NODE_ENV=='development1'?config = {
   ...config,
   ...dev
 }: config = {

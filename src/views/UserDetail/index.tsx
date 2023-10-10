@@ -31,6 +31,7 @@ import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { searchFriends } from '../../api/friends';
 import dayjs from 'dayjs';
+import { runInAction } from 'mobx';
 const UserDetail = ({ 
   MyThemed,
   AppStore,
@@ -178,7 +179,7 @@ const UserDetail = ({
       (search_user_info?.user_id!=userInfo?.user_id) && <MyCell
       rightWrapperStyle={{paddingVertical: 20}}
       title='设置备注和标签' 
-      showBottomBorder={[1].includes(search_user_info?.f_status)}
+      showBottomBorder={(search_user_info?.labels && search_user_info?.labels.length)||search_user_info?.des}
       showRightArrow={true}
       onPress={()=>{
         navigation.navigate('SetRemarkLabel',{

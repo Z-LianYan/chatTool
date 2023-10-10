@@ -60,7 +60,7 @@ class AppStore {
     upload_token:''
   }; //七牛上传配置
   
-  addFirendsApply = null;
+  addFirendsApply = [];
   
 }
 const app = new AppStore()

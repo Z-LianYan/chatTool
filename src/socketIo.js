@@ -65,13 +65,25 @@ export default class SocketIoClient {
         // });
 
         socket.on('addFirendsApply',(data)=>{//添加好友申请消息通知
-            console.log(`addFirendsApply=============>>>${userInfo.user_name}`,data)
+            console.log('===========>>>>',data);
             runInAction(()=>{
-                if(store.AppStore.addFirendsApply?.user_id != data.applyFriends.user_id) {
-                    store.AppStore.tabBar.AddressBookPage.msgCnt2 += 1;
-                    if(!['AddressBookPage'].includes(store.AppStore.curRouteName))store.AppStore.tabBar.AddressBookPage.msgCnt += 1;
-                };
-                store.AppStore.addFirendsApply = data.applyFriends;
+                if(!data?.applyFriends?.user_id) return;
+                // if(store.AppStore.addFirendsApply?.user_id != data.applyFriends.user_id) {
+                //     store.AppStore.tabBar.AddressBookPage.msgCnt2 += 1;
+                //     if(!['AddressBookPage'].includes(store.AppStore.curRouteName)) store.AppStore.tabBar.AddressBookPage.msgCnt += 1;
+                // }else{
+                //     if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && store.AppStore.tabBar.AddressBookPage.msgCnt===0 && store.AppStore.addFirendsApply?.user_id == data.applyFriends.user_id) store.AppStore.tabBar.AddressBookPage.msgCnt = store.AppStore.tabBar.AddressBookPage.msgCnt2;
+                // }
+                const idx = store.AppStore.addFirendsApply.findIndex(item=>item.user_id==data.applyFriends.user_id);
+                console.log('===========>>>>idx',idx);
+                if(idx!=-1){
+                    store.AppStore.addFirendsApply.splice(idx,1);
+                    store.AppStore.addFirendsApply.push(data.applyFriends);
+                }else{
+                    store.AppStore.addFirendsApply.push(data.applyFriends);
+                }
+                store.AppStore.tabBar.AddressBookPage.msgCnt =  store.AppStore.addFirendsApply.length;
+                store.AppStore.tabBar.AddressBookPage.msgCnt2 =  store.AppStore.addFirendsApply.length;
             });
         })
 
