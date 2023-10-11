@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useCallback } from 'react';
+import React, { useState,useEffect, useCallback, useRef } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import {
@@ -12,6 +12,7 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
+  View as Vw
 } from 'react-native';
 
 import { 
@@ -26,12 +27,13 @@ import {
   View,
   Text
 } from '../../component/customThemed';
-import { Button } from '../../component/teaset';
+import { Button, Label } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { searchFriends } from '../../api/friends';
 import dayjs from 'dayjs';
 import { runInAction } from 'mobx';
+import ReplyMsg from './ReplyMsg';
 const UserDetail = ({ 
   MyThemed,
   AppStore,
@@ -42,6 +44,8 @@ const UserDetail = ({
   const colorScheme = useColorScheme();
   const { params } = route;
   const { userInfo } = AppStore;
+  const replyMsgRef:{current:any} = useRef();
+
 
   const [search_user_info,set_search_user_info] = useState<any>({});
   useEffect(()=>{
@@ -173,7 +177,39 @@ const UserDetail = ({
       </View>
     </View>
 
-    
+    <View style={{
+      ...styles.applyMsgWrapper,
+    }}>
+      <Vw style={{
+        ...styles.applyMsgContentWrapper,
+        backgroundColor: MyThemed[colorScheme||'light'].bg,
+        // borderColor: MyThemed[colorScheme||'light'].ftcr2
+      }}>
+        {
+          search_user_info?.msgs?search_user_info.msgs.map((item:any,index:number)=>{
+            return <Text style={styles.msgContent} key={'msg'+index}>lend: {item.msg_content}</Text>
+          }):null
+        }
+        
+        <TouchableOpacity 
+        activeOpacity={0.5}
+        onPress={()=>{
+          replyMsgRef?.current.open(()=>{
+            console.log('1234567')
+          })
+        }}
+        >
+          <Label
+          style={{
+            ...styles.replyBtn,
+            color: MyThemed[colorScheme||'light'].ftCr3
+          }}
+          >回 复</Label>
+        </TouchableOpacity>
+        
+      </Vw>
+      
+    </View>
 
     {
       (search_user_info?.user_id!=userInfo?.user_id) && <MyCell
@@ -234,7 +270,7 @@ const UserDetail = ({
     }
 
     
-
+    <ReplyMsg ref={replyMsgRef}/>
 
   </ScrollView>
   
@@ -261,6 +297,33 @@ const styles = StyleSheet.create({
   rightArrow:{
     width: 15,
     height: 15
+  },
+  applyMsgWrapper:{
+    // margin: 10,
+    padding: 10,
+    // borderRadius: 10,
+    
+  },
+  applyMsgContentWrapper:{
+    padding: 10,
+    borderRadius: 10,
+    // borderWidth: 0.5,
+  },
+  msgRow:{
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  msgUserName:{
+
+  },
+  msgContent:{
+    flexDirection: "row",
+    // marginLeft: 10,
+    flexWrap: 'wrap',
+    padding: 0,
+  },
+  replyBtn:{
+    marginTop: 10,
   }
 });
 
