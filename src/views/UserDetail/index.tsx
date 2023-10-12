@@ -34,20 +34,28 @@ import { searchFriends } from '../../api/friends';
 import dayjs from 'dayjs';
 import { runInAction } from 'mobx';
 import ReplyMsg from './ReplyMsg';
+import SocketIoClient from '../../socketIo';
 const UserDetail = ({ 
   MyThemed,
   AppStore,
   navigation,
   route
 }:any) => {
+  const { params } = route;
+  
+  const sockitIo = SocketIoClient.getInstance()
+  sockitIo?.getSocketIo()?.on('addFriendApplyReplySuccess',(data:any)=>{
+    console.log('成功',data);
+    params.userInfo.msgs = params.userInfo.msgs ? [...params.userInfo.msgs,data]:[data]
+  })
+  
     
   const colorScheme = useColorScheme();
-  const { params } = route;
   const { userInfo } = AppStore;
   const replyMsgRef:{current:any} = useRef();
 
-
   const [search_user_info,set_search_user_info] = useState<any>({});
+  
   useEffect(()=>{
     const unsubscribe = navigation.addListener('state', async() => {
       // 处理路由变化的逻辑
@@ -177,40 +185,40 @@ const UserDetail = ({
       </View>
     </View>
 
-    <View style={{
-      ...styles.applyMsgWrapper,
-    }}>
-      <Vw style={{
-        ...styles.applyMsgContentWrapper,
-        backgroundColor: MyThemed[colorScheme||'light'].bg,
-        // borderColor: MyThemed[colorScheme||'light'].ftcr2
+    {
+      [0].includes(search_user_info?.f_status) &&<View style={{
+        ...styles.applyMsgWrapper,
       }}>
-        {
-          search_user_info?.msgs?search_user_info.msgs.map((item:any,index:number)=>{
-            return <Text style={styles.msgContent} key={'msg'+index}>lend: {item.msg_content}</Text>
-          }):null
-        }
-        
-        <TouchableOpacity 
-        activeOpacity={0.5}
-        onPress={()=>{
-          replyMsgRef?.current.open(()=>{
-            console.log('1234567')
-          })
-        }}
-        >
-          <Label
-          style={{
-            ...styles.replyBtn,
-            color: MyThemed[colorScheme||'light'].ftCr3
-          }}
-          >回 复</Label>
-        </TouchableOpacity>
-        
-      </Vw>
-      
-    </View>
 
+        <Vw style={{
+          ...styles.applyMsgContentWrapper,
+          backgroundColor: MyThemed[colorScheme||'light'].bg,
+          // borderColor: MyThemed[colorScheme||'light'].ftcr2
+        }}>
+          {
+            search_user_info?.msgs?search_user_info.msgs.map((item:any,index:number)=>{
+              return <Text style={styles.msgContent} key={'msg'+index}>{item.from_user_id==AppStore.userInfo.user_id?'我':item.from_user_name}: {item.msg_content}</Text>
+            }):null
+          }
+          <TouchableOpacity 
+            activeOpacity={0.5}
+            style={styles.replyBtnWrapper}
+            onPress={()=>{
+              replyMsgRef?.current.open(()=>{
+                console.log('回调')
+              })
+            }}
+            >
+              <Label
+              style={{
+                ...styles.replyBtn,
+                color: MyThemed[colorScheme||'light'].ftCr3
+              }}
+              >回 复</Label>
+            </TouchableOpacity>
+        </Vw>
+      </View>
+    }
     {
       (search_user_info?.user_id!=userInfo?.user_id) && <MyCell
       rightWrapperStyle={{paddingVertical: 20}}
@@ -270,7 +278,7 @@ const UserDetail = ({
     }
 
     
-    <ReplyMsg ref={replyMsgRef}/>
+    <ReplyMsg ref={replyMsgRef} AppStorez={AppStore} to_user_id={search_user_info.user_id}/>
 
   </ScrollView>
   
@@ -322,8 +330,16 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     padding: 0,
   },
+  replyBtnWrapper:{
+    width: 35,
+    height: 25,
+    alignItems:'center',
+    justifyContent:'center',
+    // backgroundColor:'red',
+
+  },
   replyBtn:{
-    marginTop: 10,
+    // marginTop: 10,
   }
 });
 
