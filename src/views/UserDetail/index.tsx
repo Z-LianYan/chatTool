@@ -42,12 +42,8 @@ const UserDetail = ({
   route
 }:any) => {
   const { params } = route;
-  
   const sockitIo = SocketIoClient.getInstance()
-  sockitIo?.getSocketIo()?.on('addFriendApplyReplySuccess',(data:any)=>{
-    console.log('成功',data);
-    params.userInfo.msgs = params.userInfo.msgs ? [...params.userInfo.msgs,data]:[data]
-  })
+  
   
     
   const colorScheme = useColorScheme();
@@ -57,6 +53,18 @@ const UserDetail = ({
   const [search_user_info,set_search_user_info] = useState<any>({});
   
   useEffect(()=>{
+
+    sockitIo?.getSocketIo()?.on('addFriendApplyReplySuccess',(data:any)=>{
+      console.log('成功',data);
+      console.log('成功0-------'+AppStore.userInfo.user_name,search_user_info);
+      
+      // set_search_user_info({
+      //   ...search_user_info,
+      //   msgs: [...search_user_info.msgs,data]
+      // });
+      // params.userInfo.msgs = params.userInfo.msgs ? [...params.userInfo.msgs,data]:[data]
+    })
+
     const unsubscribe = navigation.addListener('state', async() => {
       // 处理路由变化的逻辑
       handerSearchUserInfo();
@@ -80,6 +88,10 @@ const UserDetail = ({
       ...user_info
     });
   },[params.userInfo,params.user_id]);
+
+
+  
+  
 
   const footerShowBtn = useCallback(()=>{
     // !search_user_info.expire || (dayjs(search_user_info.expire).unix() < dayjs().unix()) && 
