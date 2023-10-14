@@ -53,18 +53,6 @@ const UserDetail = ({
   const [search_user_info,set_search_user_info] = useState<any>({});
   
   useEffect(()=>{
-
-    sockitIo?.getSocketIo()?.on('addFriendApplyReplySuccess',(data:any)=>{
-      console.log('成功',data);
-      console.log('成功0-------'+AppStore.userInfo.user_name,search_user_info);
-      
-      // set_search_user_info({
-      //   ...search_user_info,
-      //   msgs: [...search_user_info.msgs,data]
-      // });
-      // params.userInfo.msgs = params.userInfo.msgs ? [...params.userInfo.msgs,data]:[data]
-    })
-
     const unsubscribe = navigation.addListener('state', async() => {
       // 处理路由变化的逻辑
       handerSearchUserInfo();
@@ -216,8 +204,26 @@ const UserDetail = ({
             activeOpacity={0.5}
             style={styles.replyBtnWrapper}
             onPress={()=>{
-              replyMsgRef?.current.open(()=>{
-                console.log('回调')
+              replyMsgRef?.current.open((msg:any)=>{
+                if(search_user_info?.msgs?.length){
+                  search_user_info?.msgs.splice(0,1)
+                }else{
+                  search_user_info.msgs = []
+                }
+                set_search_user_info({
+                  ...search_user_info,
+                  msgs: [
+                    ...search_user_info?.msgs,
+                    msg,
+                  ]
+                });
+                if(params?.userInfo?.msgs?.length){
+                  // params.userInfo.msgs.splice(0,1)
+                }else{
+                  params.userInfo.msgs = [];
+                }
+                params.userInfo.msgs = [...params?.userInfo?.msgs,msg]
+                
               })
             }}
             >

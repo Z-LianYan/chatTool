@@ -69,10 +69,19 @@ const ReplyMsg = ({
   const comfirmReply = useCallback(async ()=>{
     console.log('======>>>',AppStore?.userInfo?.user_id,to_user_id,reply_content);
     if(!AppStore?.userInfo?.user_id || !to_user_id) return;
-    sockitIo?.getSocketIo()?.emit('addFriendApplyReply',{ from_user_id: AppStore?.userInfo?.user_id, to_user_id: to_user_id, msg: reply_content });
-    close();
-    set_reply_content('');
-    use_ref.current.callback && use_ref.current.callback();
+    sockitIo?.getSocketIo()?.emit('addFriendApplyReply',{ from_user_id: AppStore?.userInfo?.user_id, to_user_id: to_user_id, msg: reply_content },function(response:any) {
+      if (response && response.status === 'success') {
+          console.log('Message sent successfully!',response);
+          close();
+          set_reply_content('');
+          use_ref.current?.callback && use_ref.current?.callback(response.msg);
+      } else {
+          console.log('Failed to send message!');
+      }
+    });
+    
+    
+    
   },[reply_content]);
 
  

@@ -65,24 +65,20 @@ export default class SocketIoClient {
         // });
 
         socket.on('addFirendsApply',(data)=>{//添加好友申请消息通知
-            console.log('===========>>>>',data);
+            console.log('===========>>>>有添加好友消息通知',data);
             runInAction(()=>{
-                if(!data?.applyFriends?.user_id) return;
-                // if(store.AppStore.addFirendsApply?.user_id != data.applyFriends.user_id) {
-                //     store.AppStore.tabBar.AddressBookPage.msgCnt2 += 1;
-                //     if(!['AddressBookPage'].includes(store.AppStore.curRouteName)) store.AppStore.tabBar.AddressBookPage.msgCnt += 1;
-                // }else{
-                //     if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && store.AppStore.tabBar.AddressBookPage.msgCnt===0 && store.AppStore.addFirendsApply?.user_id == data.applyFriends.user_id) store.AppStore.tabBar.AddressBookPage.msgCnt = store.AppStore.tabBar.AddressBookPage.msgCnt2;
-                // }
-                const idx = store.AppStore.addFirendsApply.findIndex(item=>item.user_id==data.applyFriends.user_id);
+                if(!data?.fromFriends?.user_id) return;
+                if(['acceptAddFriends'].includes(data?.fromFriends?.type)) return;
+                
+                const idx = store.AppStore.addFirendsApply.findIndex(item=>item.user_id==data.fromFriends.user_id);
                 console.log('===========>>>>idx',idx);
                 if(idx!=-1){
                     store.AppStore.addFirendsApply.splice(idx,1);
-                    store.AppStore.addFirendsApply.push(data.applyFriends);
+                    store.AppStore.addFirendsApply.push(data.fromFriends);
                 }else{
-                    store.AppStore.addFirendsApply.push(data.applyFriends);
+                    store.AppStore.addFirendsApply.push(data.fromFriends);
                 }
-                store.AppStore.tabBar.AddressBookPage.msgCnt =  store.AppStore.addFirendsApply.length;
+                if(!['AddressBookPage'].includes(store.AppStore.curRouteName)) store.AppStore.tabBar.AddressBookPage.msgCnt =  store.AppStore.addFirendsApply.length;
                 store.AppStore.tabBar.AddressBookPage.msgCnt2 =  store.AppStore.addFirendsApply.length;
             });
         })

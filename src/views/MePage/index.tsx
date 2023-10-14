@@ -43,9 +43,11 @@ const MePage = ({
       paddingBottom: 30
     }}>
       <View style={{flexDirection:'row',alignItems:'center'}}>
-        <Image style={{
-          ...styles.avatarImg,
-        }} source={{uri:AppStore?.userInfo?.avatar}}/>
+        {
+          AppStore?.userInfo?.avatar && <Image style={{
+            ...styles.avatarImg,
+          }} source={{uri:AppStore?.userInfo?.avatar}}/>
+        }
         <View style={{flex:1,paddingHorizontal:10}}>
           <Text style={{paddingBottom: 10,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold'}}>{AppStore?.userInfo?.user_name}</Text>
           <View style={{flexDirection:'row'}}>
