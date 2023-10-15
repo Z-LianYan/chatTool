@@ -59,6 +59,9 @@ class AppStore {
     static_host:'',
     upload_token:''
   }; //七牛上传配置
+
+
+  search_user_info = null;
   
   addFirendsApply = [];
   

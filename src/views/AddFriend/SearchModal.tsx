@@ -47,6 +47,7 @@ import { ADD_USER, NEW_FIREND, QRCODE } from '../../assets/image';
 import config from '../../config';
 import { searchFriends } from '../../api/friends';
 import { TextInput } from 'react-native-gesture-handler';
+import { runInAction } from 'mobx';
 
 
 
@@ -57,7 +58,7 @@ const SearchModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   const [keywords, setKeywords] = useState<string>();
   const [modalVisible, setModalVisible] = useState(false);
   const [loadingComplete, setLoadingComplete] = useState(false);
-  const [searchInfo, setSearchInfo] = useState(false);
+  // const [searchInfo, setSearchInfo] = useState(false);
   const inputRef:{current:any} = useRef();
 
   // const _navigation = useNavigation();
@@ -84,6 +85,27 @@ const SearchModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     open,
     close
   }));
+
+  const handSearchUser = useCallback(async ()=>{
+    const result:any = await searchFriends({keywords});
+    if(result){
+      runInAction(()=>{
+        AppStore.search_user_info = result;
+      });
+      // setSearchInfo(result);
+      navigation.navigate({
+        name: 'UserDetail',
+        params: {
+          // userInfo: result,
+        }
+      });
+      setModalVisible(!modalVisible);
+      setLoadingComplete(false)
+      setKeywords('');
+    }else{
+      setLoadingComplete(true)
+    }
+  },[keywords])
 
   
   return <Modal
@@ -120,28 +142,7 @@ const SearchModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           setKeywords(val);
         }}
         onSubmitEditing={async ()=>{
-          const result:any = await searchFriends({keywords});
-          if(result){
-            setSearchInfo(result);
-            navigation.navigate({
-              name: 'UserDetail',
-              params: {
-                userInfo: result,
-              }
-            });
-            setModalVisible(!modalVisible);
-            setLoadingComplete(false)
-            setKeywords('');
-          }else{
-            setLoadingComplete(true)
-          }
-          
-          // setTimeout(() => {
-          //   setLoadingComplete(true)
-          // }, 100);
-
-
-          
+          await handSearchUser()
         }}/>
         <Label 
         type='title' 
@@ -161,21 +162,7 @@ const SearchModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
       }
       {
         keywords && !loadingComplete && <TouchableOpacity activeOpacity={0.6} onPress={async()=>{
-          const result:any = await searchFriends({keywords});
-          if(result){
-            setSearchInfo(result);
-            navigation.navigate({
-              name: 'UserDetail',
-              params: {
-                userInfo: result,
-              }
-            });
-            setModalVisible(!modalVisible);
-            setLoadingComplete(false)
-            setKeywords('');
-          }else{
-            setLoadingComplete(true)
-          }
+          await handSearchUser()
         }}>
           <View style={{padding: 10,flexDirection: 'row',alignItems: 'center'}}>
             <Image style={{

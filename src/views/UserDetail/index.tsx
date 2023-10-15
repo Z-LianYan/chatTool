@@ -41,6 +41,7 @@ const UserDetail = ({
   navigation,
   route
 }:any) => {
+  console.log('AppStore.search_user_info=======>>',AppStore.search_user_info);
   const { params } = route;
   const sockitIo = SocketIoClient.getInstance()
   
@@ -58,24 +59,24 @@ const UserDetail = ({
       handerSearchUserInfo();
     });
     return unsubscribe;
-  },[params.userInfo,params.user_id]);
+  },[AppStore.search_user_info,params.user_id]);
   const handerSearchUserInfo = useCallback(async ()=>{
     let info:any = await AsyncStorage.getItem('remarkLabel');
     info = info?JSON.parse(info):{};
 
     if(params.user_id){
-      route.params.userInfo = await searchFriends({user_id: params.user_id});
+      AppStore.search_user_info = await searchFriends({user_id: params.user_id});
     }
     let user_info = {
-      ...params.userInfo,
-      f_user_name_remark:info[params?.userInfo?.user_id]?.f_user_name_remark ? info[params?.userInfo?.user_id]?.f_user_name_remark: params?.userInfo?.f_user_name_remark,
-      labels: info[params?.userInfo?.user_id]?.labels ? (info[params?.userInfo?.user_id]?.labels||[]): (params?.userInfo?.labels||[]),
-      des: info[params?.userInfo?.user_id]?.des? info[params?.userInfo?.user_id]?.des:params?.userInfo?.des
+      ...AppStore.search_user_info,
+      f_user_name_remark:info[AppStore?.search_user_info?.user_id]?.f_user_name_remark ? info[AppStore?.search_user_info?.user_id]?.f_user_name_remark: AppStore?.search_user_info?.f_user_name_remark,
+      labels: info[AppStore?.search_user_info?.user_id]?.labels ? (info[AppStore?.search_user_info?.user_id]?.labels||[]): (AppStore?.search_user_info?.labels||[]),
+      des: info[AppStore?.search_user_info?.user_id]?.des? info[AppStore?.search_user_info?.user_id]?.des:AppStore?.search_user_info?.des
     }
     set_search_user_info({
       ...user_info
     });
-  },[params.userInfo,params.user_id]);
+  },[AppStore?.search_user_info,params.user_id]);
 
 
   
@@ -204,27 +205,31 @@ const UserDetail = ({
             activeOpacity={0.5}
             style={styles.replyBtnWrapper}
             onPress={()=>{
+              
               replyMsgRef?.current.open((msg:any)=>{
-                if(search_user_info?.msgs?.length){
-                  search_user_info?.msgs.splice(0,1)
-                }else{
-                  search_user_info.msgs = []
-                }
-                set_search_user_info({
-                  ...search_user_info,
-                  msgs: [
-                    ...search_user_info?.msgs,
-                    msg,
-                  ]
+                runInAction(()=>{
+                  if(search_user_info?.msgs?.length){
+                    search_user_info?.msgs.splice(0,1)
+                  }else{
+                    search_user_info.msgs = []
+                  }
+                  set_search_user_info({
+                    ...search_user_info,
+                    msgs: [
+                      ...search_user_info?.msgs,
+                      msg,
+                    ]
+                  });
+                  
+                  if(AppStore?.search_user_info?.msgs?.length){
+                    // params.userInfo.msgs.splice(0,1)
+                  }else{
+                    AppStore.search_user_info.msgs = [];
+                  }
+                  AppStore.search_user_info.msgs = [...AppStore?.search_user_info?.msgs,msg];
                 });
-                if(params?.userInfo?.msgs?.length){
-                  // params.userInfo.msgs.splice(0,1)
-                }else{
-                  params.userInfo.msgs = [];
-                }
-                params.userInfo.msgs = [...params?.userInfo?.msgs,msg]
-                
               })
+              
             }}
             >
               <Label
