@@ -48,7 +48,8 @@ const SetRemarkLabel = ({
   const { search_user_info } = AppStore;
   const search_user_id = search_user_info?.user_id;
   const { userInfo } = AppStore;
-  let [formData,setFormData] = useState<any>({})
+  let [formData,setFormData] = useState<any>({});
+  let [initPage,setInitPage] = useState<boolean>(true);
   // const [isAlready,setIsAlready] = useState(false)
   // {
   //   f_user_name_remark: '',
@@ -59,16 +60,27 @@ const SetRemarkLabel = ({
     (async function(){
       let info:any = await AsyncStorage.getItem('remarkLabel');
       info = info? JSON.parse(info) : {};
-      formData = {
-        f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
-        labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
-        des: search_user_info?.des || (info && info[search_user_id]?.des),
-      };
-      
-      if(['addUser'].includes(op_type)){
-        formData.msg = `我是${search_user_info.msg||AppStore?.userInfo?.user_name}`
+      // formData = {
+      //   f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
+      //   labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
+      //   des: search_user_info?.des || (info && info[search_user_id]?.des),
+      // };
+      if(initPage) {
+        formData = {
+          f_user_name_remark: (info && info[search_user_id]?.f_user_name_remark)||search_user_info?.f_user_name_remark||search_user_info?.user_name,
+          labels: ((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[])||search_user_info?.labels,
+          des:  (info && info[search_user_id]?.des)||search_user_info?.des,
+        }
+        if(['addUser'].includes(op_type)){
+          formData.msg = `我是${search_user_info.msg||AppStore?.userInfo?.user_name}`
+        }
+        setInitPage(false);
+      }else{
+        formData = {
+          ...formData,
+          labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
+        }
       }
-
       setFormData({
         ...formData
       });

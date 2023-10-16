@@ -50,7 +50,7 @@ const SetLabel = ({
   const [labels,setLabels] = useState<any>([]);
   const [selectLabels,setSelectLabels] = useState<any>([]);
   const addEditLabelRef:{current:any} = useRef();
-  let [formData,setFormData] = useState<any>({})
+  let [formData,setFormData] = useState<any>({});
   console.log('search_user_info====>>',search_user_info);
   useEffect(()=>{
     
@@ -65,8 +65,8 @@ const SetLabel = ({
       // })
       formData = {
         labels: search_user_info.labels||(info[search_user_id]?.labels ? info[search_user_id]?.labels:[]),
-        f_user_name_remark: search_user_info?.f_user_name_remark||info[search_user_id]?.f_user_name_remark,
-        des: search_user_info?.des || info[search_user_id]?.des,
+        // f_user_name_remark: search_user_info?.f_user_name_remark||info[search_user_id]?.f_user_name_remark,
+        // des: search_user_info?.des || info[search_user_id]?.des,
       };
       
       // setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
@@ -136,8 +136,8 @@ const SetLabel = ({
         
         info[search_user_id] = {
           ...info[search_user_id],
-          des: formData.des,
-          f_user_name_remark: formData.f_user_name_remark,
+          // des: formData.des,
+          // f_user_name_remark: formData.f_user_name_remark,
         }
         // navigation.navigate({//向上一个页面传递参数
         //   name: 'SetRemarkLabel',
@@ -150,12 +150,12 @@ const SetLabel = ({
         //   },
         //   merge: true,
         // })
-        console.log('search_user_id=======>>>>',info[search_user_id]);
-        return;
+        // console.log('search_user_id=======>>>>',info[search_user_id]);
+        // return;
         runInAction(()=>{
           AppStore.search_user_info = {
             ...AppStore.search_user_info,
-            ...info[search_user_id],
+            labels: selectLabels,
             // des: formData.des,
             // f_user_name_remark: formData.f_user_name_remark,
           };
