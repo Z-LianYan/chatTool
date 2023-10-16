@@ -65,7 +65,10 @@ const UserDetail = ({
     info = info?JSON.parse(info):{};
 
     if(params.user_id){
-      AppStore.search_user_info = await searchFriends({user_id: params.user_id});
+      const friends = await searchFriends({user_id: params.user_id});
+      runInAction(()=>{
+        AppStore.search_user_info = friends;
+      });
     }
     let user_info = {
       ...AppStore.search_user_info,

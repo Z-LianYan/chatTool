@@ -44,7 +44,7 @@ const SetLabel = ({
     
   const colorScheme = useColorScheme();
   const { params } = route;
-  const { search_user_info } = params;
+  const { search_user_info } = AppStore;
   const search_user_id = search_user_info?.user_id;
   const { userInfo } = AppStore;
   const [labels,setLabels] = useState<any>([]);
@@ -56,8 +56,7 @@ const SetLabel = ({
     
     (async function(){
       await getLabelList();
-    })()
-    const unsubscribe = navigation.addListener('state', async() => {
+
       // 处理路由变化的逻辑
       let info:any = await AsyncStorage.getItem('remarkLabel');
       info = info?JSON.parse(info):{};
@@ -75,9 +74,30 @@ const SetLabel = ({
       setFormData({
         ...formData
       })
-    });
-    return unsubscribe;
-  },[route?.params?.search_user_info]);
+    })()
+    // const unsubscribe = navigation.addListener('state', async() => {
+    //   // 处理路由变化的逻辑
+    //   let info:any = await AsyncStorage.getItem('remarkLabel');
+    //   info = info?JSON.parse(info):{};
+    //   // setFormData({
+    //   //   ...info
+    //   // })
+    //   formData = {
+    //     labels: search_user_info.labels||(info[search_user_id]?.labels ? info[search_user_id]?.labels:[]),
+    //     f_user_name_remark: search_user_info?.f_user_name_remark||info[search_user_id]?.f_user_name_remark,
+    //     des: search_user_info?.des || info[search_user_id]?.des,
+    //   };
+      
+    //   // setSelectLabels((info && info[search_user_id]?.labels) ? info[search_user_id]?.labels:[])
+    //   setSelectLabels(formData?.labels ? JSON.parse(JSON.stringify(formData?.labels)):[])
+    //   setFormData({
+    //     ...formData
+    //   })
+    // });
+    // return unsubscribe;
+
+    
+  },[AppStore.search_user_info]);
   const getLabelList = useCallback(async ()=>{
     const result:any = await getFriendsLabelList({});
     console.log('label---',result);
@@ -119,18 +139,28 @@ const SetLabel = ({
           des: formData.des,
           f_user_name_remark: formData.f_user_name_remark,
         }
-        navigation.navigate({//向上一个页面传递参数
-          name: 'SetRemarkLabel',
-          params:{
-            search_user_info: {
-              ...search_user_info,
-              ...info[search_user_id],
-              msg: search_user_info.msg
-            },
-          },
-          merge: true,
-        })
-        // navigation.goBack();
+        // navigation.navigate({//向上一个页面传递参数
+        //   name: 'SetRemarkLabel',
+        //   params:{
+        //     search_user_info: {
+        //       ...search_user_info,
+        //       ...info[search_user_id],
+        //       msg: search_user_info.msg
+        //     },
+        //   },
+        //   merge: true,
+        // })
+        console.log('search_user_id=======>>>>',info[search_user_id]);
+        return;
+        runInAction(()=>{
+          AppStore.search_user_info = {
+            ...AppStore.search_user_info,
+            ...info[search_user_id],
+            // des: formData.des,
+            // f_user_name_remark: formData.f_user_name_remark,
+          };
+        });
+        navigation.goBack();
       }}/>
     </View>}/>
     <View style={{

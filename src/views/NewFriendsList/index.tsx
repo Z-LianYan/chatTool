@@ -157,10 +157,13 @@ const NewFriendsList = ({
           avatar={item.f_avatar}
           onPress={async()=>{
             const friends:any = await searchFriends({user_id: item.f_user_id});
+            runInAction(()=>{
+              AppStore.search_user_info = friends;
+            });
             navigation.navigate({
               name: 'UserDetail',
               params: {
-                userInfo: friends,
+                // userInfo: friends,
               }
             });
           }}/>
@@ -202,10 +205,13 @@ const NewFriendsList = ({
           avatar={item.f_avatar}
           onPress={async ()=>{
             const friends:any = await searchFriends({user_id: item.f_user_id});
+            runInAction(()=>{
+              AppStore.search_user_info = friends;
+            });
             navigation.navigate({
               name: 'UserDetail',
               params: {
-                userInfo: friends,
+                // userInfo: friends,
               }
             });
           }}/>

@@ -44,7 +44,8 @@ const SetRemarkLabel = ({
     
   const colorScheme = useColorScheme();
   const { params } = route;
-  const { search_user_info,op_type } = params;
+  const { op_type } = params;
+  const { search_user_info } = AppStore;
   const search_user_id = search_user_info?.user_id;
   const { userInfo } = AppStore;
   let [formData,setFormData] = useState<any>({})
@@ -70,10 +71,10 @@ const SetRemarkLabel = ({
 
       setFormData({
         ...formData
-      })
+      });
 
     })()
-  },[route?.params?.search_user_info]);
+  },[AppStore.search_user_info]);
 
   // const navigationBeforeRemove = useCallback(()=>{
   //   navigation.addListener('beforeRemove', (e:any) => {
@@ -124,14 +125,20 @@ const SetRemarkLabel = ({
         await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
       }
       
-      navigation.dispatch(navigation.pop(2));//清除内部导航堆栈
+      // navigation.dispatch(navigation.pop(2));//清除内部导航堆栈
+
+      const friends = await searchFriends({user_id: search_user_info.user_id});
+      runInAction(()=>{
+        AppStore.search_user_info = friends;
+      });
       navigation.navigate({
         name: 'UserDetail',
         params: {
           // userInfo: friends,
-          user_id: search_user_info.user_id
+          // user_id: search_user_info.user_id
         }
       });
+
     }catch(err:any){
       console.log('err======>>>',err.message);
     };
@@ -191,13 +198,20 @@ const SetRemarkLabel = ({
           infoObj[search_user_id] = formData;
           await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
         }
+
+        runInAction(()=>{
+          AppStore.search_user_info = {
+            ...search_user_info,
+            ...formData
+          };
+        });
         navigation.navigate({
           name: 'UserDetail',
           params:{
-            userInfo: {
-              ...search_user_info,
-              ...formData
-            },
+            // userInfo: {
+            //   ...search_user_info,
+            //   ...formData
+            // },
           },
           merge: true,
         })
@@ -274,10 +288,10 @@ const SetRemarkLabel = ({
         }}
         onPress={()=>{
           navigation.navigate('SetLabel',{
-            search_user_info:{
-              ...search_user_info,
-              ...formData
-            }
+            // search_user_info:{
+            //   ...search_user_info,
+            //   ...formData
+            // }
           })
         }}>
           <Text 
@@ -372,11 +386,14 @@ const SetRemarkLabel = ({
               }
 
               const friends:any = await searchFriends({user_id: search_user_info.user_id});
-              navigation.dispatch(navigation.pop());//清除内部导航堆栈
+              navigation.dispatch(navigation.pop());//清除内部导航堆栈(默认清楚上一个并且导航到)
+              runInAction(()=>{
+                AppStore.search_user_info = friends;
+              });
               navigation.navigate({
                 name: 'UserDetail',
                 params: {
-                  userInfo: friends,
+                  // userInfo: friends,
                 }
               });
             }
