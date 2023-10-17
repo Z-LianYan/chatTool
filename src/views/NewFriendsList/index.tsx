@@ -73,7 +73,6 @@ const NewFriendsList = ({
         console.log('销毁======》〉》')
         AppStore.addFirendsApply = [];
         AppStore.tabBar.AddressBookPage.msgCnt =  0;
-        AppStore.tabBar.AddressBookPage.msgCnt2 =  0;
       });
     }
   },[]);

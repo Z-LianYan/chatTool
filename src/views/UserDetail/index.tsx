@@ -54,17 +54,18 @@ const UserDetail = ({
   const [search_user_info,set_search_user_info] = useState<any>({});
   
   useEffect(()=>{
-    const unsubscribe = navigation.addListener('state', async() => {
-      // 处理路由变化的逻辑
-      handerSearchUserInfo();
-    });
-    return unsubscribe;
-  },[AppStore.search_user_info,params.user_id]);
+    // const unsubscribe = navigation.addListener('state', async() => {
+    //   // 处理路由变化的逻辑
+    //   handerSearchUserInfo();
+    // });
+    // return unsubscribe;
+    handerSearchUserInfo();
+  },[AppStore?.search_user_info,params.user_id]);
   const handerSearchUserInfo = useCallback(async ()=>{
     let info:any = await AsyncStorage.getItem('remarkLabel');
     info = info?JSON.parse(info):{};
 
-    if(params.user_id){
+    if(params.user_id && !AppStore.search_user_info){
       const friends = await searchFriends({user_id: params.user_id});
       runInAction(()=>{
         AppStore.search_user_info = friends;
@@ -72,7 +73,7 @@ const UserDetail = ({
     }
     let user_info = {
       ...AppStore.search_user_info,
-      f_user_name_remark:info[AppStore?.search_user_info?.user_id]?.f_user_name_remark ? info[AppStore?.search_user_info?.user_id]?.f_user_name_remark: AppStore?.search_user_info?.f_user_name_remark,
+      f_user_name_remark: info[AppStore?.search_user_info?.user_id]?.f_user_name_remark ? info[AppStore?.search_user_info?.user_id]?.f_user_name_remark: AppStore?.search_user_info?.f_user_name_remark,
       labels: info[AppStore?.search_user_info?.user_id]?.labels ? (info[AppStore?.search_user_info?.user_id]?.labels||[]): (AppStore?.search_user_info?.labels||[]),
       des: info[AppStore?.search_user_info?.user_id]?.des? info[AppStore?.search_user_info?.user_id]?.des:AppStore?.search_user_info?.des
     }

@@ -62,7 +62,7 @@ class AppStore {
 
 
   search_user_info = null;
-  
+
   addFirendsApply = [];
   
 }

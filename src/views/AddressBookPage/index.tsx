@@ -65,21 +65,20 @@ const AddressBookPage = ({
   console.log('AppStore.addFirendsApply=========>>>',AppStore.addFirendsApply?.length,AppStore.addFirendsApply)
   return <ScrollView>
     <MyCell
-    title={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.user_name:'新的朋友'} 
-    avatar={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.avatar:NEW_FIREND}
-    msg={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.msg:''}
+    title={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.from_user_name:'新的朋友'} 
+    avatar={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.from_avatar:NEW_FIREND}
+    msg={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.msg_content:''}
     showBottomBorder={true}
     showRightArrow={false} 
     isAvatarTintColor={false}
     rightValue={AppStore.addFirendsApply?.length ? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
-      <Text style={{width: 18,height: 18,lineHeight:18,color: '#fff',fontSize: 10,textAlign:'center'}}>{AppStore.tabBar.AddressBookPage.msgCnt2}</Text>
+      <Text style={{width: 18,height: 18,lineHeight:18,color: '#fff',fontSize: 10,textAlign:'center'}}>{AppStore.addFirendsApply.length}</Text>
     </View>:null}
     onPress={()=>{
       navigation.navigate('NewFriendsList')
       runInAction(()=>{
         AppStore.addFirendsApply = [];
         AppStore.tabBar.AddressBookPage.msgCnt = 0;
-        AppStore.tabBar.AddressBookPage.msgCnt2 = 0;
       });
     }}/>
     <MyCell
