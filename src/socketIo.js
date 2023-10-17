@@ -80,7 +80,7 @@ export default class SocketIoClient {
                     };
                 };
                 
-                const idx = store.AppStore.addFirendsApply.findIndex(item=>item.user_id==data.fromFriends.from_user_id);
+                const idx = store.AppStore.addFirendsApply.findIndex(item=>item.from_user_id==data.fromFriends.from_user_id);
                 if(idx!=-1){
                     store.AppStore.addFirendsApply.splice(idx,1);
                     store.AppStore.addFirendsApply.push(data.fromFriends);
