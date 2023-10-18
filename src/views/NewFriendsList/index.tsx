@@ -62,7 +62,7 @@ const NewFriendsList = ({
     navigation.setOptions({
       // headerTitle: "聊天",
       headerRight: ()=>{
-        return <Label text="添加朋友" style={{marginRight: 10}} size="md" onPress={()=>{
+        return <Label text="添加朋友" style={{marginRight: 15}} size="md" onPress={()=>{
           search_modal_ref.current.open()
         }}></Label>;
       }

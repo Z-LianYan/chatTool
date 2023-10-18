@@ -196,7 +196,7 @@ function StackNavigators(props:any){
                 // }}/>
                 return <TouchableOpacity 
                 activeOpacity={0.6}
-                style={{paddingLeft:10,paddingTop: 8,}}
+                style={{paddingLeft:15,paddingTop: 8,}}
                 onPress={()=>{
                     navigation.goBack()
                 }}>

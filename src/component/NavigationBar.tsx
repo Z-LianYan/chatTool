@@ -98,6 +98,7 @@ const _NavigationBar = ({
         flexDirection:'row',
         alignItems:'center',
         backgroundColor: backgroundColor?backgroundColor:MyThemed[colorScheme||'light'].hdBg,
+        paddingLeft: 15
       }}
       >
         <TouchableOpacity onPress={()=>{
