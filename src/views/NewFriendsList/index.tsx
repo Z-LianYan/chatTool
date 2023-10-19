@@ -98,8 +98,9 @@ const NewFriendsList = ({
         onPress={async ()=>{
           const friends:any = await searchFriends({user_id: item.f_user_id});
           console.log('friends===>>',friends)
+          AppStore.search_user_info = friends;
           navigation.navigate('SetRemarkLabel',{
-            search_user_info: friends,
+            // search_user_info: friends,
             op_type: 'toVerify'
           });
         }}

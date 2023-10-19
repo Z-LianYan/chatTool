@@ -383,11 +383,19 @@ const SetRemarkLabel = ({
             if(search_user_info?.expire<=dayjs().format('YYYY-MM-DD HH:mm:ss')){
               expireHander()
             }else{
-              await ACCEPT_ADD_FRIENDS({
+              const res:any = await ACCEPT_ADD_FRIENDS({
                 ...formData,
                 label_ids: (formData.labels && formData.labels.length)?formData.labels.map((item:any)=>item.label_id).join(','):null,
                 f_user_id: search_user_info.user_id,
               });
+              console.log('接受返回=============》〉》',res);
+              if(!res) return;
+              console.log('接受返回=============》〉》data',AppStore.chatLogs);
+
+              AppStore.chatLogs[res?.data?.from_user_id] = res?.data;
+
+              console.log('接受返回=============》〉》123',AppStore.chatLogs);
+
 
               //清除缓存
               let infoObj:any = await AsyncStorage.getItem('remarkLabel');

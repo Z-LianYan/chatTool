@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useLayoutEffect } from 'react';
+import React, { useState,useEffect, useLayoutEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import { observable, action, makeAutoObservable,runInAction } from 'mobx';
@@ -33,6 +33,7 @@ import MyCell from '../../component/MyCell';
 import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
+import dayjs from 'dayjs';
 // import { 
 //   View,
 //   Text
@@ -90,6 +91,27 @@ const ChatListPage = ({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
   })
+  const renderCell = useCallback(()=>{
+    // const redArr = [];
+    for(const key in AppStore.chatLogs){
+      return <MyCell 
+      time={AppStore.chatLogs[key]?.msg_contents[0]?.created_at && dayjs(AppStore.chatLogs[key]?.msg_contents[0]?.created_at).format("HH:mm")}
+      title={AppStore.chatLogs[key]?.from_user_name} 
+      avatarStyle={{
+        width: 44,
+        height: 44
+      }}
+      key={key+'chatList'}
+      showDisNotice={true}
+      msg={AppStore.chatLogs[key]?.msg_contents[0]?.msg_content}
+      hasNewMsg={true}
+      avatar={AppStore.chatLogs[key]?.from_avatar} 
+      onPress={()=>{
+        navigation.navigate('ChatPage',{});
+      }}/>
+    }
+    // return redArr;
+  },[AppStore.chatLogs]);
   return <ScrollView>
     <MyCell 
     time='12:59'
@@ -122,6 +144,13 @@ const ChatListPage = ({
     onPress={()=>{
       navigation.navigate('ChatPage',{});
     }}/>
+
+    {
+      renderCell()
+    }
+
+
+
     {/* <Text onPress={()=>{
       sockitIo.getSocketIo().emit('server',{ a: AppStore?.userInfo?.user_name, c: [] });
       // console.dir(sockitIo.getSocketIo());

@@ -68,7 +68,7 @@ export default class SocketIoClient {
          * data?.fromFriends?.type  addFirendsApply: 添加朋友申请   acceptAddFriends：接受添加好友   addFriendApplyReply： 添加好友申请回复消息
         */
         socket.on('addFirendsApply',(data,callBack)=>{//添加好友申请消息通知
-            console.log('===========>>>>有添加好友消息通知',data,callBack);
+            console.log('===========>>>>有添加好友消息通知',store.AppStore.userInfo.user_name,data,callBack);
             runInAction(()=>{
                 if(!data?.fromFriends?.from_user_id) return;
                 if(['acceptAddFriends'].includes(data?.fromFriends?.type)) return;
