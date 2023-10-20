@@ -389,14 +389,7 @@ const SetRemarkLabel = ({
                 f_user_id: search_user_info.user_id,
               });
               console.log('接受返回=============》〉》',res);
-              if(!res) return;
-              console.log('接受返回=============》〉》data',AppStore.chatLogs);
-
-              AppStore.chatLogs[res?.data?.from_user_id] = res?.data;
-
-              console.log('接受返回=============》〉》123',AppStore.chatLogs);
-
-
+              if(!res || !res.data) return;
               //清除缓存
               let infoObj:any = await AsyncStorage.getItem('remarkLabel');
               infoObj = infoObj?JSON.parse(infoObj):{};
@@ -409,6 +402,8 @@ const SetRemarkLabel = ({
               navigation.dispatch(navigation.pop());//清除内部导航堆栈(默认清楚上一个并且导航到)
               runInAction(()=>{
                 AppStore.search_user_info = friends;
+                
+                AppStore.chatLogs[res?.data?.from_user_id] = res?.data;
               });
               navigation.navigate({
                 name: 'UserDetail',

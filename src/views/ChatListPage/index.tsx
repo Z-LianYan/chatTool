@@ -93,9 +93,11 @@ const ChatListPage = ({
   })
   const renderCell = useCallback(()=>{
     // const redArr = [];
+    
     for(const key in AppStore.chatLogs){
+      let len = AppStore.chatLogs[key]?.msg_contents?.length;
       return <MyCell 
-      time={AppStore.chatLogs[key]?.msg_contents[0]?.created_at && dayjs(AppStore.chatLogs[key]?.msg_contents[0]?.created_at).format("HH:mm")}
+      time={AppStore.chatLogs[key]?.msg_contents[len-1]?.created_at && dayjs(AppStore.chatLogs[key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
       title={AppStore.chatLogs[key]?.from_user_name} 
       avatarStyle={{
         width: 44,
@@ -103,7 +105,7 @@ const ChatListPage = ({
       }}
       key={key+'chatList'}
       showDisNotice={true}
-      msg={AppStore.chatLogs[key]?.msg_contents[0]?.msg_content}
+      msg={AppStore.chatLogs[key]?.msg_contents[len-1]?.msg_content}
       hasNewMsg={true}
       avatar={AppStore.chatLogs[key]?.from_avatar} 
       onPress={()=>{
@@ -113,7 +115,7 @@ const ChatListPage = ({
     // return redArr;
   },[AppStore.chatLogs]);
   return <ScrollView>
-    <MyCell 
+    {/* <MyCell 
     time='12:59'
     title='标题' 
     avatarStyle={{
@@ -143,13 +145,15 @@ const ChatListPage = ({
     avatar="http://zly.imgresource.com.cn/public/chat/commonAvatar.png"
     onPress={()=>{
       navigation.navigate('ChatPage',{});
-    }}/>
+    }}/> */}
 
     {
       renderCell()
     }
 
-
+    {
+      !Object.keys(AppStore.chatLogs).length && <Text style={styles.emptyContent}>没有聊天记录</Text>
+    }
 
     {/* <Text onPress={()=>{
       sockitIo.getSocketIo().emit('server',{ a: AppStore?.userInfo?.user_name, c: [] });
@@ -164,6 +168,11 @@ const ChatListPage = ({
 };
 
 const styles = StyleSheet.create({
+  emptyContent:{
+    textAlign: 'center',
+    height: 200,
+    lineHeight: 200
+  }
 });
 
 export default inject("AppStore","MyThemed")(observer(ChatListPage));

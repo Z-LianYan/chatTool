@@ -71,7 +71,11 @@ export default class SocketIoClient {
             console.log('===========>>>>有添加好友消息通知',store.AppStore.userInfo.user_name,data,callBack);
             runInAction(()=>{
                 if(!data?.fromFriends?.from_user_id) return;
-                if(['acceptAddFriends'].includes(data?.fromFriends?.type)) return;
+                if(['acceptAddFriends'].includes(data?.fromFriends?.type)) {
+                    console.log('store.AppStore.chatLogs======>>>',store.AppStore.chatLogs,'=====>>>',data?.fromFriends);
+                    store.AppStore.chatLogs[data?.fromFriends?.from_user_id] = data?.fromFriends;
+                    return;
+                };
                 if(['addFriendApplyReply'].includes(data?.fromFriends?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.from_user_id) {
                     store.AppStore.search_user_info.msgs.splice(0,1);
                     store.AppStore.search_user_info.msgs.push(data?.fromFriends);
