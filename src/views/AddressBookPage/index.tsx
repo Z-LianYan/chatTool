@@ -24,7 +24,7 @@ import {
 import MyCell from '../../component/MyCell';
 import { NEW_FIREND } from '../../assets/image';
 import { View } from '../../component/customThemed';
-import { getFriendList } from '../../api/friends';
+import { getFriendList, searchFriends } from '../../api/friends';
 import { runInAction } from 'mobx';
 // import { 
 //   View,
@@ -33,12 +33,11 @@ import { runInAction } from 'mobx';
 const AddressBookPage = ({
   MyThemed,
   navigation,
-  AppStore
+  AppStore,
+  FriendsStore,
 }:any) => {
     
   const colorScheme = useColorScheme();
-  const [list,setList] = useState([]);
-  const [count,setCount] = useState(0);
 
   useEffect(()=>{
     getAddressBookList()
@@ -46,13 +45,7 @@ const AddressBookPage = ({
 
   const getAddressBookList = useCallback(async()=>{
     try{
-      const result:any = await getFriendList({
-        page: 1,
-        limit: 100
-      });
-      console.log('result------>>',result);
-      setList(result.rows);
-      setCount(result.count);
+      await FriendsStore.getFriendList();
     }catch(err:any){
       console.log('err------>>',err.message)
     }
@@ -62,13 +55,12 @@ const AddressBookPage = ({
     avatar: string,
     user_id: number,
   }
-  console.log('AppStore.addFirendsApply=========>>>',AppStore.addFirendsApply?.length,AppStore.addFirendsApply)
   return <ScrollView>
     <MyCell
     title={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.from_user_name:'新的朋友'} 
     avatar={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.from_avatar:NEW_FIREND}
     msg={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.msg_content:''}
-    showBottomBorder={true}
+    showBottomBorder={false}
     showRightArrow={false} 
     isAvatarTintColor={false}
     rightValue={AppStore.addFirendsApply?.length ? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
@@ -81,28 +73,44 @@ const AddressBookPage = ({
         AppStore.tabBar.AddressBookPage.msgCnt = 0;
       });
     }}/>
-    <MyCell
+    {/* <MyCell
     title='仅聊天的朋友' 
     avatar={NEW_FIREND}
     showBottomBorder={false}
-    showRightArrow={false}/>
-    <Vw style={styles.separator}></Vw>
+    showRightArrow={false}/>*/}
+    <Vw style={styles.separator}></Vw> 
 
     {
-      list.map((item:itemType,index)=>{
+      FriendsStore?.friendsData?.rows?.map((item:itemType,index:number)=>{
         return <MyCell
           key={index+item.user_name}
           title={item.user_name}
           avatar={item.avatar}
-          showBottomBorder={index!=list.length-1}
+          showBottomBorder={index!=FriendsStore?.friendsData.rows.length-1}
+          onPress={async ()=>{
+            const friends:any = await searchFriends({user_id: item.user_id});
+            runInAction(()=>{
+              AppStore.search_user_info = friends;
+            });
+            navigation.navigate({
+              name: 'UserDetail',
+              params: {
+                // userInfo: friends,
+              }
+            });
+          }}
           />
       })
     }
     
-    <Text style={{
+    <Text 
+    onPress={()=>{
+      FriendsStore.count++
+    }}
+    style={{
       ...styles.bottomText,
       color: MyThemed[colorScheme||'light'].ftcr2
-    }}>{count} 个朋友</Text>
+    }}>{FriendsStore?.friendsData?.count} 个朋友</Text>
   </ScrollView>;
 };
 
@@ -117,4 +125,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(AddressBookPage));;
+export default inject("AppStore","MyThemed","FriendsStore")(observer(AddressBookPage));;

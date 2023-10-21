@@ -1,7 +1,7 @@
 import React, { useState,useEffect, useLayoutEffect } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
-import { observable, action, makeAutoObservable,runInAction } from 'mobx';
+import { observable, action, makeAutoObservable,runInAction, keys } from 'mobx';
 
 import {
   SafeAreaView,
@@ -42,8 +42,11 @@ const ChatPage = ({
   AppStore,
   MyThemed,
   navigation,
+  FriendsStore,
+  route
 }:any) => {
   const sockitIo = SocketIoClient.getInstance();
+  const { params } = route;
   
   const colorScheme = useColorScheme();
   const [msgContent,setMsgContent] = useState<string>();
@@ -67,7 +70,21 @@ const ChatPage = ({
     // });
   })
   return <View style={styles.container}>
-    <ScrollView style={styles.scroll_view}></ScrollView>
+    <ScrollView style={styles.scroll_view}>
+      {
+        FriendsStore.chatLogs[params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
+          return <View key={index+'chatPage'} style={{flexDirection:'row',alignItems:'center',marginBottom:10}}>
+            <Image 
+            style={{
+              width: 25,height:25,
+              // tintColor: MyThemed[colorScheme||'light'].ftCr
+            }} 
+            source={{uri:item.from_avatar}}/>
+            <Text>{item.msg_content}</Text>
+          </View>
+        })
+      }
+    </ScrollView>
     <View style={{
       ...styles.bottomInputWrapper,
       borderTopColor: MyThemed[colorScheme||'light'].ftCr2
@@ -137,4 +154,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(ChatPage));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(ChatPage));

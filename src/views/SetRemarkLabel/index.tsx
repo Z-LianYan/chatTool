@@ -39,7 +39,8 @@ const SetRemarkLabel = ({
   MyThemed,
   AppStore,
   navigation,
-  route
+  route,
+  FriendsStore
 }:any) => {
     
   const colorScheme = useColorScheme();
@@ -139,7 +140,7 @@ const SetRemarkLabel = ({
       
       // navigation.dispatch(navigation.pop(2));//清除内部导航堆栈
 
-      const friends = await searchFriends({user_id: search_user_info.user_id});
+      const friends:any = await searchFriends({user_id: search_user_info.user_id});
       runInAction(()=>{
         AppStore.search_user_info = friends;
       });
@@ -400,10 +401,13 @@ const SetRemarkLabel = ({
 
               const friends:any = await searchFriends({user_id: search_user_info.user_id});
               navigation.dispatch(navigation.pop());//清除内部导航堆栈(默认清楚上一个并且导航到)
-              runInAction(()=>{
+              runInAction(async()=>{
                 AppStore.search_user_info = friends;
                 
-                AppStore.chatLogs[res?.data?.from_user_id] = res?.data;
+                FriendsStore.chatLogs[res?.data?.from_user_id] = res?.data;
+
+                await FriendsStore.getFriendList();
+                await FriendsStore.get_new_friends_list();
               });
               navigation.navigate({
                 name: 'UserDetail',
@@ -456,4 +460,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(SetRemarkLabel));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(SetRemarkLabel));

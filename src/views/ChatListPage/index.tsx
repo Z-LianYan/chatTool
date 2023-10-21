@@ -42,6 +42,7 @@ const ChatListPage = ({
   AppStore,
   MyThemed,
   navigation,
+  FriendsStore,
 }:any) => {
   const sockitIo = SocketIoClient.getInstance();
   
@@ -92,28 +93,29 @@ const ChatListPage = ({
     // });
   })
   const renderCell = useCallback(()=>{
-    // const redArr = [];
-    
-    for(const key in AppStore.chatLogs){
-      let len = AppStore.chatLogs[key]?.msg_contents?.length;
-      return <MyCell 
-      time={AppStore.chatLogs[key]?.msg_contents[len-1]?.created_at && dayjs(AppStore.chatLogs[key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
-      title={AppStore.chatLogs[key]?.from_user_name} 
+    const redArr = [];
+    for(const key in FriendsStore.chatLogs){
+      let len = FriendsStore.chatLogs[key]?.msg_contents?.length;
+      redArr.push(<MyCell 
+      time={FriendsStore.chatLogs[key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
+      title={FriendsStore.chatLogs[key]?.from_user_name} 
       avatarStyle={{
         width: 44,
         height: 44
       }}
       key={key+'chatList'}
       showDisNotice={true}
-      msg={AppStore.chatLogs[key]?.msg_contents[len-1]?.msg_content}
+      msg={FriendsStore.chatLogs[key]?.msg_contents[len-1]?.msg_content}
       hasNewMsg={true}
-      avatar={AppStore.chatLogs[key]?.from_avatar} 
+      avatar={FriendsStore.chatLogs[key]?.from_avatar} 
       onPress={()=>{
-        navigation.navigate('ChatPage',{});
-      }}/>
+        navigation.navigate('ChatPage',{
+          user_id: key
+        });
+      }}/>)
     }
-    // return redArr;
-  },[AppStore.chatLogs]);
+    return redArr;
+  },[FriendsStore.chatLogs]);
   return <ScrollView>
     {/* <MyCell 
     time='12:59'
@@ -152,7 +154,7 @@ const ChatListPage = ({
     }
 
     {
-      !Object.keys(AppStore.chatLogs).length && <Text style={styles.emptyContent}>没有聊天记录</Text>
+      !Object.keys(FriendsStore.chatLogs).length && <Text style={styles.emptyContent}>没有聊天记录</Text>
     }
 
     {/* <Text onPress={()=>{
@@ -175,4 +177,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(ChatListPage));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(ChatListPage));

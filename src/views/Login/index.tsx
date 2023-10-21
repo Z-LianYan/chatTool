@@ -193,4 +193,4 @@ const styles = StyleSheet.create({
     padding: 25
   }
 });
-export default inject("AppStore","MyThemed")(observer(Login));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(Login));

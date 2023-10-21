@@ -44,20 +44,19 @@ const NewFriendsList = ({
   AppStore,
   MyThemed,
   navigation,
+  FriendsStore,
 }:any) => {
   const search_modal_ref:{current:any} = useRef();
   
   const colorScheme = useColorScheme();
-  const [recentlyThreeDays,setRecentlyThreeDays] = useState([]);
-  const [threeDaysBefore,setThreeDaysBefore] = useState([]);
+  // const [recentlyThreeDays,setRecentlyThreeDays] = useState([]);
+  // const [threeDaysBefore,setThreeDaysBefore] = useState([]);
 
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
    
   });
-  // const navigationState = navigation.getState();
-  // const routeName = navigationState.routeNames[navigationState.index]
   useEffect(()=>{
     navigation.setOptions({
       // headerTitle: "聊天",
@@ -70,7 +69,6 @@ const NewFriendsList = ({
     getAddressBookList();
     return ()=>{
       runInAction(()=>{
-        console.log('销毁======》〉》')
         AppStore.addFirendsApply = [];
         AppStore.tabBar.AddressBookPage.msgCnt =  0;
       });
@@ -79,13 +77,11 @@ const NewFriendsList = ({
 
   const getAddressBookList = useCallback(async()=>{
     try{
-      const result:any = await GET_NEW_FRIENDS_LIST({});
-      setRecentlyThreeDays(result.recentlyThreeDays);
-      setThreeDaysBefore(result.threeDaysBefore);
+      await FriendsStore.get_new_friends_list();
     }catch(err:any){
     }
     
-  },[])
+  },[FriendsStore?.new_friends_list])
 
   const handerRightShow = useCallback((item:any)=>{
     if(![0].includes(item.status)) return <Text>已添加</Text>
@@ -124,12 +120,12 @@ const NewFriendsList = ({
     </TouchableOpacity>
     
     {
-      recentlyThreeDays.length?<Vw style={styles.labelWrapper}>
+      FriendsStore?.new_friends_list?.recentlyThreeDays?.length?<Vw style={styles.labelWrapper}>
         <Text>近三天</Text>
       </Vw>:''
     }
     {
-      recentlyThreeDays.map((item:any,index)=>{
+      FriendsStore?.new_friends_list?.recentlyThreeDays.map((item:any,index:number)=>{
         return <MyCell 
           key={'recentlyThreeDays'+index}
           time={<Text>
@@ -153,7 +149,7 @@ const NewFriendsList = ({
           // rightValue="12345"
           msg={item.status+'-'+item.is_apply}
           hasNewMsg={false}
-          showBottomBorder={recentlyThreeDays.length==(index+1)?false:true}
+          showBottomBorder={FriendsStore?.new_friends_list?.recentlyThreeDays.length==(index+1)?false:true}
           avatar={item.f_avatar}
           onPress={async()=>{
             const friends:any = await searchFriends({user_id: item.f_user_id});
@@ -172,12 +168,12 @@ const NewFriendsList = ({
     
 
     {
-      threeDaysBefore.length?<Vw style={styles.labelWrapper}>
+      FriendsStore?.new_friends_list?.threeDaysBefore.length?<Vw style={styles.labelWrapper}>
         <Text>三天前</Text>
       </Vw>:''
     }
     {
-      threeDaysBefore.map((item:any,index)=>{
+      FriendsStore?.new_friends_list?.threeDaysBefore.map((item:any,index:number)=>{
         return <MyCell 
           key={'threeDaysBefore'+index}
           time={<Text>
@@ -201,7 +197,7 @@ const NewFriendsList = ({
           // rightValue="12345"
           msg={item.status+'-'+item.is_apply}
           hasNewMsg={false}
-          showBottomBorder={threeDaysBefore.length==(index+1)?false:true}
+          showBottomBorder={FriendsStore?.new_friends_list?.threeDaysBefore.length==(index+1)?false:true}
           avatar={item.f_avatar}
           onPress={async ()=>{
             const friends:any = await searchFriends({user_id: item.f_user_id});
@@ -245,4 +241,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(NewFriendsList));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(NewFriendsList));

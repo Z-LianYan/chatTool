@@ -3,7 +3,7 @@ import config from './config';
 import store from './store/index';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { runInAction } from "mobx";
-
+import { useNavigation } from '@react-navigation/core';
 export default class SocketIoClient {
     static getInstance(callBack){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
         if(!SocketIoClient.instance){
@@ -69,11 +69,14 @@ export default class SocketIoClient {
         */
         socket.on('addFirendsApply',(data,callBack)=>{//添加好友申请消息通知
             console.log('===========>>>>有添加好友消息通知',store.AppStore.userInfo.user_name,data,callBack);
-            runInAction(()=>{
+            runInAction(async ()=>{
                 if(!data?.fromFriends?.from_user_id) return;
                 if(['acceptAddFriends'].includes(data?.fromFriends?.type)) {
-                    console.log('store.AppStore.chatLogs======>>>',store.AppStore.chatLogs,'=====>>>',data?.fromFriends);
-                    store.AppStore.chatLogs[data?.fromFriends?.from_user_id] = data?.fromFriends;
+                    store.FriendsStore.chatLogs[data?.fromFriends?.from_user_id] = data?.fromFriends;
+                    
+                    await store.FriendsStore.getFriendList();
+                    await store.FriendsStore.get_new_friends_list();
+
                     return;
                 };
                 if(['addFriendApplyReply'].includes(data?.fromFriends?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.from_user_id) {
