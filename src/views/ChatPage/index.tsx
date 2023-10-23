@@ -123,7 +123,7 @@ const ChatPage = ({
                       // textAlign: 'center',
                       backgroundColor:  MyThemed[colorScheme||'light'].ctBg
                     }}
-                  >{item.msg_content+'吗哪1哪礼服短款礼服绝世独立封疆大吏是封建势力对抗'}</Text>
+                  >{item.msg_content}</Text>
                 </Vw>
                 <Vw style={{
                   borderWidth: 8,
