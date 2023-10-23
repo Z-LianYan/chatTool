@@ -57,8 +57,8 @@ const AddressBookPage = ({
   }
   return <ScrollView>
     <MyCell
-    title={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.from_user_name:'新的朋友'} 
-    avatar={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.from_avatar:NEW_FIREND}
+    title={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.user_name:'新的朋友'} 
+    avatar={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.avatar:NEW_FIREND}
     msg={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.msg_content:''}
     showBottomBorder={false}
     showRightArrow={false} 

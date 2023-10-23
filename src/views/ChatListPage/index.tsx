@@ -92,30 +92,30 @@ const ChatListPage = ({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
   })
-  const renderCell = useCallback(()=>{
-    const redArr = [];
-    for(const key in FriendsStore.chatLogs){
-      let len = FriendsStore.chatLogs[key]?.msg_contents?.length;
-      redArr.push(<MyCell 
-      time={FriendsStore.chatLogs[key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
-      title={FriendsStore.chatLogs[key]?.from_user_name} 
-      avatarStyle={{
-        width: 44,
-        height: 44
-      }}
-      key={key+'chatList'}
-      showDisNotice={true}
-      msg={FriendsStore.chatLogs[key]?.msg_contents[len-1]?.msg_content}
-      hasNewMsg={true}
-      avatar={FriendsStore.chatLogs[key]?.from_avatar} 
-      onPress={()=>{
-        navigation.navigate('ChatPage',{
-          user_id: key
-        });
-      }}/>)
-    }
-    return redArr;
-  },[FriendsStore.chatLogs]);
+  // const renderCell = useCallback(()=>{
+  //   const redArr = [];
+  //   for(const key in FriendsStore.chatLogs){
+  //     let len = FriendsStore.chatLogs[key]?.msg_contents?.length;
+  //     redArr.push(<MyCell 
+  //     time={FriendsStore.chatLogs[key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
+  //     title={FriendsStore.chatLogs[key]?.from_user_name} 
+  //     avatarStyle={{
+  //       width: 44,
+  //       height: 44
+  //     }}
+  //     key={key+'chatList'}
+  //     showDisNotice={false}
+  //     msg={FriendsStore.chatLogs[key]?.msg_contents[len-1]?.msg_content}
+  //     hasNewMsg={true}
+  //     avatar={FriendsStore.chatLogs[key]?.from_avatar} 
+  //     onPress={()=>{
+  //       navigation.navigate('ChatPage',{
+  //         user_id: key
+  //       });
+  //     }}/>)
+  //   }
+  //   return redArr;
+  // },[FriendsStore.chatLogs]);
   return <ScrollView>
     {/* <MyCell 
     time='12:59'
@@ -149,12 +149,35 @@ const ChatListPage = ({
       navigation.navigate('ChatPage',{});
     }}/> */}
 
-    {
+    {/* {
       renderCell()
+    } */}
+
+    {
+      FriendsStore.chatLogs.map((item:any,index:number)=>{
+        let len = item.msg_contents.length;
+        return <MyCell 
+        time={item?.msg_contents[len-1]?.created_at && dayjs(item?.msg_contents[len-1]?.created_at).format("HH:mm")}
+        title={item?.user_name} 
+        avatarStyle={{
+          width: 44,
+          height: 44
+        }}
+        key={index+'chatListPageCell'}
+        showDisNotice={false}
+        msg={item?.msg_contents[len-1]?.msg_content}
+        hasNewMsg={true}
+        avatar={item?.avatar} 
+        onPress={()=>{
+          navigation.navigate('ChatPage',{
+            index
+          });
+        }}/>
+      })
     }
 
     {
-      !Object.keys(FriendsStore.chatLogs).length && <Text style={styles.emptyContent}>没有聊天记录</Text>
+      !FriendsStore.chatLogs.length && <Text style={styles.emptyContent}>没有聊天记录</Text>
     }
 
     {/* <Text onPress={()=>{

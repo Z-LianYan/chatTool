@@ -70,16 +70,16 @@ export default class SocketIoClient {
         socket.on('addFirendsApply',(data,callBack)=>{//添加好友申请消息通知
             console.log('===========>>>>有添加好友消息通知',store.AppStore.userInfo.user_name,data,callBack);
             runInAction(async ()=>{
-                if(!data?.fromFriends?.from_user_id) return;
+                if(!data?.fromFriends?.user_id) return;
                 if(['acceptAddFriends'].includes(data?.fromFriends?.type)) {
-                    store.FriendsStore.chatLogs[data?.fromFriends?.from_user_id] = data?.fromFriends;
+                    store.FriendsStore.chatLogs.unshift(data?.fromFriends);
                     
                     await store.FriendsStore.getFriendList();
                     await store.FriendsStore.get_new_friends_list();
 
                     return;
                 };
-                if(['addFriendApplyReply'].includes(data?.fromFriends?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.from_user_id) {
+                if(['addFriendApplyReply'].includes(data?.fromFriends?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.user_id) {
                     store.AppStore.search_user_info.msgs.splice(0,1);
                     store.AppStore.search_user_info.msgs.push(data?.fromFriends);
                     store.AppStore.search_user_info = {
@@ -87,7 +87,7 @@ export default class SocketIoClient {
                     };
                 };
                 
-                const idx = store.AppStore.addFirendsApply.findIndex(item=>item.from_user_id==data.fromFriends.from_user_id);
+                const idx = store.AppStore.addFirendsApply.findIndex(item=>item.user_id==data.fromFriends.user_id);
                 if(idx!=-1){
                     store.AppStore.addFirendsApply.splice(idx,1);
                     store.AppStore.addFirendsApply.push(data.fromFriends);

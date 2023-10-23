@@ -39,7 +39,8 @@ const UserDetail = ({
   MyThemed,
   AppStore,
   navigation,
-  route
+  route,
+  FriendsStore,
 }:any) => {
   console.log('AppStore.search_user_info=======>>',AppStore.search_user_info);
   const { params } = route;
@@ -127,7 +128,25 @@ const UserDetail = ({
           backgroundColor: MyThemed[colorScheme||'light'].ctBg,
         }}
         onPress={() => {
-          navigation.navigate('ChatPage',{});
+          // if(!FriendsStore.chatLogs[search_user_info.user_id]) FriendsStore.chatLogs[search_user_info.user_id] = {
+          //   from_user_id: search_user_info.user_id,
+          //   from_user_name: search_user_info.user_name,
+          //   from_avatar: search_user_info.avatar,
+          //   msg_contents: []
+          // }
+          // runInAction(()=>{
+          //   FriendsStore.chatLogs.unshift({
+          //     user_id: search_user_info.user_id,
+          //     user_name: search_user_info.user_name,
+          //     avatar: search_user_info.avatar,
+          //     msg_contents: []
+          //   });
+          // })
+          
+          let index = FriendsStore.chatLogs.findIndex((item:any)=>item.from_user_id===search_user_info.user_id);
+          const params = {}
+          if(index!=-1) params['index'] = index;
+          navigation.navigate('ChatPage',params);
         }}
       />
     }else{
@@ -370,4 +389,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(UserDetail));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(UserDetail));

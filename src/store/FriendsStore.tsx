@@ -14,7 +14,16 @@ class FriendsStore {
     makeAutoObservable(this)
   }
 
-  chatLogs = {}
+  /** 
+   * chatLogs 聊天记录
+   * {
+   *  from_user_id,
+   *  from_user_name,
+   *  from_avatar,
+   *  msg_contents:[]
+   * }
+   * */
+  chatLogs = []
 
   friendsData = {
     count: 0,

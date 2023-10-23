@@ -71,15 +71,11 @@ const Login = (props:any) => {
       if (!reg_tel.test(mobile_phone)) {
         return Toast.message("请输入正确的手机号");
       }
-      // console.log('route------>>>', route);
-      
       const result:any = await userLogin(form_data);
-      console.log('00000---000>>>',result);
       AppStore.setUserInfo(result);
       if(result && result.token){
         await AsyncStorage.setItem('token',result.token);
         const sockitIo = SocketIoClient.getInstance(()=>{
-          console.log('链接回调了吗？？？？=========》〉》〉')
           if(route.params && route.params.toUrl){
             props.navigation.replace(route.params.toUrl);
             return;

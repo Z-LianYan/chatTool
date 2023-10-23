@@ -41,6 +41,7 @@ class MyThemed {
     ftCr3: ftCr3Dark,//朋友圈会员名称字体
     hdBg: bgDark,//头部导航栏背景色
     hdbrBmCr: '#ccc',//头部导航栏底部边框颜色 
+    fromMsgBg: '#3fb676', // 对方发送过来的消息景色 
 
     primaryColor: primaryColorDark,//主题色
     secondaryColor: secondaryColorDark,//次要 色
@@ -84,6 +85,7 @@ class MyThemed {
     ftCr3: ftCr3Light,//朋友圈会员名称字体
     hdBg: bgLight,//头部导航栏背景色
     hdbrBmCr: '#ccc',//头部导航栏底部边框颜色,
+    fromMsgBg: '#95ec6a', // 对方发送过来的消息景色 
 
     primaryColor: primaryColorLight,//主题色
     secondaryColor: secondaryColorDark,//次要 色

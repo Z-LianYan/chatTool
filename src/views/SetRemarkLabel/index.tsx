@@ -404,7 +404,7 @@ const SetRemarkLabel = ({
               runInAction(async()=>{
                 AppStore.search_user_info = friends;
                 
-                FriendsStore.chatLogs[res?.data?.from_user_id] = res?.data;
+                FriendsStore.chatLogs.unshift(res?.data);
 
                 await FriendsStore.getFriendList();
                 await FriendsStore.get_new_friends_list();

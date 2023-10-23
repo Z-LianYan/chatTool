@@ -211,6 +211,7 @@ function StackNavigators(props:any){
             // },
             headerStyle:{
                 backgroundColor: MyThemed[colorScheme||'light'].bg,
+                
                 // borderBottomWidth:1,
                 // borderBottomColor: MyThemed[colorScheme||'light'].hdbrBmCr
             },

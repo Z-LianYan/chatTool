@@ -47,8 +47,9 @@ const ChatPage = ({
 }:any) => {
   const sockitIo = SocketIoClient.getInstance();
   const { params } = route;
+  console.log('参数======》〉》',params,FriendsStore.chatLogs);
   
-  const colorScheme = useColorScheme();
+  const colorScheme:any = useColorScheme();
   const [msgContent,setMsgContent] = useState<string>();
 
   
@@ -59,7 +60,10 @@ const ChatPage = ({
     navigation.setOptions({
       // headerLeft:'',
       headerRight: '',
-      title:'张三'
+      title:'张三',
+      headerStyle: { 
+        backgroundColor: MyThemed[colorScheme||'light'].bg,
+      }
     });
   });
   // const navigationState = navigation.getState();
@@ -69,25 +73,79 @@ const ChatPage = ({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
   })
-  return <View style={styles.container}>
+  return <Vw style={styles.container}>
     <ScrollView style={styles.scroll_view}>
       {
-        FriendsStore.chatLogs[params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
-          return <View key={index+'chatPage'} style={{flexDirection:'row',alignItems:'center',marginBottom:10}}>
+        FriendsStore.chatLogs[params?.index]?.msg_contents?.map((item:any,index:number)=>{
+          return <Vw key={index+'chatPage'} style={{
+            ...styles.msgCell,
+            justifyContent: item.from_user_id !== AppStore.userInfo.user_id? 'flex-end':'flex-start',
+          }}>
+            {
+              item.from_user_id !== AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                <Vw style={styles.msgTextWrapper}>
+                  <Text
+                    style={{
+                      ...styles.msgText,
+                      backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
+                      color: MyThemed['light'].ftCr
+                    }}
+                  >{item.msg_content}</Text>
+                </Vw>
+                <Vw style={{
+                  borderWidth: 8,
+                  // borderColor: 'transparent',
+                  borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
+                  borderTopColor: 'transparent',
+                  borderRightColor: 'transparent',
+                  borderBottomColor: 'transparent',
+                  position: 'absolute',
+                  right: -16,
+                  top: 10,
+                  // marginTop: -8,
+                }}></Vw>
+              </Vw>
+              
+            }
             <Image 
             style={{
-              width: 25,height:25,
-              // tintColor: MyThemed[colorScheme||'light'].ftCr
+              ...styles.msgCellAvatar,
+              marginLeft: item.from_user_id !== AppStore.userInfo.user_id? 10:0,
+              marginRight: item.from_user_id === AppStore.userInfo.user_id? 10:0,
             }} 
             source={{uri:item.from_avatar}}/>
-            <Text>{item.msg_content}</Text>
-          </View>
+            {
+              item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                <Vw style={styles.msgTextWrapper}>
+                  <Text
+                    style={{
+                      ...styles.msgText,
+                      // textAlign: 'center',
+                      backgroundColor:  MyThemed[colorScheme||'light'].ctBg
+                    }}
+                  >{item.msg_content+'吗哪1哪礼服短款礼服绝世独立封疆大吏是封建势力对抗'}</Text>
+                </Vw>
+                <Vw style={{
+                  borderWidth: 8,
+                  // borderColor: 'transparent',
+                  borderLeftColor: 'transparent',
+                  borderTopColor: 'transparent',
+                  borderRightColor: MyThemed[colorScheme||'light'].ctBg,
+                  borderBottomColor: 'transparent',
+                  position: 'absolute',
+                  left: -16,
+                  top: 10,
+                  // marginTop: -8,
+                }}></Vw>
+              </Vw>
+            }
+          </Vw>
         })
       }
     </ScrollView>
-    <View style={{
+    <Vw style={{
       ...styles.bottomInputWrapper,
-      borderTopColor: MyThemed[colorScheme||'light'].ftCr2
+      borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
     }}>
       <TextInput 
       multiline={true}
@@ -95,7 +153,7 @@ const ChatPage = ({
       style={{
         ...styles.msgContentInput,
         flex:1,
-        // backgroundColor: MyThemed[colorScheme||'light'].ctBg,borderWidth: 0,height: 50,borderRadius: 10,color:MyThemed[colorScheme||'light'].ftCr
+        backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
       }}
       placeholder='' 
       value={msgContent} 
@@ -120,8 +178,8 @@ const ChatPage = ({
         }} 
         source={ADD_CIR}/>
       </TouchableOpacity>
-    </View>
-  </View>;
+    </Vw>
+  </Vw>;
 };
 
 const styles = StyleSheet.create({
@@ -132,6 +190,34 @@ const styles = StyleSheet.create({
   },
   scroll_view:{
     flex:1,
+    paddingTop: 30,
+    paddingHorizontal: 15,
+    paddingBottom: 15,
+  },
+  msgCell:{
+    flexDirection:'row',
+    // alignItems:'center',
+    marginVertical:10,
+  },
+  
+  msgTextContainer:{
+    maxWidth: '70%',
+    position: 'relative',
+  },
+  msgTextWrapper:{
+    borderRadius: 8,
+    overflow: 'hidden'
+  },
+  msgCellAvatar:{
+    width: 32,
+    height: 32,
+    borderRadius: 5,
+  },
+  msgText:{
+    // maxWidth: '70%',
+    padding: 8,
+    lineHeight: 20,
+    // borderRadius: 5,
   },
   bottomInputWrapper:{
     position: 'absolute',
@@ -145,9 +231,14 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   msgContentInput:{
-    backgroundColor: '#cccccc',
+    // backgroundColor: '#cccccc',
     borderRadius: 10,
-    height: 40
+    height: 40,
+    // padding: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10
   },
   add_cir_icon:{
     marginLeft: 20,
