@@ -92,7 +92,7 @@ function BottomTabNavigator(props:any) {//AppStore
       // headerShown:true,//是否隐藏头部导航
       headerTitleAlign:'center',//头部标题居中
       headerStyle: { 
-        backgroundColor: props.MyThemed[colorScheme||'light'].bg,
+        backgroundColor: props.MyThemed[colorScheme||'light'].hdBg,
         // borderBottomWidth:1,
         // borderBottomColor: props.MyThemed[colorScheme||'light'].hdbrBmCr
         height: Platform.OS === "android"?90:50
