@@ -17,9 +17,9 @@ class FriendsStore {
   /** 
    * chatLogs 聊天记录
    * {
-   *  from_user_id,
-   *  from_user_name,
-   *  from_avatar,
+   *  user_id,
+   *  user_name,
+   *  avatar,
    *  msg_contents:[]
    * }
    * */

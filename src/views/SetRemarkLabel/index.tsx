@@ -143,15 +143,14 @@ const SetRemarkLabel = ({
       const friends:any = await searchFriends({user_id: search_user_info.user_id});
       runInAction(()=>{
         AppStore.search_user_info = friends;
+        navigation.navigate({
+          name: 'UserDetail',
+          params: {
+            // userInfo: friends,
+            // user_id: search_user_info.user_id
+          }
+        });
       });
-      navigation.navigate({
-        name: 'UserDetail',
-        params: {
-          // userInfo: friends,
-          // user_id: search_user_info.user_id
-        }
-      });
-
     }catch(err:any){
       console.log('err======>>>',err.message);
     };

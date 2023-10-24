@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useLayoutEffect } from 'react';
+import React, { useState,useEffect, useLayoutEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import { observable, action, makeAutoObservable,runInAction, keys } from 'mobx';
@@ -60,7 +60,7 @@ const ChatPage = ({
     navigation.setOptions({
       // headerLeft:'',
       headerRight: '',
-      title:'张三',
+      title: FriendsStore.chatLogs[params?.index]?.user_name,
       headerStyle: { 
         backgroundColor: MyThemed[colorScheme||'light'].bg,
       }
@@ -73,6 +73,23 @@ const ChatPage = ({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
   })
+
+  const sendMsg = useCallback(async ()=>{
+    console.log('response---->>sendMsg')
+    
+    sockitIo?.getSocketIo()?.emit('sendMsg',{ 
+      msg_type: 'text', 
+      msg_content: msgContent,
+      to_user_id: FriendsStore.chatLogs[params?.index].user_id,
+    },function(response:any) {
+      console.log('response---->>',response)
+      if (response && response.status === 'success') {
+          
+      } else {
+          console.log('Failed to send message!');
+      }
+    });
+  },[msgContent]);
   return <Vw style={styles.container}>
     <ScrollView style={styles.scroll_view}>
       {
@@ -155,7 +172,7 @@ const ChatPage = ({
         flex:1,
         backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
       }}
-      placeholder='' 
+      placeholder='111' 
       value={msgContent} 
       // animated={true}
       autoFocus={false}//只聚焦，没有自动弹出键盘
@@ -164,7 +181,10 @@ const ChatPage = ({
         console.log('val===',val)
         setMsgContent(val)
       }}
-      onSubmitEditing={async ()=>{}}/>
+      onSubmitEditing={async ()=>{
+        console.log('00000')
+        // await sendMsg()
+      }}/>
       <TouchableOpacity 
       style={styles.add_cir_icon}
       onPress={()=>{
@@ -177,6 +197,17 @@ const ChatPage = ({
           tintColor: MyThemed[colorScheme||'light'].ftCr
         }} 
         source={ADD_CIR}/>
+      </TouchableOpacity>
+      <TouchableOpacity 
+      style={{
+        ...styles.sen_btn,
+        backgroundColor: MyThemed[colorScheme||'light'].primaryColor
+      }}
+      onPress={()=>{
+        console.log('123456');
+        
+      }}>
+        <Text>发送</Text>
       </TouchableOpacity>
     </Vw>
   </Vw>;
@@ -242,6 +273,10 @@ const styles = StyleSheet.create({
   },
   add_cir_icon:{
     marginLeft: 20,
+  },
+  sen_btn:{
+    marginLeft: 20,
+    borderWidth: 1,
   }
 });
 
