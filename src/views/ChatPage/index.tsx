@@ -34,6 +34,7 @@ import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
 import { TextInput } from 'react-native-gesture-handler';
+import _ from 'lodash';
 // import { 
 //   View,
 //   Text
@@ -52,15 +53,15 @@ const ChatPage = ({
   const colorScheme:any = useColorScheme();
   const [msgContent,setMsgContent] = useState<string>();
 
-  
-
+  const login_user_id = AppStore?.userInfo?.user_id
+  console.log('login_user_id=====>>>',login_user_id)
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
     navigation.setOptions({
       // headerLeft:'',
       headerRight: '',
-      title: FriendsStore.chatLogs[params?.index]?.user_name,
+      title: params?.title||'',
       headerStyle: { 
         backgroundColor: MyThemed[colorScheme||'light'].bg,
       }
@@ -77,29 +78,66 @@ const ChatPage = ({
   const sendMsg = useCallback(async ()=>{
     console.log('response---->>sendMsg')
     
-    sockitIo?.getSocketIo()?.emit('sendMsg',{ 
+    sockitIo?.getSocketIo()?.emit('sendServerMsg',{ 
       msg_type: 'text', 
       msg_content: msgContent,
-      to_user_id: FriendsStore.chatLogs[params?.index].user_id,
+      to_user_id: AppStore.search_user_info?.user_id,
     },function(response:any) {
-      console.log('response---->>',response)
+      console.log('response---->>12345========',login_user_id,params?.user_id);
+      if(!login_user_id || !params?.user_id) return;
+      console.log('response---->>12345');
+
       if (response && response.status === 'success') {
-          
+        if(!response.msg_content) return;
+        runInAction(()=>{
+          // FriendsStore.chatLogs[login_user_id] = {
+
+          //   ...FriendsStore.chatLogs[login_user_id],
+          // }
+          if(!FriendsStore.chatLogs[login_user_id]){
+            FriendsStore.chatLogs[login_user_id] = {};
+            FriendsStore.chatLogs[login_user_id][params?.user_id]={
+              user_id:  AppStore.search_user_info?.user_id,
+              user_name:  AppStore.search_user_info?.user_name,
+              avatar:  AppStore.search_user_info?.avatar, 
+              msg_contents: [response.msg_content],
+            }
+          }else if(!FriendsStore.chatLogs[login_user_id][params?.user_id]){
+            FriendsStore.chatLogs[login_user_id][params?.user_id]={
+              user_id:  AppStore.search_user_info?.user_id,
+              user_name:  AppStore.search_user_info?.user_name,
+              avatar:  AppStore.search_user_info?.avatar, 
+              msg_contents: [response.msg_content],
+            }
+          }else if(FriendsStore.chatLogs[login_user_id][params?.user_id]){
+            const obj = _.cloneDeep(FriendsStore.chatLogs[login_user_id][params?.user_id]);
+            delete FriendsStore.chatLogs[login_user_id][params?.user_id];
+            obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,response.msg_content]:[response.msg_content]
+            let _obj = {}
+            _obj[params?.user_id] = obj;
+            _obj =  {
+              ..._obj,
+              ...FriendsStore.chatLogs[login_user_id]
+            }
+            FriendsStore.chatLogs[login_user_id] = _obj;
+          }
+        })
       } else {
-          console.log('Failed to send message!');
+        console.log('Failed to send message!');
       }
+      
     });
   },[msgContent]);
   return <Vw style={styles.container}>
     <ScrollView style={styles.scroll_view}>
       {
-        FriendsStore.chatLogs[params?.index]?.msg_contents?.map((item:any,index:number)=>{
+        FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
           return <Vw key={index+'chatPage'} style={{
             ...styles.msgCell,
-            justifyContent: item.from_user_id !== AppStore.userInfo.user_id? 'flex-end':'flex-start',
+            justifyContent: item.from_user_id === AppStore.userInfo.user_id? 'flex-end':'flex-start',
           }}>
             {
-              item.from_user_id !== AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+              item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
                 <Vw style={styles.msgTextWrapper}>
                   <Text
                     style={{
@@ -127,12 +165,12 @@ const ChatPage = ({
             <Image 
             style={{
               ...styles.msgCellAvatar,
-              marginLeft: item.from_user_id !== AppStore.userInfo.user_id? 10:0,
-              marginRight: item.from_user_id === AppStore.userInfo.user_id? 10:0,
+              marginLeft: item.from_user_id === AppStore.userInfo.user_id? 10:0,
+              marginRight: item.from_user_id !== AppStore.userInfo.user_id? 10:0,
             }} 
-            source={{uri:item.from_avatar}}/>
+            source={{uri: item.from_avatar}}/>
             {
-              item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+              item.from_user_id !== AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
                 <Vw style={styles.msgTextWrapper}>
                   <Text
                     style={{
@@ -172,7 +210,7 @@ const ChatPage = ({
         flex:1,
         backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
       }}
-      placeholder='111' 
+      placeholder='' 
       value={msgContent} 
       // animated={true}
       autoFocus={false}//只聚焦，没有自动弹出键盘
@@ -181,34 +219,33 @@ const ChatPage = ({
         console.log('val===',val)
         setMsgContent(val)
       }}
-      onSubmitEditing={async ()=>{
-        console.log('00000')
-        // await sendMsg()
-      }}/>
-      <TouchableOpacity 
-      style={styles.add_cir_icon}
-      onPress={()=>{
-        console.log('123456');
-        
-      }}>
-        <Image 
+      onSubmitEditing={async ()=>{}}/>
+      
+      {
+        msgContent ? <TouchableOpacity 
         style={{
-          width: 25,height:25,
-          tintColor: MyThemed[colorScheme||'light'].ftCr
-        }} 
-        source={ADD_CIR}/>
-      </TouchableOpacity>
-      <TouchableOpacity 
-      style={{
-        ...styles.sen_btn,
-        backgroundColor: MyThemed[colorScheme||'light'].primaryColor
-      }}
-      onPress={()=>{
-        console.log('123456');
-        
-      }}>
-        <Text>发送</Text>
-      </TouchableOpacity>
+          ...styles.sen_btn,
+          backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
+        }}
+        onPress={async ()=>{
+          console.log('123456');
+          await sendMsg()
+        }}>
+          <Text style={styles.sen_btn_txt}>发送</Text>
+        </TouchableOpacity>:<TouchableOpacity 
+        style={styles.add_cir_icon}
+        onPress={()=>{
+          console.log('123456');
+          
+        }}>
+          <Image 
+          style={{
+            width: 25,height:25,
+            tintColor: MyThemed[colorScheme||'light'].ftCr
+          }} 
+          source={ADD_CIR}/>
+        </TouchableOpacity>
+      }
     </Vw>
   </Vw>;
 };
@@ -257,7 +294,7 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingVertical: 10,
     borderTopWidth: 1,
   },
@@ -276,7 +313,13 @@ const styles = StyleSheet.create({
   },
   sen_btn:{
     marginLeft: 20,
-    borderWidth: 1,
+    // borderWidth: 1,
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  sen_btn_txt:{
+    color: '#ffffff'
   }
 });
 

@@ -102,6 +102,44 @@ export default class SocketIoClient {
         })
 
 
+        socket.on('sendClientMsg',(data,callBack)=>{//添加好友申请消息通知
+            console.log('===========>>>>有消息',store.AppStore.userInfo.user_name,data);
+            const login_user_id = store.AppStore.userInfo.user_id;
+            const from_user_id = data.user_id;
+            runInAction(async ()=>{
+                if(!store.FriendsStore.chatLogs[login_user_id]){
+                    store.FriendsStore.chatLogs[login_user_id] = {};
+                    store.FriendsStore.chatLogs[login_user_id][from_user_id]={
+                      user_id:  store.AppStore.search_user_info?.user_id,
+                      user_name:  store.AppStore.search_user_info?.user_name,
+                      avatar:  store.AppStore.search_user_info?.avatar, 
+                      msg_contents: [response.msg_content],
+                    }
+                  }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
+                    store.FriendsStore.chatLogs[login_user_id][from_user_id]={
+                      user_id:  store.AppStore.search_user_info?.user_id,
+                      user_name:  store.AppStore.search_user_info?.user_name,
+                      avatar:  store.AppStore.search_user_info?.avatar, 
+                      msg_contents: [response.msg_content],
+                    }
+                  }else if(store.FriendsStore.chatLogs[login_user_id][from_user_id]){
+                    const obj = _.cloneDeep(store.FriendsStore.chatLogs[login_user_id][from_user_id]);
+                    delete store.FriendsStore.chatLogs[login_user_id][from_user_id];
+                    obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,response.msg_content]:[response.msg_content]
+                    let _obj = {}
+                    _obj[from_user_id] = obj;
+                    _obj =  {
+                      ..._obj,
+                      ...store.FriendsStore.chatLogs[login_user_id]
+                    }
+                    store.FriendsStore.chatLogs[login_user_id] = _obj;
+                }
+
+                callBack && callBack();
+            });
+        })
+
+
     }
 
     getSocketIo(){

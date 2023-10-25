@@ -23,7 +23,9 @@ class FriendsStore {
    *  msg_contents:[]
    * }
    * */
-  chatLogs = []
+  chatLogs = {
+    
+  }
 
   friendsData = {
     count: 0,

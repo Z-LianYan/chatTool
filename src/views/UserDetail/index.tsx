@@ -128,25 +128,15 @@ const UserDetail = ({
           backgroundColor: MyThemed[colorScheme||'light'].ctBg,
         }}
         onPress={() => {
-          // if(!FriendsStore.chatLogs[search_user_info.user_id]) FriendsStore.chatLogs[search_user_info.user_id] = {
-          //   from_user_id: search_user_info.user_id,
-          //   from_user_name: search_user_info.user_name,
-          //   from_avatar: search_user_info.avatar,
-          //   msg_contents: []
-          // }
-          // runInAction(()=>{
-          //   FriendsStore.chatLogs.unshift({
-          //     user_id: search_user_info.user_id,
-          //     user_name: search_user_info.user_name,
-          //     avatar: search_user_info.avatar,
-          //     msg_contents: []
-          //   });
-          // })
           
-          let index = FriendsStore.chatLogs.findIndex((item:any)=>item.from_user_id===search_user_info.user_id);
-          const params = {}
-          if(index!=-1) params['index'] = index;
-          navigation.navigate('ChatPage',params);
+          // let index = FriendsStore.chatLogs.findIndex((item:any)=>item.from_user_id===search_user_info.user_id);
+          // const params = {
+          //   title: search_user_info.user_name
+          // }
+          // if(index!=-1) params['index'] = index;
+          navigation.navigate('ChatPage',{
+            user_id: search_user_info.user_id
+          });
         }}
       />
     }else{
