@@ -81,7 +81,7 @@ const ChatPage = ({
     sockitIo?.getSocketIo()?.emit('sendServerMsg',{ 
       msg_type: 'text', 
       msg_content: msgContent,
-      to_user_id: AppStore.search_user_info?.user_id,
+      to_user_id: params?.user_id,
     },function(response:any) {
       console.log('response---->>12345========',login_user_id,params?.user_id);
       if(!login_user_id || !params?.user_id) return;
@@ -228,7 +228,6 @@ const ChatPage = ({
           backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
         }}
         onPress={async ()=>{
-          console.log('123456');
           await sendMsg()
         }}>
           <Text style={styles.sen_btn_txt}>发送</Text>

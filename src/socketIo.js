@@ -4,6 +4,7 @@ import store from './store/index';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { runInAction } from "mobx";
 import { useNavigation } from '@react-navigation/core';
+import _ from 'lodash';
 export default class SocketIoClient {
     static getInstance(callBack){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
         if(!SocketIoClient.instance){
@@ -110,22 +111,22 @@ export default class SocketIoClient {
                 if(!store.FriendsStore.chatLogs[login_user_id]){
                     store.FriendsStore.chatLogs[login_user_id] = {};
                     store.FriendsStore.chatLogs[login_user_id][from_user_id]={
-                      user_id:  store.AppStore.search_user_info?.user_id,
-                      user_name:  store.AppStore.search_user_info?.user_name,
-                      avatar:  store.AppStore.search_user_info?.avatar, 
-                      msg_contents: [response.msg_content],
+                      user_id:  data?.user_id,
+                      user_name:  data?.user_name,
+                      avatar:  data?.avatar, 
+                      msg_contents: [data.msg_content],
                     }
                   }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
                     store.FriendsStore.chatLogs[login_user_id][from_user_id]={
-                      user_id:  store.AppStore.search_user_info?.user_id,
-                      user_name:  store.AppStore.search_user_info?.user_name,
-                      avatar:  store.AppStore.search_user_info?.avatar, 
-                      msg_contents: [response.msg_content],
+                      user_id:  data?.user_id,
+                      user_name:  data?.user_name,
+                      avatar:  data?.avatar, 
+                      msg_contents: [data.msg_content],
                     }
                   }else if(store.FriendsStore.chatLogs[login_user_id][from_user_id]){
                     const obj = _.cloneDeep(store.FriendsStore.chatLogs[login_user_id][from_user_id]);
                     delete store.FriendsStore.chatLogs[login_user_id][from_user_id];
-                    obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,response.msg_content]:[response.msg_content]
+                    obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,data.msg_content]:[data.msg_content]
                     let _obj = {}
                     _obj[from_user_id] = obj;
                     _obj =  {
@@ -133,6 +134,8 @@ export default class SocketIoClient {
                       ...store.FriendsStore.chatLogs[login_user_id]
                     }
                     store.FriendsStore.chatLogs[login_user_id] = _obj;
+
+                    console.log('saaaaad=====>>>',store.FriendsStore.chatLogs[login_user_id])
                 }
 
                 callBack && callBack();
