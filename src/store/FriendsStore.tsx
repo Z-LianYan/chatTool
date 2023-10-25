@@ -16,16 +16,16 @@ class FriendsStore {
 
   /** 
    * chatLogs 聊天记录
-   * {
-   *  user_id,
-   *  user_name,
-   *  avatar,
-   *  msg_contents:[]
+   * login_user_id: {
+   *  user_id: {
+   *    user_id,
+   *    user_name,
+   *    avatar,
+   *    msg_contents:[]
+   *  }
    * }
    * */
-  chatLogs = {
-    
-  }
+  chatLogs = {}
 
   friendsData = {
     count: 0,

@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useLayoutEffect, useCallback } from 'react';
+import React, { useState,useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import { observable, action, makeAutoObservable,runInAction, keys } from 'mobx';
@@ -34,7 +34,8 @@ import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
 import { TextInput } from 'react-native-gesture-handler';
-import _ from 'lodash';
+import dayjs from 'dayjs';
+const _ = require('lodash');
 // import { 
 //   View,
 //   Text
@@ -46,6 +47,7 @@ const ChatPage = ({
   FriendsStore,
   route
 }:any) => {
+  const scrollRef:{current:any} = useRef();
   const sockitIo = SocketIoClient.getInstance();
   const { params } = route;
   console.log('参数======》〉》',params,FriendsStore.chatLogs);
@@ -76,50 +78,63 @@ const ChatPage = ({
   })
 
   const sendMsg = useCallback(async ()=>{
-    console.log('response---->>sendMsg')
-    
-    sockitIo?.getSocketIo()?.emit('sendServerMsg',{ 
-      msg_type: 'text', 
-      msg_content: msgContent,
+    console.log('response---->>sendMsg');
+    if(!msgContent) return;
+    const msg_row = {
+      from_user_id: AppStore.userInfo?.user_id,
       to_user_id: params?.user_id,
+      msg_content: msgContent,
+      created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      from_user_name: AppStore?.userInfo?.user_name,
+      from_avatar: AppStore?.userInfo?.avatar,
+      msg_type: 'text',
+      sendIng: true,
+      msgUniqueId: String(params?.user_id) + dayjs().format('YYYYMMDDHHmmssSSS'),
+    }
+    setMsgContent('');
+    scrollRef.current.scrollTo({x: 0, y: 1000000, animated: true})
+    runInAction(()=>{
+      if(!FriendsStore.chatLogs[login_user_id]){
+        FriendsStore.chatLogs[login_user_id] = {};
+        FriendsStore.chatLogs[login_user_id][params?.user_id]={
+          user_id:  AppStore.search_user_info?.user_id,
+          user_name:  AppStore.search_user_info?.user_name,
+          avatar:  AppStore.search_user_info?.avatar, 
+          msg_contents: [msg_row],
+        }
+      }else if(!FriendsStore.chatLogs[login_user_id][params?.user_id]){
+        FriendsStore.chatLogs[login_user_id][params?.user_id]={
+          user_id:  AppStore.search_user_info?.user_id,
+          user_name:  AppStore.search_user_info?.user_name,
+          avatar:  AppStore.search_user_info?.avatar, 
+          msg_contents: [msg_row],
+        }
+      }else if(FriendsStore.chatLogs[login_user_id][params?.user_id]){
+        const obj = _.cloneDeep(FriendsStore.chatLogs[login_user_id][params?.user_id]);
+        delete FriendsStore.chatLogs[login_user_id][params?.user_id];
+        obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,msg_row]:[msg_row]
+        let _obj = {}
+        _obj[params?.user_id] = obj;
+        _obj =  {
+          ..._obj,
+          ...FriendsStore.chatLogs[login_user_id]
+        }
+        FriendsStore.chatLogs[login_user_id] = _obj;
+      }
+    })
+    sockitIo?.getSocketIo()?.emit('sendServerMsg',{ 
+      msg_type: msg_row.msg_type, 
+      msg_content: msg_row.msg_content,
+      to_user_id: msg_row.to_user_id,
+      msgUniqueId: msg_row.msgUniqueId
     },function(response:any) {
-      console.log('response---->>12345========',login_user_id,params?.user_id);
       if(!login_user_id || !params?.user_id) return;
-      console.log('response---->>12345');
-
-      if (response && response.status === 'success') {
-        if(!response.msg_content) return;
+      if (response && response.status === 'success' && response.msg_content) {
         runInAction(()=>{
-          // FriendsStore.chatLogs[login_user_id] = {
-
-          //   ...FriendsStore.chatLogs[login_user_id],
-          // }
-          if(!FriendsStore.chatLogs[login_user_id]){
-            FriendsStore.chatLogs[login_user_id] = {};
-            FriendsStore.chatLogs[login_user_id][params?.user_id]={
-              user_id:  AppStore.search_user_info?.user_id,
-              user_name:  AppStore.search_user_info?.user_name,
-              avatar:  AppStore.search_user_info?.avatar, 
-              msg_contents: [response.msg_content],
-            }
-          }else if(!FriendsStore.chatLogs[login_user_id][params?.user_id]){
-            FriendsStore.chatLogs[login_user_id][params?.user_id]={
-              user_id:  AppStore.search_user_info?.user_id,
-              user_name:  AppStore.search_user_info?.user_name,
-              avatar:  AppStore.search_user_info?.avatar, 
-              msg_contents: [response.msg_content],
-            }
-          }else if(FriendsStore.chatLogs[login_user_id][params?.user_id]){
-            const obj = _.cloneDeep(FriendsStore.chatLogs[login_user_id][params?.user_id]);
-            delete FriendsStore.chatLogs[login_user_id][params?.user_id];
-            obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,response.msg_content]:[response.msg_content]
-            let _obj = {}
-            _obj[params?.user_id] = obj;
-            _obj =  {
-              ..._obj,
-              ...FriendsStore.chatLogs[login_user_id]
-            }
-            FriendsStore.chatLogs[login_user_id] = _obj;
+          const len = FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.length;
+          const msg_contents = FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents;
+          for(const item of msg_contents){
+            if(response.msg_content.msgUniqueId == item.msgUniqueId) item.sendIng = false;
           }
         })
       } else {
@@ -129,7 +144,8 @@ const ChatPage = ({
     });
   },[msgContent]);
   return <Vw style={styles.container}>
-    <ScrollView style={styles.scroll_view}>
+    <ScrollView style={styles.scroll_view} ref={scrollRef}>
+      <Vw style={{height: 30}}></Vw>
       {
         FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
           return <Vw key={index+'chatPage'} style={{
@@ -138,6 +154,9 @@ const ChatPage = ({
           }}>
             {
               item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                {
+                  item.sendIng && <Text style={styles.leftLoadingIcon}>加载中...</Text>
+                }
                 <Vw style={styles.msgTextWrapper}>
                   <Text
                     style={{
@@ -201,6 +220,7 @@ const ChatPage = ({
     <Vw style={{
       ...styles.bottomInputWrapper,
       borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
+      backgroundColor: MyThemed[colorScheme||'light'].bg
     }}>
       <TextInput 
       multiline={true}
@@ -218,6 +238,12 @@ const ChatPage = ({
       onChangeText={(val:string)=>{
         console.log('val===',val)
         setMsgContent(val)
+      }}
+      onFocus={()=>{
+        console.log('000000')
+        setTimeout(() => {
+          scrollRef.current.scrollTo({x: 0, y: 1000000, animated: false})
+        },200);
       }}
       onSubmitEditing={async ()=>{}}/>
       
@@ -252,14 +278,19 @@ const ChatPage = ({
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    position: 'relative',
-    
+    // position: 'absolute',
+    // left: 0,
+    // top: 0,
+    // right: 0,
+    // bottom: 0,
   },
   scroll_view:{
     flex:1,
-    paddingTop: 30,
+    // paddingTop: 30,
     paddingHorizontal: 15,
-    paddingBottom: 15,
+    // paddingBottom: 15,
+    // borderWidth: 1,
+    // borderColor: 'red'
   },
   msgCell:{
     flexDirection:'row',
@@ -287,10 +318,11 @@ const styles = StyleSheet.create({
     // borderRadius: 5,
   },
   bottomInputWrapper:{
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    // position: 'absolute',
+    // bottom: 0,
+    // left: 0,
+    // right: 0,
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -319,6 +351,11 @@ const styles = StyleSheet.create({
   },
   sen_btn_txt:{
     color: '#ffffff'
+  },
+  leftLoadingIcon:{
+    position: 'absolute',
+    top: 15,
+    left: -30
   }
 });
 

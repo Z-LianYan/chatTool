@@ -94,22 +94,23 @@ const ChatListPage = ({
   })
   const renderCell = useCallback(()=>{
     const redArr = [];
-    const user_id = AppStore.userInfo?.user_id;
-    for(const key in FriendsStore.chatLogs[user_id]){
-      let len = FriendsStore.chatLogs[user_id][key]?.msg_contents?.length;
+    const login_user_id = AppStore.userInfo?.user_id;
+    for(const key in FriendsStore.chatLogs[login_user_id]){
+      let len = FriendsStore.chatLogs[login_user_id][key]?.msg_contents?.length;
       redArr.push(<MyCell 
-      time={FriendsStore.chatLogs[user_id][key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[user_id][key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
-      title={FriendsStore.chatLogs[user_id][key]?.user_name} 
+      time={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
+      title={FriendsStore.chatLogs[login_user_id][key]?.user_name} 
       avatarStyle={{
         width: 44,
         height: 44
       }}
       key={key+'chatList'}
       showDisNotice={false}
-      msg={FriendsStore.chatLogs[user_id][key]?.msg_contents[len-1]?.msg_content}
+      msg={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.msg_content}
       hasNewMsg={true}
-      avatar={FriendsStore.chatLogs[user_id][key]?.avatar} 
+      avatar={FriendsStore.chatLogs[login_user_id][key]?.avatar} 
       onPress={()=>{
+        console.log('======>>12222',FriendsStore.chatLogs[login_user_id][key])
         navigation.navigate('ChatPage',{
           user_id: key
         });
