@@ -107,13 +107,19 @@ const ChatListPage = ({
       key={key+'chatList'}
       showDisNotice={false}
       msg={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.msg_content}
-      hasNewMsg={true}
+      hasNewMsg={FriendsStore.chatLogs[login_user_id][key]?.hasNewMsg}
       avatar={FriendsStore.chatLogs[login_user_id][key]?.avatar} 
       onPress={()=>{
         console.log('======>>12222',FriendsStore.chatLogs[login_user_id][key])
-        navigation.navigate('ChatPage',{
-          user_id: key
+        runInAction(async ()=>{
+          FriendsStore.chatLogs[login_user_id][key].hasNewMsg = false;
+          setTimeout(() => {
+            navigation.navigate('ChatPage',{
+              user_id: key
+            });
+          });
         });
+        
       }}/>)
     }
     return redArr;

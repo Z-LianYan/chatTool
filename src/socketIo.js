@@ -73,7 +73,42 @@ export default class SocketIoClient {
             runInAction(async ()=>{
                 if(!data?.fromFriends?.user_id) return;
                 if(['acceptAddFriends'].includes(data?.fromFriends?.type)) {
-                    store.FriendsStore.chatLogs.unshift(data?.fromFriends);
+                    // store.FriendsStore.chatLogs.unshift(data?.fromFriends);
+
+                    if(data?.fromFriends?.msg_contents){
+                        const login_user_id = store.AppStore.userInfo?.user_id;
+                        const from_user_id = data?.fromFriends?.user_id
+                        if(!store.FriendsStore.chatLogs[login_user_id]){
+                          store.FriendsStore.chatLogs[login_user_id] = {};
+                          store.FriendsStore.chatLogs[login_user_id][from_user_id]={
+                            user_id:  from_user_id,
+                            user_name:  data?.fromFriends?.user_name,
+                            avatar:  data?.fromFriends?.avatar, 
+                            hasNewMsg: true,
+                            msg_contents: [...data?.fromFriends?.msg_contents],
+                          }
+                        }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
+                          store.FriendsStore.chatLogs[login_user_id][from_user_id]={
+                            user_id:  from_user_id,
+                            user_name:  data?.fromFriends?.user_name,
+                            avatar:  data?.fromFriends?.avatar, 
+                            hasNewMsg: true,
+                            msg_contents: [...data?.fromFriends?.msg_contents],
+                          }
+                        }else if(store.FriendsStore.chatLogs[login_user_id][from_user_id]){
+                          const obj = _.cloneDeep(store.FriendsStore.chatLogs[login_user_id][from_user_id]);
+                          delete store.FriendsStore.chatLogs[login_user_id][from_user_id];
+                          obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,...data?.fromFriends?.msg_contents]:[...data?.fromFriends3?.msg_contents]
+                          let _obj = {};
+                          obj.hasNewMsg = true;
+                          _obj[from_user_id] = obj;
+                          _obj =  {
+                            ..._obj,
+                            ...store.FriendsStore.chatLogs[login_user_id]
+                          }
+                          store.FriendsStore.chatLogs[login_user_id] = _obj;
+                        }
+                    }
                     
                     await store.FriendsStore.getFriendList();
                     await store.FriendsStore.get_new_friends_list();
@@ -114,6 +149,7 @@ export default class SocketIoClient {
                       user_id:  data?.user_id,
                       user_name:  data?.user_name,
                       avatar:  data?.avatar, 
+                      hasNewMsg: store.AppStore.curRouteName=='ChatPage'?false:true,
                       msg_contents: [data.msg_content],
                     }
                   }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
@@ -121,21 +157,21 @@ export default class SocketIoClient {
                       user_id:  data?.user_id,
                       user_name:  data?.user_name,
                       avatar:  data?.avatar, 
+                      hasNewMsg: store.AppStore.curRouteName=='ChatPage'?false:true,
                       msg_contents: [data.msg_content],
                     }
                   }else if(store.FriendsStore.chatLogs[login_user_id][from_user_id]){
                     const obj = _.cloneDeep(store.FriendsStore.chatLogs[login_user_id][from_user_id]);
                     delete store.FriendsStore.chatLogs[login_user_id][from_user_id];
                     obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,data.msg_content]:[data.msg_content]
-                    let _obj = {}
+                    let _obj = {};
+                    obj.hasNewMsg = store.AppStore.curRouteName=='ChatPage'?false:true;
                     _obj[from_user_id] = obj;
                     _obj =  {
                       ..._obj,
                       ...store.FriendsStore.chatLogs[login_user_id]
                     }
                     store.FriendsStore.chatLogs[login_user_id] = _obj;
-
-                    console.log('saaaaad=====>>>',store.FriendsStore.chatLogs[login_user_id])
                 }
 
                 callBack && callBack();

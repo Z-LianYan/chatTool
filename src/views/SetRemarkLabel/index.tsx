@@ -34,6 +34,7 @@ import { runInAction } from 'mobx';
 import { ACCEPT_ADD_FRIENDS, ADD_FRIENDS_APPLY, editFriends, searchFriends } from '../../api/friends';
 import { StackActions } from '@react-navigation/core';
 import dayjs from 'dayjs';
+const _ = require('lodash')
 
 const SetRemarkLabel = ({ 
   MyThemed,
@@ -403,7 +404,38 @@ const SetRemarkLabel = ({
               runInAction(async()=>{
                 AppStore.search_user_info = friends;
                 
-                FriendsStore.chatLogs.unshift(res?.data);
+                // FriendsStore.chatLogs.unshift(res?.data);
+                if(res?.data?.msg_contents){
+                  const login_user_id = AppStore.userInfo?.user_id;
+                  if(!FriendsStore.chatLogs[login_user_id]){
+                    FriendsStore.chatLogs[login_user_id] = {};
+                    FriendsStore.chatLogs[login_user_id][params?.user_id]={
+                      user_id:  AppStore.search_user_info?.user_id,
+                      user_name:  AppStore.search_user_info?.user_name,
+                      avatar:  AppStore.search_user_info?.avatar, 
+                      msg_contents: [...res?.data?.msg_contents],
+                    }
+                  }else if(!FriendsStore.chatLogs[login_user_id][params?.user_id]){
+                    FriendsStore.chatLogs[login_user_id][params?.user_id]={
+                      user_id:  AppStore.search_user_info?.user_id,
+                      user_name:  AppStore.search_user_info?.user_name,
+                      avatar:  AppStore.search_user_info?.avatar, 
+                      msg_contents: [...res?.data?.msg_contents],
+                    }
+                  }else if(FriendsStore.chatLogs[login_user_id][params?.user_id]){
+                    const obj = _.cloneDeep(FriendsStore.chatLogs[login_user_id][params?.user_id]);
+                    delete FriendsStore.chatLogs[login_user_id][params?.user_id];
+                    obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,...res?.data?.msg_contents]:[...res?.data?.msg_contents]
+                    let _obj = {}
+                    _obj[params?.user_id] = obj;
+                    _obj =  {
+                      ..._obj,
+                      ...FriendsStore.chatLogs[login_user_id]
+                    }
+                    FriendsStore.chatLogs[login_user_id] = _obj;
+                  }
+                }
+                
 
                 await FriendsStore.getFriendList();
                 await FriendsStore.get_new_friends_list();

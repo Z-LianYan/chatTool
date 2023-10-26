@@ -6,7 +6,7 @@ class AppStore {
     // 建议使用这种方式，自动识别类型，不需要再加前缀
     makeAutoObservable(this)
   }
-
+  
   curRouteName = 'ChatListPage'; //当前tabbar 所在的路有 （用户消息数量显示）
   tabBar = {
     ChatListPage: {

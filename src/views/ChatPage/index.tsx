@@ -50,13 +50,13 @@ const ChatPage = ({
   const scrollRef:{current:any} = useRef();
   const sockitIo = SocketIoClient.getInstance();
   const { params } = route;
-  console.log('参数======》〉》',params,FriendsStore.chatLogs);
   
   const colorScheme:any = useColorScheme();
   const [msgContent,setMsgContent] = useState<string>();
-
-  const login_user_id = AppStore?.userInfo?.user_id
-  console.log('login_user_id=====>>>',login_user_id)
+  const [showSkeleton,setShowSkeleton] = useState<boolean>(true);
+  const [textInputHeight,setTextInputHeight] = useState<number>(40);
+  
+  const login_user_id = AppStore?.userInfo?.user_id;
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
@@ -68,17 +68,35 @@ const ChatPage = ({
         backgroundColor: MyThemed[colorScheme||'light'].bg,
       }
     });
+    
   });
-  // const navigationState = navigation.getState();
-  // const routeName = navigationState.routeNames[navigationState.index]
   useEffect(()=>{
-    // navigation.setOptions({
-    //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
-    // });
-  })
-
+    setTimeout(() => {
+      scrollRef.current.scrollToEnd();
+      setTimeout(()=>{
+        setShowSkeleton(false);
+      },300);
+    });
+    
+    return ()=>{
+      console.log('------========>>>销毁111',login_user_id,params?.user_id);
+      runInAction(()=>{
+        
+        if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]){
+          FriendsStore.chatLogs[login_user_id][params?.user_id].hasNewMsg = false;
+        }
+      });
+    }
+  },[])
+  // const getScrollHeight = useCallback(async ()=>{
+  //   return new Promise((resolve, reject)=>{
+  //     scrollRef.current?.measure((x:any, y:any, width:any, height:any, pageX:any, pageY:any) => {
+  //       console.log(x, y, width, height, pageX, pageY);
+  //       resolve(height);
+  //     });
+  //   })
+  // },[])
   const sendMsg = useCallback(async ()=>{
-    console.log('response---->>sendMsg');
     if(!msgContent) return;
     const msg_row = {
       from_user_id: AppStore.userInfo?.user_id,
@@ -92,7 +110,6 @@ const ChatPage = ({
       msgUniqueId: String(params?.user_id) + dayjs().format('YYYYMMDDHHmmssSSS'),
     }
     setMsgContent('');
-    scrollRef.current.scrollTo({x: 0, y: 1000000, animated: true})
     runInAction(()=>{
       if(!FriendsStore.chatLogs[login_user_id]){
         FriendsStore.chatLogs[login_user_id] = {};
@@ -121,30 +138,42 @@ const ChatPage = ({
         }
         FriendsStore.chatLogs[login_user_id] = _obj;
       }
-    })
-    sockitIo?.getSocketIo()?.emit('sendServerMsg',{ 
-      msg_type: msg_row.msg_type, 
-      msg_content: msg_row.msg_content,
-      to_user_id: msg_row.to_user_id,
-      msgUniqueId: msg_row.msgUniqueId
-    },function(response:any) {
-      if(!login_user_id || !params?.user_id) return;
-      if (response && response.status === 'success' && response.msg_content) {
-        runInAction(()=>{
-          const len = FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.length;
-          const msg_contents = FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents;
-          for(const item of msg_contents){
-            if(response.msg_content.msgUniqueId == item.msgUniqueId) item.sendIng = false;
-          }
-        })
-      } else {
-        console.log('Failed to send message!');
-      }
-      
+      // scrollRef.current.scrollTo({x: 0, y: scrollHeight+50, animated: false});
+      setTimeout(() => {
+        scrollRef.current.scrollToEnd()
+      }, 200);
+      sockitIo?.getSocketIo()?.emit('sendServerMsg',{ 
+        msg_type: msg_row.msg_type, 
+        msg_content: msg_row.msg_content,
+        to_user_id: msg_row.to_user_id,
+        msgUniqueId: msg_row.msgUniqueId
+      },function(response:any) {
+        if(!login_user_id || !params?.user_id) return;
+        if (response && response.status === 'success' && response.msg_content) {
+          runInAction(()=>{
+            const len = FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.length;
+            const msg_contents = FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents;
+            for(const item of msg_contents){
+              if(response.msg_content.msgUniqueId == item.msgUniqueId) item.sendIng = false;
+            }
+          })
+        } else {
+          console.log('Failed to send message!');
+        }
+        
+      });
     });
   },[msgContent]);
   return <Vw style={styles.container}>
-    <ScrollView style={styles.scroll_view} ref={scrollRef}>
+    {
+      showSkeleton && <View style={{
+        ...styles.skeletonWrapper,
+        backgroundColor: MyThemed[colorScheme||'light'].bg
+      }}></View>
+    }
+    <ScrollView 
+    style={styles.scroll_view} 
+    ref={scrollRef}>
       <Vw style={{height: 30}}></Vw>
       {
         FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
@@ -155,7 +184,7 @@ const ChatPage = ({
             {
               item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
                 {
-                  item.sendIng && <Text style={styles.leftLoadingIcon}>加载中...</Text>
+                  item.sendIng && <Text style={styles.leftLoadingIcon}>发送中...</Text>
                 }
                 <Vw style={styles.msgTextWrapper}>
                   <Text
@@ -229,6 +258,7 @@ const ChatPage = ({
         ...styles.msgContentInput,
         flex:1,
         backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
+        height: textInputHeight,
       }}
       placeholder='' 
       value={msgContent} 
@@ -236,17 +266,19 @@ const ChatPage = ({
       autoFocus={false}//只聚焦，没有自动弹出键盘
       keyboardType="default"
       onChangeText={(val:string)=>{
-        console.log('val===',val)
+        // console.log('val===',val)
         setMsgContent(val)
       }}
-      onFocus={()=>{
-        console.log('000000')
+      onContentSizeChange={(event:any)=>{
+        const { contentSize } = event.nativeEvent
+        if((['android'].includes(Platform.OS) && contentSize.height>120)|| (['ios'].includes(Platform.OS) && (contentSize.height+20)<120)) setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
+      }}
+      onFocus={async ()=>{
         setTimeout(() => {
-          scrollRef.current.scrollTo({x: 0, y: 1000000, animated: false})
+          scrollRef.current.scrollToEnd()
         },200);
       }}
       onSubmitEditing={async ()=>{}}/>
-      
       {
         msgContent ? <TouchableOpacity 
         style={{
@@ -278,23 +310,22 @@ const ChatPage = ({
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    // position: 'absolute',
-    // left: 0,
-    // top: 0,
-    // right: 0,
-    // bottom: 0,
+    position: 'relative',
+  },
+  skeletonWrapper:{
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    zIndex: 1
   },
   scroll_view:{
     flex:1,
-    // paddingTop: 30,
     paddingHorizontal: 15,
-    // paddingBottom: 15,
-    // borderWidth: 1,
-    // borderColor: 'red'
   },
   msgCell:{
     flexDirection:'row',
-    // alignItems:'center',
     marginVertical:10,
   },
   
@@ -312,16 +343,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   msgText:{
-    // maxWidth: '70%',
     padding: 8,
     lineHeight: 20,
-    // borderRadius: 5,
   },
   bottomInputWrapper:{
-    // position: 'absolute',
-    // bottom: 0,
-    // left: 0,
-    // right: 0,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
@@ -330,21 +355,19 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   msgContentInput:{
-    // backgroundColor: '#cccccc',
     borderRadius: 10,
-    height: 40,
-    // padding: 10,
+    // height: 40,
     paddingTop: 10,
     paddingBottom: 10,
     paddingLeft: 10,
-    paddingRight: 10
+    paddingRight: 10,
+    textAlignVertical: "top"
   },
   add_cir_icon:{
     marginLeft: 20,
   },
   sen_btn:{
     marginLeft: 20,
-    // borderWidth: 1,
     borderRadius: 5,
     paddingVertical: 5,
     paddingHorizontal: 10,
@@ -355,7 +378,8 @@ const styles = StyleSheet.create({
   leftLoadingIcon:{
     position: 'absolute',
     top: 15,
-    left: -30
+    left: -30,
+    fontSize: 10,
   }
 });
 
