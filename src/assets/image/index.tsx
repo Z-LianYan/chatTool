@@ -27,3 +27,4 @@ export const WOMAN_AVATAR = require('./woman-avatar.png');
 export const CLOSE_CIRCLE_ICON = require('./close-circle.png');
 export const ADD_ICON = require('./add-icon.png');
 export const RIGHT_UP_ARROW = require('./right-up-arrow.png');
+export const LOADING_ICON = require('./loading.gif');

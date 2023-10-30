@@ -379,11 +379,11 @@ const SetRemarkLabel = ({
             backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
           }}
           onPress={async () => {
-            
 
             if(search_user_info?.expire<=dayjs().format('YYYY-MM-DD HH:mm:ss')){
               expireHander()
             }else{
+              if(!params?.user_id) return;
               const res:any = await ACCEPT_ADD_FRIENDS({
                 ...formData,
                 label_ids: (formData.labels && formData.labels.length)?formData.labels.map((item:any)=>item.label_id).join(','):null,

@@ -110,8 +110,9 @@ const UserDetail = ({
       style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
       onPress={() => {
         navigation.navigate('SetRemarkLabel',{
-          search_user_info: search_user_info,
-          op_type: 'toVerify'
+          // search_user_info: search_user_info,
+          op_type: 'toVerify',
+          user_id: search_user_info.user_id,
         });
       }}
     />

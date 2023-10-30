@@ -34,6 +34,7 @@ import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
 import { TextInput } from 'react-native-gesture-handler';
+import { LOADING_ICON } from '../../assets/image/index';
 import dayjs from 'dayjs';
 const _ = require('lodash');
 // import { 
@@ -97,6 +98,8 @@ const ChatPage = ({
   //   })
   // },[])
   const sendMsg = useCallback(async ()=>{
+    console.log('FriendsStore.chatLogs[login_user_id]====>>>23',FriendsStore.chatLogs[login_user_id]);
+    // return;
     if(!msgContent) return;
     const msg_row = {
       from_user_id: AppStore.userInfo?.user_id,
@@ -184,7 +187,12 @@ const ChatPage = ({
             {
               item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
                 {
-                  item.sendIng && <Text style={styles.leftLoadingIcon}>发送中...</Text>
+                  // item.sendIng && <Text style={styles.leftLoadingIcon}>发送中...</Text>
+                  item.sendIng && <Image 
+                  style={{
+                    ...styles.leftLoadingIcon,
+                  }} 
+                  source={LOADING_ICON}/>
                 }
                 <Vw style={styles.msgTextWrapper}>
                   <Text
@@ -270,8 +278,9 @@ const ChatPage = ({
         setMsgContent(val)
       }}
       onContentSizeChange={(event:any)=>{
-        const { contentSize } = event.nativeEvent
-        if((['android'].includes(Platform.OS) && contentSize.height>120)|| (['ios'].includes(Platform.OS) && (contentSize.height+20)<120)) setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
+        const { contentSize } = event.nativeEvent;
+        if(contentSize.height>300) return;
+        setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
       }}
       onFocus={async ()=>{
         setTimeout(() => {
@@ -361,7 +370,8 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingLeft: 10,
     paddingRight: 10,
-    textAlignVertical: "top"
+    textAlignVertical: "top",
+    fontSize: 20
   },
   add_cir_icon:{
     marginLeft: 20,
@@ -377,9 +387,11 @@ const styles = StyleSheet.create({
   },
   leftLoadingIcon:{
     position: 'absolute',
-    top: 15,
+    top: 3,
     left: -30,
-    fontSize: 10,
+    width: 30,
+    height: 30,
+    // fontSize: 10,
   }
 });
 

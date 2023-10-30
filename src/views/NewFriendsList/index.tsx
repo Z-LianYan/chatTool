@@ -97,7 +97,8 @@ const NewFriendsList = ({
           AppStore.search_user_info = friends;
           navigation.navigate('SetRemarkLabel',{
             // search_user_info: friends,
-            op_type: 'toVerify'
+            op_type: 'toVerify',
+            user_id: friends.user_id,
           });
         }}
       ></Button>
