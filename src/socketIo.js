@@ -173,8 +173,9 @@ export default class SocketIoClient {
                     }
                     store.FriendsStore.chatLogs[login_user_id] = _obj;
                 }
-
-                callBack && callBack();
+                callBack && callBack({
+                    msg_unique_id: data.msg_content?.msg_unique_id
+                });
             });
         })
 
