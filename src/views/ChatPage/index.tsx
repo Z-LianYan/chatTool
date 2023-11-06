@@ -64,7 +64,7 @@ const ChatPage = ({
     navigation.setOptions({
       // headerLeft:'',
       headerRight: '',
-      title: params?.title||'',
+      title: params?.user_name||'',
       headerStyle: { 
         backgroundColor: MyThemed[colorScheme||'light'].bg,
       }
@@ -99,6 +99,23 @@ const ChatPage = ({
   // },[])
   const sendMsg = useCallback(async ()=>{
     console.log('FriendsStore.chatLogs[login_user_id]====>>>23',FriendsStore.chatLogs[login_user_id]);
+    const _msgContent = msgContent?.trim();
+    if(!_msgContent){
+      Alert.alert(
+        "提示",
+        "不能发送空白消息",
+        [
+          // {
+          //   text: "",
+          //   onPress: () => console.log("Cancel Pressed"),
+          //   style: "cancel"
+          // },
+          { text: "确定", onPress: async () => {}}
+        ]
+      );
+      return;
+    }
+    
     // return;
     if(!msgContent) return;
     const msg_row = {
@@ -110,7 +127,7 @@ const ChatPage = ({
       from_avatar: AppStore?.userInfo?.avatar,
       msg_type: 'text',
       sendIng: true,
-      msgUniqueId: String(params?.user_id) + dayjs().format('YYYYMMDDHHmmssSSS'),
+      msg_unique_id: String(params?.user_id) + dayjs().format('YYYYMMDDHHmmssSSS')+String(Math.floor(Math.random()*1000)),
     }
     setMsgContent('');
     runInAction(()=>{
@@ -149,7 +166,7 @@ const ChatPage = ({
         msg_type: msg_row.msg_type, 
         msg_content: msg_row.msg_content,
         to_user_id: msg_row.to_user_id,
-        msgUniqueId: msg_row.msgUniqueId
+        msg_unique_id: msg_row.msg_unique_id
       },function(response:any) {
         if(!login_user_id || !params?.user_id) return;
         if (response && response.status === 'success' && response.msg_content) {
@@ -157,7 +174,7 @@ const ChatPage = ({
             const len = FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.length;
             const msg_contents = FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents;
             for(const item of msg_contents){
-              if(response.msg_content.msgUniqueId == item.msgUniqueId) item.sendIng = false;
+              if(response.msg_content.msg_unique_id == item.msg_unique_id) item.sendIng = false;
             }
           })
         } else {

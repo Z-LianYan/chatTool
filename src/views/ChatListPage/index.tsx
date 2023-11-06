@@ -115,7 +115,8 @@ const ChatListPage = ({
           FriendsStore.chatLogs[login_user_id][key].hasNewMsg = false;
           setTimeout(() => {
             navigation.navigate('ChatPage',{
-              user_id: key
+              user_id: key,
+              user_name: FriendsStore.chatLogs[login_user_id][key]?.user_name
             });
           });
         });

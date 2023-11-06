@@ -137,6 +137,7 @@ const UserDetail = ({
           // if(index!=-1) params['index'] = index;
           navigation.navigate('ChatPage',{
             user_id: search_user_info.user_id,
+            user_name: search_user_info.user_name
           });
         }}
       />
