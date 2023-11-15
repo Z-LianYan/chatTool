@@ -138,8 +138,8 @@ export default class SocketIoClient {
         })
 
 
-        socket.on('sendClientMsg',(data,callBack)=>{//添加好友申请消息通知
-            console.log('===========>>>>有消息',store.AppStore.userInfo.user_name,data);
+        socket.on('sendClientMsg',(data,callBack)=>{//服务端发送过来的消息
+            console.log('===========>>>>有消息',store.AppStore.userInfo.user_name,data?.msg_content?.msg_unique_id);
             const login_user_id = store.AppStore.userInfo.user_id;
             const from_user_id = data.user_id;
             runInAction(async ()=>{

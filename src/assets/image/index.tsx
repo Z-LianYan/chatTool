@@ -28,3 +28,6 @@ export const CLOSE_CIRCLE_ICON = require('./close-circle.png');
 export const ADD_ICON = require('./add-icon.png');
 export const RIGHT_UP_ARROW = require('./right-up-arrow.png');
 export const LOADING_ICON = require('./loading.gif');
+export const ALBUM_ICON = require('./album-icon.png');
+export const CAPTURE_ICON = require('./capture-icon.png');
+export const VIDEO_ICON = require('./video-icon.png');
