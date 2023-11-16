@@ -185,177 +185,192 @@ const ChatPage = ({
         backgroundColor: MyThemed[colorScheme||'light'].bg
       }}></View>
     }
-    
-    <ScrollView 
-    style={styles.scroll_view} 
-    ref={scrollRef}>
-      <TouchableOpacity 
-      style={{flex:1}}
-      activeOpacity={1}
-      onPress={()=>{
-        setShowBottomOperationBtn(false);
+    <Vw style={{
+      flex:1,
+      position: 'relative'
+    }}>
+      <Vw style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
       }}>
 
-        <Vw style={{height: 30}}></Vw>
-        {
-          FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
-            return <Vw key={index+'chatPage'} style={{
-              ...styles.msgCell,
-              justifyContent: item.from_user_id === AppStore.userInfo.user_id? 'flex-end':'flex-start',
-            }}>
-              {
-                item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+        <ScrollView 
+        style={styles.scroll_view} 
+        ref={scrollRef}>
+          <TouchableOpacity 
+          style={{flex:1}}
+          activeOpacity={1}
+          onPress={()=>{
+            setShowBottomOperationBtn(false);
+          }}>
+
+            <Vw style={{height: 30}}></Vw>
+            {
+              FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
+                return <Vw key={index+'chatPage'} style={{
+                  ...styles.msgCell,
+                  justifyContent: item.from_user_id === AppStore.userInfo.user_id? 'flex-end':'flex-start',
+                }}>
                   {
-                    // item.sendIng && <Text style={styles.leftLoadingIcon}>发送中...</Text>
-                    item.sendIng && <Image 
-                    style={{
-                      ...styles.leftLoadingIcon,
-                    }} 
-                    source={LOADING_ICON}/>
+                    item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                      {
+                        // item.sendIng && <Text style={styles.leftLoadingIcon}>发送中...</Text>
+                        item.sendIng && <Image 
+                        style={{
+                          ...styles.leftLoadingIcon,
+                        }} 
+                        source={LOADING_ICON}/>
+                      }
+                      <Vw style={styles.msgTextWrapper}>
+                        <Text
+                          selectable={true}
+                          style={{
+                            ...styles.msgText,
+                            backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
+                            color: MyThemed['light'].ftCr
+                          }}
+                        >{item.msg_content}</Text>
+                      </Vw>
+                      <Vw style={{
+                        borderWidth: 8,
+                        // borderColor: 'transparent',
+                        borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
+                        borderTopColor: 'transparent',
+                        borderRightColor: 'transparent',
+                        borderBottomColor: 'transparent',
+                        position: 'absolute',
+                        right: -16,
+                        top: 10,
+                        // marginTop: -8,
+                      }}></Vw>
+                    </Vw>
+                    
                   }
-                  <Vw style={styles.msgTextWrapper}>
-                    <Text
-                      style={{
-                        ...styles.msgText,
-                        backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
-                        color: MyThemed['light'].ftCr
-                      }}
-                    >{item.msg_content}</Text>
-                  </Vw>
-                  <Vw style={{
-                    borderWidth: 8,
-                    // borderColor: 'transparent',
-                    borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
-                    borderTopColor: 'transparent',
-                    borderRightColor: 'transparent',
-                    borderBottomColor: 'transparent',
-                    position: 'absolute',
-                    right: -16,
-                    top: 10,
-                    // marginTop: -8,
-                  }}></Vw>
+                  <Image 
+                  style={{
+                    ...styles.msgCellAvatar,
+                    marginLeft: item.from_user_id === AppStore.userInfo.user_id? 10:0,
+                    marginRight: item.from_user_id !== AppStore.userInfo.user_id? 10:0,
+                  }} 
+                  source={{uri: item.from_avatar}}/>
+                  {
+                    item.from_user_id !== AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                      <Vw style={styles.msgTextWrapper}>
+                        <Text
+                          selectable={true}
+                          style={{
+                            ...styles.msgText,
+                            // textAlign: 'center',
+                            backgroundColor:  MyThemed[colorScheme||'light'].ctBg
+                          }}
+                        >{item.msg_content}</Text>
+                      </Vw>
+                      <Vw style={{
+                        borderWidth: 8,
+                        // borderColor: 'transparent',
+                        borderLeftColor: 'transparent',
+                        borderTopColor: 'transparent',
+                        borderRightColor: MyThemed[colorScheme||'light'].ctBg,
+                        borderBottomColor: 'transparent',
+                        position: 'absolute',
+                        left: -16,
+                        top: 10,
+                        // marginTop: -8,
+                      }}></Vw>
+                    </Vw>
+                  }
                 </Vw>
+              })
+            }
+            
+          </TouchableOpacity>
+        </ScrollView>
+        <Vw style={{
+          ...styles.bottomInputWrapper,
+          borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
+          backgroundColor: MyThemed[colorScheme||'light'].bg
+        }}>
+          <TextInput 
+          ref={inputRef}
+          multiline={true}
+          clearButtonMode={'always'}
+          style={{
+            ...styles.msgContentInput,
+            flex:1,
+            backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
+            height: textInputHeight,
+          }}
+          placeholder='' 
+          value={msgContent} 
+          // animated={true}
+          autoFocus={false}//只聚焦，没有自动弹出键盘
+          keyboardType="default"
+          onChangeText={(val:string)=>{
+            // console.log('val===',val)
+            setMsgContent(val)
+          }}
+          onContentSizeChange={(event:any)=>{
+            const { contentSize } = event.nativeEvent;
+            if(contentSize.height>300) return;
+            setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
+          }}
+          onFocus={async ()=>{
+            setShowBottomOperationBtn(false);
+            setTimeout(() => {
+              scrollRef.current.scrollToEnd()
+            },200);
+          }}
+          onSubmitEditing={async ()=>{}}/>
+          {
+            msgContent ? <TouchableOpacity 
+            style={{
+              ...styles.sen_btn,
+              backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
+            }}
+            onPress={async ()=>{
+              await sendMsg()
+            }}>
+              <Text style={styles.sen_btn_txt}>发送</Text>
+            </TouchableOpacity>:<TouchableOpacity 
+            style={styles.add_cir_icon}
+            onPress={()=>{
+              
+              console.log('inputRef.current.==>>',inputRef.current.isFocused())
+              if(inputRef.current.isFocused()){
+                inputRef.current.blur();
+                setTimeout(()=>{
+                  setShowBottomOperationBtn(true);
+                });
+              }else{
                 
+                if(showBottomOperationBtn){
+                  setTimeout(()=>{
+                    inputRef.current.focus();
+                  });
+                }else{
+                  setTimeout(()=>{
+                    setShowBottomOperationBtn(true);
+                  })
+                }
               }
+            }}>
               <Image 
               style={{
-                ...styles.msgCellAvatar,
-                marginLeft: item.from_user_id === AppStore.userInfo.user_id? 10:0,
-                marginRight: item.from_user_id !== AppStore.userInfo.user_id? 10:0,
+                width: 25,height:25,
+                tintColor: MyThemed[colorScheme||'light'].ftCr
               }} 
-              source={{uri: item.from_avatar}}/>
-              {
-                item.from_user_id !== AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
-                  <Vw style={styles.msgTextWrapper}>
-                    <Text
-                      style={{
-                        ...styles.msgText,
-                        // textAlign: 'center',
-                        backgroundColor:  MyThemed[colorScheme||'light'].ctBg
-                      }}
-                    >{item.msg_content}</Text>
-                  </Vw>
-                  <Vw style={{
-                    borderWidth: 8,
-                    // borderColor: 'transparent',
-                    borderLeftColor: 'transparent',
-                    borderTopColor: 'transparent',
-                    borderRightColor: MyThemed[colorScheme||'light'].ctBg,
-                    borderBottomColor: 'transparent',
-                    position: 'absolute',
-                    left: -16,
-                    top: 10,
-                    // marginTop: -8,
-                  }}></Vw>
-                </Vw>
-              }
-            </Vw>
-          })
-        }
-        
-      </TouchableOpacity>
-    </ScrollView>
-    <Vw style={{
-      ...styles.bottomInputWrapper,
-      borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
-      backgroundColor: MyThemed[colorScheme||'light'].bg
-    }}>
-      <TextInput 
-      ref={inputRef}
-      multiline={true}
-      clearButtonMode={'always'}
-      style={{
-        ...styles.msgContentInput,
-        flex:1,
-        backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
-        height: textInputHeight,
-      }}
-      placeholder='' 
-      value={msgContent} 
-      // animated={true}
-      autoFocus={false}//只聚焦，没有自动弹出键盘
-      keyboardType="default"
-      onChangeText={(val:string)=>{
-        // console.log('val===',val)
-        setMsgContent(val)
-      }}
-      onContentSizeChange={(event:any)=>{
-        const { contentSize } = event.nativeEvent;
-        if(contentSize.height>300) return;
-        setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
-      }}
-      onFocus={async ()=>{
-        setShowBottomOperationBtn(false);
-        setTimeout(() => {
-          scrollRef.current.scrollToEnd()
-        },200);
-      }}
-      onSubmitEditing={async ()=>{}}/>
-      {
-        msgContent ? <TouchableOpacity 
-        style={{
-          ...styles.sen_btn,
-          backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
-        }}
-        onPress={async ()=>{
-          await sendMsg()
-        }}>
-          <Text style={styles.sen_btn_txt}>发送</Text>
-        </TouchableOpacity>:<TouchableOpacity 
-        style={styles.add_cir_icon}
-        onPress={()=>{
-          
-          console.log('inputRef.current.==>>',inputRef.current.isFocused())
-          if(inputRef.current.isFocused()){
-            inputRef.current.blur();
-            setTimeout(()=>{
-              setShowBottomOperationBtn(true);
-            });
-          }else{
-            
-            
-            if(showBottomOperationBtn){
-              setTimeout(()=>{
-                inputRef.current.focus();
-              });
-            }else{
-              setShowBottomOperationBtn(true);
-            }
+              source={ADD_CIR}/>
+            </TouchableOpacity>
           }
-          
+        </Vw>
 
-          
-        }}>
-          <Image 
-          style={{
-            width: 25,height:25,
-            tintColor: MyThemed[colorScheme||'light'].ftCr
-          }} 
-          source={ADD_CIR}/>
-        </TouchableOpacity>
-      }
+      </Vw>
+      
+
     </Vw>
-    
     {
       showBottomOperationBtn && <BottomOperationBtn/>
     }
