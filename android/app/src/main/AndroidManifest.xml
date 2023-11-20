@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.chattool">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- optionally, if you want to record audio: -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
 
     <!--android:usesCleartextTraffic="true" 为true时 http协议能请求-->

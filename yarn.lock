@@ -5665,6 +5665,11 @@ react-native-gesture-handler@^2.12.0:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
+react-native-image-picker@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.npmmirror.com/react-native-image-picker/-/react-native-image-picker-7.0.2.tgz#41eb49e7d808752ef448e26d256036470252936d"
+  integrity sha512-2Y+TMzv2l32IikqYpj4WOqkYvv42SXkSvL9zAo0XdhA3Rbe3lc0Oz12KlR6M2bGh8RxXz5lUrs+9mxy/GpcLIg==
+
 react-native-safe-area-context@^4.7.1:
   version "4.7.1"
   resolved "https://registry.npmmirror.com/react-native-safe-area-context/-/react-native-safe-area-context-4.7.1.tgz#b7be2d68dee909717cfa439bb5c7966042d231e8"
@@ -5684,6 +5689,11 @@ react-native-update@^8.1.0:
   integrity sha512-rkMYrrdauju4pTMkmx0voJoHu/uuPkg5q7Bw2faMaUW+jy+yW3aljjekGXZf/EvVKabOMdxSSmYU3uAWvPEyKA==
   dependencies:
     nanoid "^3.3.3"
+
+react-native-vision-camera@^3.6.6:
+  version "3.6.6"
+  resolved "https://registry.npmmirror.com/react-native-vision-camera/-/react-native-vision-camera-3.6.6.tgz#c018c21566e7a6cbfe8078cb8e7430bb2d54b301"
+  integrity sha512-riIepYzel6jrhjd03smvrnI7RVLGPVxTx2ccNqFOx3Gycz1KiQ7X4ClZoZK60asjUlTHG/G3lGJONprljnaNhQ==
 
 react-native@0.72.3:
   version "0.72.3"

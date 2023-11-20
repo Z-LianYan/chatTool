@@ -17,7 +17,7 @@ import {
   Text as Tt,
   View as Vw,
   Alert,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 
 import { 
