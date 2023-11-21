@@ -51,10 +51,11 @@ import { runInAction } from 'mobx';
 import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, NEW_FIREND, VIDEO_ICON } from '../../assets/image';
 
 import {launchCamera, launchImageLibrary,} from 'react-native-image-picker';
-import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera} from 'react-native-vision-camera';
+import CameraModal from '../../component/CameraModal';
+
 
 const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
-  
+  const camera_modal = useRef<any>();
   const use_ref = useRef<any>();
   const colorScheme:any = useColorScheme();
 
@@ -99,45 +100,11 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:a
     
   },[]);
 
-  // const { hasPermission, requestPermission } = useCameraPermission()
-  const { hasPermission, requestPermission } = useMicrophonePermission()
-  if(!hasPermission){
-    requestPermission()
-  }
-
-  console.log('hasPermission-====>>',hasPermission);
-
-  const device = useCameraDevice('back');//受权后才会有
-  const camera = useRef<Camera>(null)
-  // console.log('device=====>>>',device);
+  
   return <Vw style={{
     ...styles.bottomOperationBtn,
     borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
   }}>
-    <Text 
-    onPress={async ()=>{
-      // console.log('12345',camera?.current)
-      const photo = await camera?.current?.takePhoto({
-        qualityPrioritization: 'speed',
-        flash: 'on',
-        enableShutterSound: false,
-        enableAutoRedEyeReduction: true,
-      });
-      console.log('photo====>>>',photo)
-    }}>拍摄</Text>
-    {
-      device && <Camera
-        ref={camera}
-        style={{
-          width:300,
-          height: 500,
-        }}
-        device={device}
-        isActive={true}
-        photo={true}
-      />
-    }
-
 
     <TouchableOpacity 
     activeOpacity={0.6}
@@ -163,6 +130,9 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:a
     style={{
       ...styles.operationItem,
       backgroundColor: MyThemed[colorScheme||'light'].ctBg
+    }}
+    onPress={()=>{
+      camera_modal.current.open()
     }}>
       <Image 
       style={{
@@ -187,7 +157,7 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:a
       <Text>视频聊天</Text>
     </TouchableOpacity>
 
-    
+    <CameraModal ref={camera_modal}/>
     
   </Vw>;
 };

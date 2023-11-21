@@ -32,7 +32,7 @@ import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
 import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, NEW_FIREND, VIDEO_ICON } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
-import { Menu } from '../../component/teaset';
+import { Label, Menu, Overlay } from '../../component/teaset';
 import { TextInput } from 'react-native-gesture-handler';
 import { LOADING_ICON } from '../../assets/image/index';
 import dayjs from 'dayjs';
@@ -178,6 +178,18 @@ const ChatPage = ({
       });
     });
   },[msgContent]);
+
+
+  const overlayView =  <Overlay.View
+      style={{alignItems: 'center', justifyContent: 'center'}}
+      modal={false}
+      overlayOpacity={0}
+      >
+      <View style={{backgroundColor: '#fff', padding: 40, borderRadius: 15, alignItems: 'center'}}>
+        <Label style={{color: '#000'}} size='xl' text='Overlay' />
+      </View>
+    </Overlay.View>
+  
   return <Vw style={styles.container}>
     {
       showSkeleton && <View style={{
@@ -337,6 +349,9 @@ const ChatPage = ({
             </TouchableOpacity>:<TouchableOpacity 
             style={styles.add_cir_icon}
             onPress={()=>{
+
+              // Overlay.show(overlayView);
+              // return;
               
               console.log('inputRef.current.==>>',inputRef.current.isFocused())
               if(inputRef.current.isFocused()){
