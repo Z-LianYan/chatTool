@@ -15,7 +15,8 @@ import {
   Alert,
   View as Vw,
   Text as Tx,
-  Modal
+  Modal,
+  Linking
 } from 'react-native';
 import { 
   NavigationContainer,
@@ -44,7 +45,7 @@ import { runInAction } from 'mobx';
 
 
 import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera} from 'react-native-vision-camera';
-import { CLOSE_CIRCLE_ICON } from '../assets/image';
+import { CLOSE_CIRCLE_ICON, CLOSE_FLASH, OPEN_FLASH, TURN_CAPTURE } from '../assets/image';
 
 const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
   const use_ref = useRef<any>();
@@ -54,26 +55,35 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   // const [modalVisible, setModalVisible] = useState(false);
   // const [loadingComplete, setLoadingComplete] = useState(false);
   const [overlay_view, set_overlay_view] = useState<any>();
-  const inputRef:{current:any} = useRef();
+  const overlay_view_ref:{current:any} = useRef();
+  const device = useCameraDevice('back');//受权后才会有
+  const camera = useRef<Camera>(null);
 
   useEffect(()=>{
     
   },[]);
 
 
-  const open = useCallback((callback:any)=>{
-    console.log('open=====>>>>');
-    // use_ref.current = {
-    //   callback: callback
-    // };
-    // setModalVisible(true);
+  const open = useCallback(async (callback:any)=>{
+    use_ref.current = callback;
+    console.log('open=====>>>>callback',callback);
+    const photo = await camera?.current?.startRecording({
+      onRecordingFinished: (video) => {
+        console.log('onRecordingFinished===>>>',video)
+      },
+      onRecordingError: (error) => {
+        console.error('onRecordingError====>',error)
+      }
+    });
+    console.log('photo====>>>',photo)
     const _ov = Overlay.show(overlayView);
-    set_overlay_view(_ov)
+    console.log('_ov====>>',_ov);
+    overlay_view_ref.current = _ov;
+    // set_overlay_view(_ov)
   },[]);
-  const close = useCallback(()=>{
-    console.log('123456')
-    // setModalVisible(false);
-    Overlay.hide(overlay_view)
+  const close = useCallback(async()=>{
+    Overlay.hide(overlay_view_ref.current);
+    
   },[]);
 
   // 把父组件需要调用的方法暴露出来
@@ -83,26 +93,72 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   }));
 
 
-  const { hasPermission, requestPermission } = useCameraPermission()
+
+
+  // const { hasPermission, requestPermission } = useCameraPermission()
 
   // const { hasPermission, requestPermission } = useMicrophonePermission()
-  if(!hasPermission){
-    requestPermission()
-  }
+  // if(!hasPermission){
+  //   requestPermission()
+  // }
+  // const { hasPermission, requestPermission } = useCameraPermission()
 
-  console.log('hasPermission-====>>',hasPermission);
+  // const cameraPermission = await Camera.getCameraPermissionStatus()
+// const microphonePermission = await Camera.getMicrophonePermissionStatus()
+  const onUseCameraPermission = useCallback(async ()=>{
+    
+    return new Promise(async (resolve, reject) => {
+      const cameraPermission:any = await Camera.getCameraPermissionStatus()
+      console.log('cameraPermission====>>',cameraPermission);
+      if(['granted'].includes(cameraPermission)){//您的应用程序已被授权使用该权限
+        resolve(200);
+      }
+      if(['not-determined'].includes(cameraPermission)){//您的应用尚未请求用户许可
+        const newCameraPermission = await Camera.requestCameraPermission()
+        console.log('newCameraPermission====>>',newCameraPermission);
+      }
 
-  const device = useCameraDevice('back');//受权后才会有
-  const camera = useRef<Camera>(null)
-  // console.log('device=====>>>',device);
+      if(['denied'].includes(cameraPermission)){//您的应用程序已向用户请求权限，但被明确拒绝。您无法再次使用请求功能，但可以使用LinkingAPI​​​​将用户重定向到设置应用程序，他可以在其中手动授予权限
+        // resolve(200);
+        const initialUrl = await Linking.openSettings();//应用程序设计页
+        console.log('initialUrl===>>>',initialUrl)
+      }
 
-  const overlayView = <Overlay.View
-    style={{alignItems: 'center', justifyContent: 'center'}}
-    modal={false}
-    overlayOpacity={1}
-    >
-    <Text 
-    onPress={async ()=>{
+      if(['restricted'].includes(cameraPermission)){//您的应用程序无法使用相机或麦克风，因为该功能已受到限制，可能是由于家长控制等主动限制造成的
+        resolve(200);
+      }
+      
+    })
+  },[]);
+  // const { hasPermission, requestPermission } = useMicrophonePermission();
+  const onUseMicrophonePermission = useCallback(async ()=>{
+    return new Promise(async (resolve, reject) => {
+      const microphonePermission:any = await Camera.getMicrophonePermissionStatus();
+      console.log('microphonePermission====>>',microphonePermission);
+      if(['granted'].includes(microphonePermission)){//您的应用程序已被授权使用该权限
+        resolve(200);
+      }
+      if(['not-determined'].includes(microphonePermission)){//您的应用尚未请求用户许可
+        const newCameraPermission = await Camera.getMicrophonePermissionStatus()
+        console.log('getMicrophonePermissionStatus====>>2',newCameraPermission);
+      }
+
+      if(['denied'].includes(microphonePermission)){//您的应用程序已向用户请求权限，但被明确拒绝。您无法再次使用请求功能，但可以使用LinkingAPI​​​​将用户重定向到设置应用程序，他可以在其中手动授予权限
+        // resolve(200);
+        const initialUrl = await Linking.openSettings();//应用程序设计页
+        console.log('initialUrl===>>>2',initialUrl)
+      }
+
+      if(['restricted'].includes(microphonePermission)){//您的应用程序无法使用相机或麦克风，因为该功能已受到限制，可能是由于家长控制等主动限制造成的
+        resolve(200);
+      }
+    })
+  },[]);
+
+
+  // console.log('hasPermission-====>>',hasPermission);
+
+  const onCapture = useCallback(()=>{
       // console.log('12345',camera?.current)
       // const photo = await camera?.current?.takePhoto({
       //   qualityPrioritization: 'speed',
@@ -110,21 +166,24 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
       //   enableShutterSound: false,
       //   enableAutoRedEyeReduction: true,
       // });
-      
 
-      const photo = await camera?.current?.startRecording({
+      const photo = camera?.current?.startRecording({
         onRecordingFinished: (video) => {
-          console.log('onRecordingFinished===>>>',video)
+          console.log("onRecordingFinished=========>>>",video)
         },
         onRecordingError: (error) => {
-          console.error('onRecordingError====>',error)
+          console.error('onRecordingError===========>>>>>>',error)
         }
       });
-      console.log('photo====>>>',photo)
-    }}>拍摄</Text>
-    <Text onPress={async()=>{
-      await camera?.current?.stopRecording()
-    }}>停止</Text>
+      console.log('photo======>>>',photo)
+  },[]);
+
+  
+  const overlayView = <Overlay.View
+    style={{alignItems: 'center', justifyContent: 'center'}}
+    modal={false}
+    overlayOpacity={1}
+    >
     <Vw style={styles.container}>
       {
         device && <Camera
@@ -138,19 +197,52 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           // photo={true}
           video={true}
           audio={false}
-        />
+        >
+          <Text style={{color:'#fff'}}>哈哈哈哈</Text>
+        </Camera>
       }
     </Vw>
+
+    
     <Vw style={styles.bottomBtn}>
-      <Text>123</Text>
-      <Vw style={styles.captureBtnWrapper}>
-        <Text>轻触拍照，长按摄像</Text>
+      <Text style={styles.captureTxt}>轻触拍照，长按摄像</Text>
+      <Vw style={styles.bottomBtnWrapper}>
+        <TouchableOpacity
+        activeOpacity={0.6}
+        style={styles.flashIconWrapper}
+        >
+          <Image 
+            style={styles.flashIcon} 
+            source={OPEN_FLASH}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.6}
           style={styles.captureBtn}
+          onLongPress={async ()=>{
+            await onUseCameraPermission();
+            await onUseMicrophonePermission();
+            onCapture()
+          }}
+          onPressOut={async ()=>{
+            console.log('0000');
+            await camera?.current?.stopRecording()
+            use_ref.current.callBack && use_ref.current.callBack()
+          }}
+          onPress={async ()=>{
+            
+          }}
         ></TouchableOpacity>
+        <TouchableOpacity
+        activeOpacity={0.6}
+        style={styles.convertWrapper}
+        >
+          <Image 
+            style={styles.convertIcon} 
+            source={TURN_CAPTURE}
+          />
+        </TouchableOpacity>
       </Vw>
-      <Text>5</Text>
     </Vw>
     <TouchableOpacity
     style={styles.closeBtnWrapper} 
@@ -178,20 +270,44 @@ const styles = StyleSheet.create({
   },
   bottomBtn:{
     position: 'absolute',
-    bottom: 50,
+    bottom: 100,
     left: 0,
     right: 0,
+    
+  },
+  captureTxt:{
+    color: '#fff',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  bottomBtnWrapper:{
     flexDirection:'row',
     justifyContent: 'space-around',
     alignItems: 'center'
   },
-  captureBtnWrapper:{
-    
+  flashIconWrapper:{
+
   },
+  flashIcon:{
+    width: 30,
+    height: 30,
+    tintColor: '#fff'
+  },
+  
+  convertWrapper:{
+
+  },
+  convertIcon:{
+    width: 30,
+    height: 30,
+    tintColor: '#fff'
+  },
+  
   captureBtn:{
-    width: 100,
-    height: 100,
-    backgroundColor: '#ffff' 
+    width: 80,
+    height: 80,
+    backgroundColor: '#ffff',
+    borderRadius: 40
   },
   closeBtnWrapper:{
     width: 30,

@@ -132,7 +132,9 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:a
       backgroundColor: MyThemed[colorScheme||'light'].ctBg
     }}
     onPress={()=>{
-      camera_modal.current.open()
+      camera_modal.current.open(()=>{
+        console.log('回调了====》〉》')
+      })
     }}>
       <Image 
       style={{

@@ -31,3 +31,7 @@ export const LOADING_ICON = require('./loading.gif');
 export const ALBUM_ICON = require('./album-icon.png');
 export const CAPTURE_ICON = require('./capture-icon.png');
 export const VIDEO_ICON = require('./video-icon.png');
+
+export const CLOSE_FLASH = require('./close-flash.png');
+export const OPEN_FLASH = require('./open-flash.png');
+export const TURN_CAPTURE = require('./turn-capture.png');
