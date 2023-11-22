@@ -14,7 +14,8 @@ import {
   TouchableHighlight,
   Alert,
   View as Vw,
-  Modal
+  Modal,
+  Linking
 } from 'react-native';
 import { 
   NavigationContainer,
@@ -52,6 +53,7 @@ import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, NEW_FIREND, VIDEO_ICON } f
 
 import {launchCamera, launchImageLibrary,} from 'react-native-image-picker';
 import CameraModal from '../../component/CameraModal';
+import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera} from 'react-native-vision-camera';
 
 
 const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
@@ -100,6 +102,64 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:a
     
   },[]);
 
+
+  const onUseCameraPermission = useCallback(async ()=>{
+    return new Promise(async (resolve, reject) => {
+      const cameraPermission:any = await Camera.getCameraPermissionStatus()
+      console.log('cameraPermission====>>',cameraPermission);
+      if(['granted'].includes(cameraPermission)){//您的应用程序已被授权使用该权限
+        resolve(200);
+      }
+      if(['not-determined'].includes(cameraPermission)){//您的应用尚未请求用户许可
+        const newCameraPermission = await Camera.requestCameraPermission();
+        if(['denied'].includes(newCameraPermission)) resolve(400);
+        if(['granted'].includes(newCameraPermission)) resolve(200);
+        if(['restricted'].includes(newCameraPermission)) {
+          Alert.alert(
+            "权限申请",
+            "您的应用程序无法使用相机或麦克风，因为该功能已受到限制",
+            [
+              { text: "确定", onPress: async () => {}}
+            ]
+          );
+          resolve(400)
+        };
+      }
+
+      if(['denied'].includes(cameraPermission)){//您的应用程序已向用户请求权限，但被明确拒绝。您无法再次使用请求功能，但可以使用LinkingAPI​​​​将用户重定向到设置应用程序，他可以在其中手动授予权限
+        Alert.alert(
+          "权限申请",
+          "在设置-应用-chatTool-权限中开启相机权限，以正常使用拍照,录制视频",
+          [
+            {
+              text: "取消",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel"
+            },
+            { text: "去设置", onPress: async () => {
+              const initialUrl = await Linking.openSettings();//应用程序设计页
+              console.log('initialUrl===>>>',initialUrl)
+            }}
+          ]
+        );
+        resolve(400)
+      }
+
+      if(['restricted'].includes(cameraPermission)){//您的应用程序无法使用相机或麦克风，因为该功能已受到限制，可能是由于家长控制等主动限制造成的
+        Alert.alert(
+          "权限申请",
+          "您的应用程序无法使用相机或麦克风，因为该功能已受到限制",
+          [
+            { text: "确定", onPress: async () => {}}
+          ]
+        );
+        resolve(400);
+      }
+      
+    })
+  },[]);
+  // const { hasPermission, requestPermission } = useMicrophonePermission();
+  
   
   return <Vw style={{
     ...styles.bottomOperationBtn,
@@ -131,7 +191,9 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:a
       ...styles.operationItem,
       backgroundColor: MyThemed[colorScheme||'light'].ctBg
     }}
-    onPress={()=>{
+    onPress={async ()=>{
+      const res = await onUseCameraPermission()
+      if(res!=200) return;
       camera_modal.current.open(()=>{
         console.log('回调了====》〉》')
       })
