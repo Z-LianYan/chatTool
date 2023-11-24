@@ -17,7 +17,7 @@ import {
   Text as Tt,
   View as Vw,
   Alert,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 
 import { 
@@ -30,12 +30,14 @@ import { View,Text } from '../../component/customThemed';
 import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
-import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
+import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, NEW_FIREND, VIDEO_ICON } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
-import { Menu } from '../../component/teaset';
+import { Label, Menu, Overlay } from '../../component/teaset';
 import { TextInput } from 'react-native-gesture-handler';
 import { LOADING_ICON } from '../../assets/image/index';
 import dayjs from 'dayjs';
+import BottomOperationBtn from './BottomOperationBtn';
+import { uniqueMsgId } from '../../utils/tool';
 const _ = require('lodash');
 // import { 
 //   View,
@@ -49,6 +51,8 @@ const ChatPage = ({
   route
 }:any) => {
   const scrollRef:{current:any} = useRef();
+  const inputRef:{current:any} = useRef();
+  
   const sockitIo = SocketIoClient.getInstance();
   const { params } = route;
   
@@ -56,6 +60,7 @@ const ChatPage = ({
   const [msgContent,setMsgContent] = useState<string>();
   const [showSkeleton,setShowSkeleton] = useState<boolean>(true);
   const [textInputHeight,setTextInputHeight] = useState<number>(40);
+  const [showBottomOperationBtn,setShowBottomOperationBtn] = useState<boolean>(false);
   
   const login_user_id = AppStore?.userInfo?.user_id;
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
@@ -78,25 +83,15 @@ const ChatPage = ({
         setShowSkeleton(false);
       },300);
     });
-    
     return ()=>{
-      console.log('------========>>>销毁111',login_user_id,params?.user_id);
       runInAction(()=>{
-        
         if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]){
           FriendsStore.chatLogs[login_user_id][params?.user_id].hasNewMsg = false;
         }
       });
     }
-  },[])
-  // const getScrollHeight = useCallback(async ()=>{
-  //   return new Promise((resolve, reject)=>{
-  //     scrollRef.current?.measure((x:any, y:any, width:any, height:any, pageX:any, pageY:any) => {
-  //       console.log(x, y, width, height, pageX, pageY);
-  //       resolve(height);
-  //     });
-  //   })
-  // },[])
+  })
+  
   const sendMsg = useCallback(async ()=>{
     console.log('FriendsStore.chatLogs[login_user_id]====>>>23',FriendsStore.chatLogs[login_user_id]);
     const _msgContent = msgContent?.trim();
@@ -127,7 +122,7 @@ const ChatPage = ({
       from_avatar: AppStore?.userInfo?.avatar,
       msg_type: 'text',
       sendIng: true,
-      msg_unique_id: String(params?.user_id) + dayjs().format('YYYYMMDDHHmmssSSS')+String(Math.floor(Math.random()*1000)),
+      msg_unique_id: uniqueMsgId(params?.user_id)
     }
     setMsgContent('');
     runInAction(()=>{
@@ -168,6 +163,7 @@ const ChatPage = ({
         to_user_id: msg_row.to_user_id,
         msg_unique_id: msg_row.msg_unique_id
       },function(response:any) {
+        console.log('服务端回调事件---------》〉》',response)
         if(!login_user_id || !params?.user_id) return;
         if (response && response.status === 'success' && response.msg_content) {
           runInAction(()=>{
@@ -184,6 +180,18 @@ const ChatPage = ({
       });
     });
   },[msgContent]);
+
+
+  const overlayView =  <Overlay.View
+      style={{alignItems: 'center', justifyContent: 'center'}}
+      modal={false}
+      overlayOpacity={0}
+      >
+      <View style={{backgroundColor: '#fff', padding: 40, borderRadius: 15, alignItems: 'center'}}>
+        <Label style={{color: '#000'}} size='xl' text='Overlay' />
+      </View>
+    </Overlay.View>
+  
   return <Vw style={styles.container}>
     {
       showSkeleton && <View style={{
@@ -191,145 +199,198 @@ const ChatPage = ({
         backgroundColor: MyThemed[colorScheme||'light'].bg
       }}></View>
     }
-    <ScrollView 
-    style={styles.scroll_view} 
-    ref={scrollRef}>
-      <Vw style={{height: 30}}></Vw>
-      {
-        FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
-          return <Vw key={index+'chatPage'} style={{
-            ...styles.msgCell,
-            justifyContent: item.from_user_id === AppStore.userInfo.user_id? 'flex-end':'flex-start',
-          }}>
-            {
-              item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
-                {
-                  // item.sendIng && <Text style={styles.leftLoadingIcon}>发送中...</Text>
-                  item.sendIng && <Image 
-                  style={{
-                    ...styles.leftLoadingIcon,
-                  }} 
-                  source={LOADING_ICON}/>
-                }
-                <Vw style={styles.msgTextWrapper}>
-                  <Text
-                    style={{
-                      ...styles.msgText,
-                      backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
-                      color: MyThemed['light'].ftCr
-                    }}
-                  >{item.msg_content}</Text>
-                </Vw>
-                <Vw style={{
-                  borderWidth: 8,
-                  // borderColor: 'transparent',
-                  borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
-                  borderTopColor: 'transparent',
-                  borderRightColor: 'transparent',
-                  borderBottomColor: 'transparent',
-                  position: 'absolute',
-                  right: -16,
-                  top: 10,
-                  // marginTop: -8,
-                }}></Vw>
-              </Vw>
-              
-            }
-            <Image 
-            style={{
-              ...styles.msgCellAvatar,
-              marginLeft: item.from_user_id === AppStore.userInfo.user_id? 10:0,
-              marginRight: item.from_user_id !== AppStore.userInfo.user_id? 10:0,
-            }} 
-            source={{uri: item.from_avatar}}/>
-            {
-              item.from_user_id !== AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
-                <Vw style={styles.msgTextWrapper}>
-                  <Text
-                    style={{
-                      ...styles.msgText,
-                      // textAlign: 'center',
-                      backgroundColor:  MyThemed[colorScheme||'light'].ctBg
-                    }}
-                  >{item.msg_content}</Text>
-                </Vw>
-                <Vw style={{
-                  borderWidth: 8,
-                  // borderColor: 'transparent',
-                  borderLeftColor: 'transparent',
-                  borderTopColor: 'transparent',
-                  borderRightColor: MyThemed[colorScheme||'light'].ctBg,
-                  borderBottomColor: 'transparent',
-                  position: 'absolute',
-                  left: -16,
-                  top: 10,
-                  // marginTop: -8,
-                }}></Vw>
-              </Vw>
-            }
-          </Vw>
-        })
-      }
-    </ScrollView>
     <Vw style={{
-      ...styles.bottomInputWrapper,
-      borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
-      backgroundColor: MyThemed[colorScheme||'light'].bg
+      flex:1,
+      position: 'relative'
     }}>
-      <TextInput 
-      multiline={true}
-      clearButtonMode={'always'}
-      style={{
-        ...styles.msgContentInput,
-        flex:1,
-        backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
-        height: textInputHeight,
-      }}
-      placeholder='' 
-      value={msgContent} 
-      // animated={true}
-      autoFocus={false}//只聚焦，没有自动弹出键盘
-      keyboardType="default"
-      onChangeText={(val:string)=>{
-        // console.log('val===',val)
-        setMsgContent(val)
-      }}
-      onContentSizeChange={(event:any)=>{
-        const { contentSize } = event.nativeEvent;
-        if(contentSize.height>300) return;
-        setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
-      }}
-      onFocus={async ()=>{
-        setTimeout(() => {
-          scrollRef.current.scrollToEnd()
-        },200);
-      }}
-      onSubmitEditing={async ()=>{}}/>
-      {
-        msgContent ? <TouchableOpacity 
-        style={{
-          ...styles.sen_btn,
-          backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
-        }}
-        onPress={async ()=>{
-          await sendMsg()
+      <Vw style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+      }}>
+
+        <ScrollView 
+        style={styles.scroll_view} 
+        ref={scrollRef}>
+          <TouchableOpacity 
+          style={{flex:1}}
+          activeOpacity={1}
+          onPress={()=>{
+            setShowBottomOperationBtn(false);
+          }}>
+
+            <Vw style={{height: 30}}></Vw>
+            {
+              FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
+                return <Vw key={index+'chatPage'} style={{
+                  ...styles.msgCell,
+                  justifyContent: item.from_user_id === AppStore.userInfo.user_id? 'flex-end':'flex-start',
+                }}>
+                  {
+                    item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                      {
+                        // item.sendIng && <Text style={styles.leftLoadingIcon}>发送中...</Text>
+                        item.sendIng && <Image 
+                        style={{
+                          ...styles.leftLoadingIcon,
+                        }} 
+                        source={LOADING_ICON}/>
+                      }
+                      <Vw style={styles.msgTextWrapper}>
+                        <Text
+                          selectable={true}
+                          style={{
+                            ...styles.msgText,
+                            backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
+                            color: MyThemed['light'].ftCr
+                          }}
+                        >{item.msg_content}</Text>
+                      </Vw>
+                      <Vw style={{
+                        borderWidth: 8,
+                        // borderColor: 'transparent',
+                        borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
+                        borderTopColor: 'transparent',
+                        borderRightColor: 'transparent',
+                        borderBottomColor: 'transparent',
+                        position: 'absolute',
+                        right: -16,
+                        top: 10,
+                        // marginTop: -8,
+                      }}></Vw>
+                    </Vw>
+                    
+                  }
+                  <Image 
+                  style={{
+                    ...styles.msgCellAvatar,
+                    marginLeft: item.from_user_id === AppStore.userInfo.user_id? 10:0,
+                    marginRight: item.from_user_id !== AppStore.userInfo.user_id? 10:0,
+                  }} 
+                  source={{uri: item.from_avatar}}/>
+                  {
+                    item.from_user_id !== AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                      <Vw style={styles.msgTextWrapper}>
+                        <Text
+                          selectable={true}
+                          style={{
+                            ...styles.msgText,
+                            // textAlign: 'center',
+                            backgroundColor:  MyThemed[colorScheme||'light'].ctBg
+                          }}
+                        >{item.msg_content}</Text>
+                      </Vw>
+                      <Vw style={{
+                        borderWidth: 8,
+                        // borderColor: 'transparent',
+                        borderLeftColor: 'transparent',
+                        borderTopColor: 'transparent',
+                        borderRightColor: MyThemed[colorScheme||'light'].ctBg,
+                        borderBottomColor: 'transparent',
+                        position: 'absolute',
+                        left: -16,
+                        top: 10,
+                        // marginTop: -8,
+                      }}></Vw>
+                    </Vw>
+                  }
+                </Vw>
+              })
+            }
+            
+          </TouchableOpacity>
+        </ScrollView>
+        <Vw style={{
+          ...styles.bottomInputWrapper,
+          borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
+          backgroundColor: MyThemed[colorScheme||'light'].bg
         }}>
-          <Text style={styles.sen_btn_txt}>发送</Text>
-        </TouchableOpacity>:<TouchableOpacity 
-        style={styles.add_cir_icon}
-        onPress={()=>{
-          console.log('123456');
-          
-        }}>
-          <Image 
+          <TextInput 
+          ref={inputRef}
+          multiline={true}
+          clearButtonMode={'always'}
           style={{
-            width: 25,height:25,
-            tintColor: MyThemed[colorScheme||'light'].ftCr
-          }} 
-          source={ADD_CIR}/>
-        </TouchableOpacity>
-      }
+            ...styles.msgContentInput,
+            flex:1,
+            backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
+            height: textInputHeight,
+          }}
+          placeholder='' 
+          value={msgContent} 
+          // animated={true}
+          autoFocus={false}//只聚焦，没有自动弹出键盘
+          keyboardType="default"
+          onChangeText={(val:string)=>{
+            // console.log('val===',val)
+            setMsgContent(val)
+          }}
+          onContentSizeChange={(event:any)=>{
+            const { contentSize } = event.nativeEvent;
+            if(contentSize.height>300) return;
+            setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
+          }}
+          onFocus={async ()=>{
+            setShowBottomOperationBtn(false);
+            setTimeout(() => {
+              scrollRef.current.scrollToEnd()
+            },200);
+          }}
+          onSubmitEditing={async ()=>{}}/>
+          {
+            msgContent ? <TouchableOpacity 
+            style={{
+              ...styles.sen_btn,
+              backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
+            }}
+            onPress={async ()=>{
+              await sendMsg()
+            }}>
+              <Text style={styles.sen_btn_txt}>发送</Text>
+            </TouchableOpacity>:<TouchableOpacity 
+            style={styles.add_cir_icon}
+            onPress={()=>{
+
+              // Overlay.show(overlayView);
+              // return;
+              
+              console.log('inputRef.current.==>>',inputRef.current.isFocused())
+              if(inputRef.current.isFocused()){
+                inputRef.current.blur();
+                setTimeout(()=>{
+                  setShowBottomOperationBtn(true);
+                });
+              }else{
+                
+                if(showBottomOperationBtn){
+                  setTimeout(()=>{
+                    inputRef.current.focus();
+                  });
+                }else{
+                  setTimeout(()=>{
+                    setShowBottomOperationBtn(true);
+                  })
+                }
+              }
+            }}>
+              <Image 
+              style={{
+                width: 25,height:25,
+                tintColor: MyThemed[colorScheme||'light'].ftCr
+              }} 
+              source={ADD_CIR}/>
+            </TouchableOpacity>
+          }
+        </Vw>
+
+      </Vw>
+      
+
     </Vw>
+    {
+      showBottomOperationBtn && <BottomOperationBtn/>
+    }
   </Vw>;
 };
 
@@ -409,7 +470,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     // fontSize: 10,
-  }
+  },
 });
 
 export default inject("AppStore","MyThemed","FriendsStore")(observer(ChatPage));

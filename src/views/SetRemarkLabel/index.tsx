@@ -34,6 +34,7 @@ import { runInAction } from 'mobx';
 import { ACCEPT_ADD_FRIENDS, ADD_FRIENDS_APPLY, editFriends, searchFriends } from '../../api/friends';
 import { StackActions } from '@react-navigation/core';
 import dayjs from 'dayjs';
+import { uniqueMsgId } from '../../utils/tool';
 const _ = require('lodash')
 
 const SetRemarkLabel = ({ 
@@ -127,7 +128,9 @@ const SetRemarkLabel = ({
         ...formData,
         label_ids: (formData.labels && formData.labels.length)?formData.labels.map((it:any)=>it.label_id).join(','):null,
         f_user_id: search_user_info.user_id,
-        source: search_user_info.source
+        source: search_user_info.source,
+        msg_unique_id: uniqueMsgId(params?.user_id),
+        type: 'text'
       });
       
       //清除缓存

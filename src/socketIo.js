@@ -115,7 +115,9 @@ export default class SocketIoClient {
 
                     return;
                 };
+                console.log('addFriendApplyReply---->>>000')
                 if(['addFriendApplyReply'].includes(data?.fromFriends?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.user_id) {
+                    console.log('addFriendApplyReply---->>>')
                     store.AppStore.search_user_info.msgs.splice(0,1);
                     store.AppStore.search_user_info.msgs.push(data?.fromFriends);
                     store.AppStore.search_user_info = {
@@ -138,9 +140,8 @@ export default class SocketIoClient {
         })
 
 
-        socket.on('sendClientMsg',(data,callBack)=>{//接收服务端发送过来的消息
-            console.log('===========>>>>有消息',store.AppStore.userInfo.user_name,data);
-
+        socket.on('sendClientMsg',(data,callBack)=>{//服务端发送过来的消息
+            console.log('===========>>>>有消息',store.AppStore.userInfo.user_name,data?.msg_content?.msg_unique_id);
             const login_user_id = store.AppStore.userInfo.user_id;
             const from_user_id = data.user_id;
             runInAction(async ()=>{
