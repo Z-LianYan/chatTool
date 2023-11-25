@@ -56,7 +56,6 @@ class FriendsStore {
   };
 
   async get_new_friends_list(params?:any,text='') {
-    console.log('获取新朋友=========》〉》');
     return new Promise((resolve, reject) => {
       HttpUtils.post(Api.GET_NEW_FRIENDS_LIST, params, text).then((res:any)=> {
         switch (res.error) {

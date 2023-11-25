@@ -129,8 +129,8 @@ const SetRemarkLabel = ({
         label_ids: (formData.labels && formData.labels.length)?formData.labels.map((it:any)=>it.label_id).join(','):null,
         f_user_id: search_user_info.user_id,
         source: search_user_info.source,
-        msg_unique_id: uniqueMsgId(params?.user_id),
-        type: 'text'
+        msg_unique_id: uniqueMsgId(search_user_info?.user_id),
+        msg_type: 'text'
       });
       
       //清除缓存

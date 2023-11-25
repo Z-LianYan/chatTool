@@ -142,7 +142,8 @@ export default class SocketIoClient {
 
         socket.on('sendClientMsg',(data,callBack)=>{//服务端发送过来的消息
             // data.type 
-            console.log('===========>>>>有消息',store.AppStore.userInfo.user_name,data?.msg_content?.msg_unique_id);
+            console.log('===========>>>>有消息---',store.AppStore.userInfo.user_name,data?.msg_content?.msg_unique_id);
+            console.log('===========>>>>有消息---data', data);
             const login_user_id = store.AppStore.userInfo.user_id;
             const from_user_id = data.user_id;
             runInAction(async ()=>{
@@ -176,6 +177,9 @@ export default class SocketIoClient {
                     }
                     store.FriendsStore.chatLogs[login_user_id] = _obj;
                 }
+                if(['addFirendsApply'].includes(data?.type)){
+                    console.log('========>>>addFirendsApply',data.type);
+                }
                 if(['addFriendApplyReply'].includes(data?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.user_id) {
                     console.log('addFriendApplyReply---->>>')
                     store.AppStore.search_user_info.msgs.splice(0,1);
@@ -184,6 +188,9 @@ export default class SocketIoClient {
                         ...store.AppStore.search_user_info
                     };
                 };
+
+
+                if(!['AddressBookPage'].includes(store.AppStore.curRouteName)) store.AppStore.tabBar.AddressBookPage.msgCnt =  store.FriendsStore.chatLogs[login_user_id][from_user_id].msg_contents.length;
 
                 
                 callBack && callBack({

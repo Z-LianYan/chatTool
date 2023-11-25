@@ -42,7 +42,7 @@ const UserDetail = ({
   route,
   FriendsStore,
 }:any) => {
-  console.log('AppStore.search_user_info=======>>',AppStore.search_user_info);
+  // console.log('AppStore.search_user_info=======>>',AppStore.search_user_info);
   const { params } = route;
   const sockitIo = SocketIoClient.getInstance()
   
