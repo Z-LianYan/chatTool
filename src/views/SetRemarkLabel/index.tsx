@@ -409,7 +409,7 @@ const SetRemarkLabel = ({
             backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
           }}
           onPress={async () => {
-
+            const login_user_id = AppStore.userInfo.user_id;
             if(search_user_info?.expire<=dayjs().format('YYYY-MM-DD HH:mm:ss')){
               expireHander()
             }else{
@@ -430,45 +430,28 @@ const SetRemarkLabel = ({
                 await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
               }
 
-              const friends:any = await searchFriends({user_id: search_user_info.user_id});
+              // const friends:any = await searchFriends({user_id: search_user_info.user_id});
               navigation.dispatch(navigation.pop());//清除内部导航堆栈(默认清除上一个并且导航到)
               runInAction(async()=>{
-                AppStore.search_user_info = friends;
-
-
-
                 
-                // FriendsStore.chatLogs.unshift(res?.data);
-                // if(res?.data?.msg_contents){
-                //   const login_user_id = AppStore.userInfo?.user_id;
-                //   if(!FriendsStore.chatLogs[login_user_id]){
-                //     FriendsStore.chatLogs[login_user_id] = {};
-                //     FriendsStore.chatLogs[login_user_id][params?.user_id]={
-                //       user_id:  AppStore.search_user_info?.user_id,
-                //       user_name:  AppStore.search_user_info?.user_name,
-                //       avatar:  AppStore.search_user_info?.avatar, 
-                //       msg_contents: [...res?.data?.msg_contents],
-                //     }
-                //   }else if(!FriendsStore.chatLogs[login_user_id][params?.user_id]){
-                //     FriendsStore.chatLogs[login_user_id][params?.user_id]={
-                //       user_id:  AppStore.search_user_info?.user_id,
-                //       user_name:  AppStore.search_user_info?.user_name,
-                //       avatar:  AppStore.search_user_info?.avatar, 
-                //       msg_contents: [...res?.data?.msg_contents],
-                //     }
-                //   }else if(FriendsStore.chatLogs[login_user_id][params?.user_id]){
-                //     const obj = _.cloneDeep(FriendsStore.chatLogs[login_user_id][params?.user_id]);
-                //     delete FriendsStore.chatLogs[login_user_id][params?.user_id];
-                //     obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,...res?.data?.msg_contents]:[...res?.data?.msg_contents]
-                //     let _obj = {}
-                //     _obj[params?.user_id] = obj;
-                //     _obj =  {
-                //       ..._obj,
-                //       ...FriendsStore.chatLogs[login_user_id]
-                //     }
-                //     FriendsStore.chatLogs[login_user_id] = _obj;
-                //   }
-                // }
+                const has_val = FriendsStore.addFriendchatLogs[login_user_id] && FriendsStore.addFriendchatLogs[login_user_id][search_user_id];
+                if(!FriendsStore.chatLogs[login_user_id]) FriendsStore.chatLogs[login_user_id] = {
+                  userIdSort: [search_user_id]
+                };
+
+                if(has_val){
+                  FriendsStore.chatLogs[login_user_id][search_user_id] = _.cloneDeep(FriendsStore.addFriendchatLogs[login_user_id][search_user_id]);
+                  const idx = FriendsStore.addFriendchatLogs[login_user_id].userIdSort.includes(search_user_id);
+                  if(idx!=-1) FriendsStore.addFriendchatLogs[login_user_id].userIdSort.splice(idx,1)
+                  delete FriendsStore.addFriendchatLogs[login_user_id][search_user_id];
+                }else{
+                  FriendsStore.chatLogs[login_user_id][search_user_id] = {
+                    user_id: search_user_info.user_id,
+                    user_name: search_user_info.user_name,
+                    avatar: search_user_info.avatar,
+                    msg_contents: []
+                  };
+                }
                 
 
                 await FriendsStore.getFriendList();

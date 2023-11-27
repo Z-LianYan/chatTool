@@ -59,21 +59,21 @@ const AddressBookPage = ({
   
   const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{}
   const userIdSort = FriendsStore.addFriendchatLogs[login_user_id]?.userIdSort||[];
-  const lastIndex = userIdSort.length-1;
-  const lastUser = addFriendchatLogs[userIdSort[lastIndex]]||{};
+  // const lastIndex = userIdSort.length-1;
+  const beforeUser = addFriendchatLogs[userIdSort[0]]||{};
   
   let newAddFriendNotRedMsgCount = 0;
   for(const key in addFriendchatLogs) if(addFriendchatLogs[key].isNewAddFriendNotRedMsg) newAddFriendNotRedMsgCount += 1;
 
   return <ScrollView>
     <MyCell
-    title={lastUser?.isNewAddFriendNotRedMsg? lastUser?.user_name : '新的朋友'} 
-    avatar={lastUser?.isNewAddFriendNotRedMsg? lastUser?.avatar : NEW_FIREND}
-    msg={lastUser?.isNewAddFriendNotRedMsg? (lastUser?.msg_contents?.length && lastUser?.msg_contents[lastUser?.msg_contents?.length-1]?.msg_content):''}
+    title={beforeUser?.isNewAddFriendNotRedMsg? beforeUser?.user_name : '新的朋友'} 
+    avatar={beforeUser?.isNewAddFriendNotRedMsg? beforeUser?.avatar : NEW_FIREND}
+    msg={beforeUser?.isNewAddFriendNotRedMsg? (beforeUser?.msg_contents?.length && beforeUser?.msg_contents[beforeUser?.msg_contents?.length-1]?.msg_content):''}
     showBottomBorder={false}
     showRightArrow={false}
     isAvatarTintColor={false}
-    rightValue={lastUser?.isNewAddFriendNotRedMsg? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
+    rightValue={beforeUser?.isNewAddFriendNotRedMsg? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
       <Text style={{width: 18,height: 18,lineHeight:18,color: '#fff',fontSize: 10,textAlign:'center'}}>{newAddFriendNotRedMsgCount}</Text>
     </View>:null}
     onPress={()=>{

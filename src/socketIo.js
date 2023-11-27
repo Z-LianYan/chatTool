@@ -161,7 +161,7 @@ export default class SocketIoClient {
 
             const login_user_id = store.AppStore.userInfo.user_id;
             const from_user_id = data.user_id;
-            runInAction(async ()=>{
+            runInAction(async ()=>{// acceptAddFriends
                 const isAddFriend = ['addFirendsApply','addFriendApplyReply','acceptAddFriends'].includes(data?.type);
                 const target_obj = {
                     chatLogs: isAddFriend ? store.FriendsStore.addFriendchatLogs : store.FriendsStore.chatLogs,
@@ -169,7 +169,6 @@ export default class SocketIoClient {
                     data: data,
                     hasNewMsg: store.AppStore.curRouteName=='ChatPage'?false:true
                 }
-                
                 if(isAddFriend){
                     //处理添加好友时消息逻辑
                     if(['addFirendsApply','addFriendApplyReply'].includes(data?.type)) target_obj.isNewAddFriendNotRedMsg = true;
@@ -180,12 +179,26 @@ export default class SocketIoClient {
                     if(['addFriendApplyReply'].includes(data?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.user_id) {
                         
                     };
+
+                    
                     
                 }else{
 
                 }
-
                 await handlerChatLog(target_obj);
+
+                if(['acceptAddFriends'].includes(data?.type)){
+                    runInAction(()=>{
+                        if(!store.FriendsStore.chatLogs[login_user_id]){
+                            store.FriendsStore.chatLogs[login_user_id] = {};
+                            store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]);
+                            delete store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]
+                        }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
+                            store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]);
+                        }
+                    });
+                }
+
 
                 if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && isAddFriend) {
                     runInAction(()=>{

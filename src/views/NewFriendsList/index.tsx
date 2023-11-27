@@ -57,6 +57,8 @@ const NewFriendsList = ({
   useLayoutEffect(() => {
    
   });
+  const login_user_id = AppStore.userInfo.user_id;
+  const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{}
   useEffect(()=>{
     navigation.setOptions({
       // headerTitle: "聊天",
@@ -69,7 +71,10 @@ const NewFriendsList = ({
     getAddressBookList();
     return ()=>{
       runInAction(()=>{
-        AppStore.addFirendsApply = [];
+        for(let key in addFriendchatLogs){
+          delete addFriendchatLogs[key].isNewAddFriendNotRedMsg,
+          addFriendchatLogs[key].hasNewMsg = false;
+        }
         AppStore.tabBar.AddressBookPage.msgCnt =  0;
       });
     }
@@ -150,7 +155,7 @@ const NewFriendsList = ({
           // showDisNotice={true}
           showRightArrow={false}
           // rightValue="12345"
-          msg={item.status+'-'+item.is_apply}
+          // msg={item.status+'-'+item.is_apply}
           hasNewMsg={false}
           showBottomBorder={FriendsStore?.new_friends_list?.recentlyThreeDays.length==(index+1)?false:true}
           avatar={item.f_avatar}

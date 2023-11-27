@@ -34,6 +34,7 @@ import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
 import dayjs from 'dayjs';
+import { isArray } from 'lodash';
 // import { 
 //   View,
 //   Text
@@ -95,7 +96,9 @@ const ChatListPage = ({
   const renderCell = useCallback(()=>{
     const redArr = [];
     const login_user_id = AppStore.userInfo?.user_id;
+    console.log('FriendsStore.chatLogs[login_user_id]======>>',FriendsStore.chatLogs[login_user_id])
     for(const key in FriendsStore.chatLogs[login_user_id]){
+      if(Array.isArray(FriendsStore.chatLogs[login_user_id][key])) continue;
       let len = FriendsStore.chatLogs[login_user_id][key]?.msg_contents?.length;
       redArr.push(<MyCell 
       time={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
@@ -162,41 +165,11 @@ const ChatListPage = ({
       renderCell()
     }
 
-    {/* {
-      FriendsStore.chatLogs.map((item:any,index:number)=>{
-        let len = item.msg_contents.length;
-        return <MyCell 
-        time={item?.msg_contents[len-1]?.created_at && dayjs(item?.msg_contents[len-1]?.created_at).format("HH:mm")}
-        title={item?.user_name} 
-        avatarStyle={{
-          width: 44,
-          height: 44
-        }}
-        key={index+'chatListPageCell'}
-        showDisNotice={false}
-        msg={item?.msg_contents[len-1]?.msg_content}
-        hasNewMsg={true}
-        avatar={item?.avatar} 
-        onPress={()=>{
-          navigation.navigate('ChatPage',{
-            index
-          });
-        }}/>
-      })
-    } */}
-
+   
     {
       !FriendsStore.chatLogs.length && <Text style={styles.emptyContent}>没有聊天记录</Text>
     }
 
-    {/* <Text onPress={()=>{
-      sockitIo.getSocketIo().emit('server',{ a: AppStore?.userInfo?.user_name, c: [] });
-      // console.dir(sockitIo.getSocketIo());
-    }}>
-      {
-        AppStore?.userInfo?.user_name
-      }
-    </Text> */}
     
   </ScrollView>;
 };

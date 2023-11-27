@@ -34,7 +34,7 @@ export async function handlerChatLog({
     }else{
         const idx = chatLogs[login_user_id].userIdSort.indexOf(from_user_id);
         if(idx!=-1) chatLogs[login_user_id].userIdSort.splice(idx,1);
-        chatLogs[login_user_id].userIdSort.push(from_user_id);
+        chatLogs[login_user_id].userIdSort.unshift(from_user_id);
 
         if(!chatLogs[login_user_id][from_user_id]){
             chatLogs[login_user_id][from_user_id]={
@@ -45,18 +45,6 @@ export async function handlerChatLog({
                 msg_contents: [data.msg_content],
             }
         }else if(chatLogs[login_user_id][from_user_id]){
-            // const obj = _.cloneDeep(chatLogs[login_user_id][from_user_id]);
-            // delete chatLogs[login_user_id][from_user_id];
-            // obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,data.msg_content]:[data.msg_content]
-            // let _obj = {};
-            // obj.hasNewMsg = hasNewMsg;
-            // _obj[from_user_id] = obj;
-            // _obj =  {
-            //     ..._obj,
-            //     ...chatLogs[login_user_id]
-            // }
-            // chatLogs[login_user_id] = _obj;
-    
             chatLogs[login_user_id][from_user_id] = {
                 ...chatLogs[login_user_id][from_user_id],
                 hasNewMsg,

@@ -35,6 +35,7 @@ import dayjs from 'dayjs';
 import { runInAction } from 'mobx';
 import ReplyMsg from './ReplyMsg';
 import SocketIoClient from '../../socketIo';
+import { handlerChatLog } from '../../utils/tool';
 const UserDetail = ({ 
   MyThemed,
   AppStore,
@@ -159,6 +160,22 @@ const UserDetail = ({
     }
 
   },[search_user_info]);
+  
+
+  console.log('chatLogs=====>>12345',search_user_info)
+
+  const showReplyBtn = useCallback(()=>{
+    let hasReply = false;
+    for(const item of chatLogs) {
+      if(item.from_user_id==search_user_info.user_id) hasReply =  true;
+    }
+    if(hasReply && [1].includes(search_user_info.f_is_apply)) return true;
+    if([0].includes(search_user_info.f_is_apply) && chatLogs.length) return true;
+    return false
+  },[chatLogs])
+
+  console.log('showReplyBtn=====>>12345--',search_user_info.f_is_apply,search_user_info.user_id,showReplyBtn(),chatLogs)
+  
 
   return <ScrollView style={styles.container}>
     <NavigationBar
@@ -203,7 +220,7 @@ const UserDetail = ({
     </View>
 
     {
-      [0].includes(search_user_info?.f_status) &&<View style={{
+      ([0].includes(search_user_info?.f_status) && chatLogs.length) ? <View style={{
         ...styles.applyMsgWrapper,
       }}>
 
@@ -213,37 +230,52 @@ const UserDetail = ({
           // borderColor: MyThemed[colorScheme||'light'].ftcr2
         }}>
           {
-            chatLogs.length? chatLogs.map((item:any,index:number)=>{
+            chatLogs.length? chatLogs.slice(-3).map((item:any,index:number)=>{
               return <Text style={styles.msgContent} key={'msg'+index}>{item?.from_user_id==AppStore.userInfo.user_id?'我':item?.from_user_name}: {item?.msg_content}</Text>
             }):null
           }
-          <TouchableOpacity 
+          {
+            showReplyBtn() && <TouchableOpacity 
             activeOpacity={0.5}
             style={styles.replyBtnWrapper}
             onPress={()=>{
               
-              replyMsgRef?.current.open((msg:any)=>{
-                runInAction(()=>{
-                  if(search_user_info?.msgs?.length){
-                    search_user_info?.msgs.splice(0,1)
-                  }else{
-                    search_user_info.msgs = []
-                  }
-                  set_search_user_info({
-                    ...search_user_info,
-                    msgs: [
-                      ...search_user_info?.msgs,
-                      msg,
-                    ]
-                  });
+              replyMsgRef?.current.open(async (msg:any)=>{
+                // runInAction(()=>{
+                //   if(search_user_info?.msgs?.length){
+                //     search_user_info?.msgs.splice(0,1)
+                //   }else{
+                //     search_user_info.msgs = []
+                //   }
+                //   set_search_user_info({
+                //     ...search_user_info,
+                //     msgs: [
+                //       ...search_user_info?.msgs,
+                //       msg,
+                //     ]
+                //   });
                   
-                  if(AppStore?.search_user_info?.msgs?.length){
-                    // params.userInfo.msgs.splice(0,1)
-                  }else{
-                    AppStore.search_user_info.msgs = [];
-                  }
-                  AppStore.search_user_info.msgs = [...AppStore?.search_user_info?.msgs,msg];
-                });
+                //   if(AppStore?.search_user_info?.msgs?.length){
+                //     // params.userInfo.msgs.splice(0,1)
+                //   }else{
+                //     AppStore.search_user_info.msgs = [];
+                //   }
+                //   AppStore.search_user_info.msgs = [...AppStore?.search_user_info?.msgs,msg];
+                // });
+                runInAction(async ()=>{
+                  await handlerChatLog({
+                    chatLogs: FriendsStore.addFriendchatLogs,
+                    login_user_id: login_user_id,
+                    hasNewMsg: false,
+                    data:{
+                      user_id: search_user_info.user_id,
+                      user_name: search_user_info.user_name,
+                      avatar: search_user_info.avatar,
+                      msg_content: msg
+                    }
+                  });
+                })
+                
               })
               
             }}
@@ -255,8 +287,9 @@ const UserDetail = ({
               }}
               >回 复</Label>
             </TouchableOpacity>
+          }
         </Vw>
-      </View>
+      </View>:null
     }
     {
       (search_user_info?.user_id!=userInfo?.user_id) && <MyCell
