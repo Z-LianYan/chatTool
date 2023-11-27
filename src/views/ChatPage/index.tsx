@@ -122,7 +122,7 @@ const ChatPage = ({
       from_avatar: AppStore?.userInfo?.avatar,
       msg_type: 'text',
       sendIng: true,
-      msg_unique_id: uniqueMsgId(params?.user_id)
+      msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id)
     }
     setMsgContent('');
     runInAction(()=>{

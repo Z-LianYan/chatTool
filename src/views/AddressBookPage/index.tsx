@@ -55,22 +55,36 @@ const AddressBookPage = ({
     avatar: string,
     user_id: number,
   }
+  const login_user_id = AppStore.userInfo.user_id;
+  
+  const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{}
+  const userIdSort = FriendsStore.addFriendchatLogs[login_user_id]?.userIdSort||[];
+  const lastIndex = userIdSort.length-1;
+  const lastUser = addFriendchatLogs[userIdSort[lastIndex]]||{};
+  
+  let newAddFriendNotRedMsgCount = 0;
+  for(const key in addFriendchatLogs) if(addFriendchatLogs[key].isNewAddFriendNotRedMsg) newAddFriendNotRedMsgCount += 1;
+
   return <ScrollView>
     <MyCell
-    title={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.user_name:'新的朋友'} 
-    avatar={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.avatar:NEW_FIREND}
-    msg={AppStore.addFirendsApply?.length?AppStore.addFirendsApply[AppStore.addFirendsApply?.length-1]?.msg_content:''}
+    title={lastUser?.isNewAddFriendNotRedMsg? lastUser?.user_name : '新的朋友'} 
+    avatar={lastUser?.isNewAddFriendNotRedMsg? lastUser?.avatar : NEW_FIREND}
+    msg={lastUser?.isNewAddFriendNotRedMsg? (lastUser?.msg_contents?.length && lastUser?.msg_contents[lastUser?.msg_contents?.length-1]?.msg_content):''}
     showBottomBorder={false}
-    showRightArrow={false} 
+    showRightArrow={false}
     isAvatarTintColor={false}
-    rightValue={AppStore.addFirendsApply?.length ? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
-      <Text style={{width: 18,height: 18,lineHeight:18,color: '#fff',fontSize: 10,textAlign:'center'}}>{AppStore.addFirendsApply.length}</Text>
+    rightValue={lastUser?.isNewAddFriendNotRedMsg? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
+      <Text style={{width: 18,height: 18,lineHeight:18,color: '#fff',fontSize: 10,textAlign:'center'}}>{newAddFriendNotRedMsgCount}</Text>
     </View>:null}
     onPress={()=>{
       navigation.navigate('NewFriendsList')
       runInAction(()=>{
-        AppStore.addFirendsApply = [];
-        AppStore.tabBar.AddressBookPage.msgCnt = 0;
+        // AppStore.addFirendsApply = [];
+        // AppStore.tabBar.AddressBookPage.msgCnt = 0;
+        for(let key in addFriendchatLogs){
+          delete addFriendchatLogs[key].isNewAddFriendNotRedMsg,
+          addFriendchatLogs[key].hasNewMsg = false;
+        }
       });
     }}/>
     {/* <MyCell

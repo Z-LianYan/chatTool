@@ -84,8 +84,9 @@ const UserDetail = ({
   },[AppStore?.search_user_info,params.user_id]);
 
 
-  
-  
+  const login_user_id = AppStore.userInfo.user_id;
+  const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{};
+  const chatLogs = addFriendchatLogs[search_user_info.user_id]?.msg_contents||[];
 
   const footerShowBtn = useCallback(()=>{
     // !search_user_info.expire || (dayjs(search_user_info.expire).unix() < dayjs().unix()) && 
@@ -212,8 +213,8 @@ const UserDetail = ({
           // borderColor: MyThemed[colorScheme||'light'].ftcr2
         }}>
           {
-            search_user_info?.msgs?search_user_info.msgs.map((item:any,index:number)=>{
-              return <Text style={styles.msgContent} key={'msg'+index}>{item.from_user_id==AppStore.userInfo.user_id?'我':item.from_user_name}: {item.msg_content}</Text>
+            chatLogs.length? chatLogs.map((item:any,index:number)=>{
+              return <Text style={styles.msgContent} key={'msg'+index}>{item?.from_user_id==AppStore.userInfo.user_id?'我':item?.from_user_name}: {item?.msg_content}</Text>
             }):null
           }
           <TouchableOpacity 

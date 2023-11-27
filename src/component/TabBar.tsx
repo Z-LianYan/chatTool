@@ -99,12 +99,6 @@ const TabBar = ({
       });
 
       if (!isFocused && !event.defaultPrevented) {
-        // if(route.name=='MinePage' && !AppStore.userInfo){
-        //   navigation.navigate({ name: 'LoginPage', params:{
-        //     toUrl:'MinePage'
-        //   }});
-        //   return;
-        // }
         navigation.navigate({ name: route.name, merge: true });
         AppStore.curRouteName = route.name;
         if(route.name=='AddressBookPage'){

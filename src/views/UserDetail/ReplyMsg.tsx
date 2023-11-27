@@ -33,6 +33,7 @@ import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
 import SocketIoClient from '../../socketIo';
+import { uniqueMsgId } from '../../utils/tool';
 const ReplyMsg = ({ 
   MyThemed,
   AppStore,
@@ -70,19 +71,18 @@ const ReplyMsg = ({
   const comfirmReply = useCallback(async ()=>{
     if(isSending) return;
     if(isSending) setIsSending(true);
-    console.log('======>>>',AppStore?.userInfo?.user_id,to_user_id,reply_content);
     if(!AppStore?.userInfo?.user_id || !to_user_id) return;
-    
     sockitIo?.getSocketIo()?.emit('addFriendApplyReply',{ 
-      from_user_id: AppStore?.userInfo?.user_id, 
-      to_user_id: to_user_id, 
-      msg: reply_content 
+      msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id),
+      to_user_id: to_user_id,
+      msg_content: reply_content,
+      msg_type: 'text',
     },function(response:any) {
       if (response && response.status === 'success') {
           console.log('Message sent successfully!',response);
           close();
           set_reply_content('');
-          use_ref.current?.callback && use_ref.current?.callback(response.msg);
+          use_ref.current?.callback && use_ref.current?.callback(response.msg_content);
       } else {
           console.log('Failed to send message!');
       }

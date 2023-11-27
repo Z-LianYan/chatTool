@@ -14,6 +14,7 @@ class FriendsStore {
     makeAutoObservable(this)
   }
 
+  
   /** 
    * chatLogs 聊天记录
    * login_user_id: {
@@ -24,13 +25,15 @@ class FriendsStore {
    *    msg_contents:[]
    *  }
    * }
-   * */
-  chatLogs = {}
+   * */ 
+  addFriendchatLogs = {}//添加朋友时的聊天记录
+  chatLogs = {}//添加朋友后聊天记录
 
   friendsData = {
     count: 0,
     rows: []
   }
+  
   async getFriendList(params?:any,text='加载中...') {
     return new Promise((resolve, reject) => {
       HttpUtils.post(Api.GET_FRIENDS_LIST, params, text).then((res:any)=> {

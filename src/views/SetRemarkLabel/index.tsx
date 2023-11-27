@@ -34,7 +34,7 @@ import { runInAction } from 'mobx';
 import { ACCEPT_ADD_FRIENDS, ADD_FRIENDS_APPLY, editFriends, searchFriends } from '../../api/friends';
 import { StackActions } from '@react-navigation/core';
 import dayjs from 'dayjs';
-import { uniqueMsgId } from '../../utils/tool';
+import { handlerChatLog, uniqueMsgId } from '../../utils/tool';
 const _ = require('lodash')
 
 const SetRemarkLabel = ({ 
@@ -123,14 +123,40 @@ const SetRemarkLabel = ({
   // },[formData])
 
   const addFriendApply = useCallback(async ()=>{
+    const login_user_id = AppStore.userInfo.user_id;
     try{
-      await ADD_FRIENDS_APPLY({
+      const msg_unique_id = uniqueMsgId(AppStore.userInfo?.user_id);
+      const msg_type = 'text';
+      runInAction(async ()=>{
+        await handlerChatLog({
+          chatLogs: FriendsStore.addFriendchatLogs,
+          login_user_id: login_user_id,
+          hasNewMsg: false,
+          data:{
+            user_id: search_user_info.user_id,
+            user_name: search_user_info.user_name,
+            avatar: search_user_info.avatar,
+            msg_content: {
+              created_at: new Date(),
+              from_avatar: AppStore.userInfo.avatar,
+              from_user_id: AppStore.userInfo.user_id,
+              from_user_name: AppStore.userInfo.user_name,
+              msg_content: formData.msg,
+              msg_unique_id: msg_unique_id,
+              to_user_id: search_user_info.user_id,
+              msg_type,
+            }
+          }
+        });
+      });
+      console.log('FriendsStore.addFriendchatLogs===>>>>>>>>???',FriendsStore.addFriendchatLogs)
+      const res:any = await ADD_FRIENDS_APPLY({
         ...formData,
         label_ids: (formData.labels && formData.labels.length)?formData.labels.map((it:any)=>it.label_id).join(','):null,
         f_user_id: search_user_info.user_id,
         source: search_user_info.source,
-        msg_unique_id: uniqueMsgId(search_user_info?.user_id),
-        msg_type: 'text'
+        msg_unique_id: msg_unique_id,
+        msg_type: msg_type
       });
       
       //清除缓存
@@ -145,6 +171,7 @@ const SetRemarkLabel = ({
       // navigation.dispatch(navigation.pop(2));//清除内部导航堆栈
 
       const friends:any = await searchFriends({user_id: search_user_info.user_id});
+      
       runInAction(()=>{
         AppStore.search_user_info = friends;
         navigation.navigate({
@@ -391,6 +418,7 @@ const SetRemarkLabel = ({
                 ...formData,
                 label_ids: (formData.labels && formData.labels.length)?formData.labels.map((item:any)=>item.label_id).join(','):null,
                 f_user_id: search_user_info.user_id,
+                msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id)
               });
               console.log('接受返回=============》〉》',res);
               if(!res || !res.data) return;
@@ -403,41 +431,44 @@ const SetRemarkLabel = ({
               }
 
               const friends:any = await searchFriends({user_id: search_user_info.user_id});
-              navigation.dispatch(navigation.pop());//清除内部导航堆栈(默认清楚上一个并且导航到)
+              navigation.dispatch(navigation.pop());//清除内部导航堆栈(默认清除上一个并且导航到)
               runInAction(async()=>{
                 AppStore.search_user_info = friends;
+
+
+
                 
                 // FriendsStore.chatLogs.unshift(res?.data);
-                if(res?.data?.msg_contents){
-                  const login_user_id = AppStore.userInfo?.user_id;
-                  if(!FriendsStore.chatLogs[login_user_id]){
-                    FriendsStore.chatLogs[login_user_id] = {};
-                    FriendsStore.chatLogs[login_user_id][params?.user_id]={
-                      user_id:  AppStore.search_user_info?.user_id,
-                      user_name:  AppStore.search_user_info?.user_name,
-                      avatar:  AppStore.search_user_info?.avatar, 
-                      msg_contents: [...res?.data?.msg_contents],
-                    }
-                  }else if(!FriendsStore.chatLogs[login_user_id][params?.user_id]){
-                    FriendsStore.chatLogs[login_user_id][params?.user_id]={
-                      user_id:  AppStore.search_user_info?.user_id,
-                      user_name:  AppStore.search_user_info?.user_name,
-                      avatar:  AppStore.search_user_info?.avatar, 
-                      msg_contents: [...res?.data?.msg_contents],
-                    }
-                  }else if(FriendsStore.chatLogs[login_user_id][params?.user_id]){
-                    const obj = _.cloneDeep(FriendsStore.chatLogs[login_user_id][params?.user_id]);
-                    delete FriendsStore.chatLogs[login_user_id][params?.user_id];
-                    obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,...res?.data?.msg_contents]:[...res?.data?.msg_contents]
-                    let _obj = {}
-                    _obj[params?.user_id] = obj;
-                    _obj =  {
-                      ..._obj,
-                      ...FriendsStore.chatLogs[login_user_id]
-                    }
-                    FriendsStore.chatLogs[login_user_id] = _obj;
-                  }
-                }
+                // if(res?.data?.msg_contents){
+                //   const login_user_id = AppStore.userInfo?.user_id;
+                //   if(!FriendsStore.chatLogs[login_user_id]){
+                //     FriendsStore.chatLogs[login_user_id] = {};
+                //     FriendsStore.chatLogs[login_user_id][params?.user_id]={
+                //       user_id:  AppStore.search_user_info?.user_id,
+                //       user_name:  AppStore.search_user_info?.user_name,
+                //       avatar:  AppStore.search_user_info?.avatar, 
+                //       msg_contents: [...res?.data?.msg_contents],
+                //     }
+                //   }else if(!FriendsStore.chatLogs[login_user_id][params?.user_id]){
+                //     FriendsStore.chatLogs[login_user_id][params?.user_id]={
+                //       user_id:  AppStore.search_user_info?.user_id,
+                //       user_name:  AppStore.search_user_info?.user_name,
+                //       avatar:  AppStore.search_user_info?.avatar, 
+                //       msg_contents: [...res?.data?.msg_contents],
+                //     }
+                //   }else if(FriendsStore.chatLogs[login_user_id][params?.user_id]){
+                //     const obj = _.cloneDeep(FriendsStore.chatLogs[login_user_id][params?.user_id]);
+                //     delete FriendsStore.chatLogs[login_user_id][params?.user_id];
+                //     obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,...res?.data?.msg_contents]:[...res?.data?.msg_contents]
+                //     let _obj = {}
+                //     _obj[params?.user_id] = obj;
+                //     _obj =  {
+                //       ..._obj,
+                //       ...FriendsStore.chatLogs[login_user_id]
+                //     }
+                //     FriendsStore.chatLogs[login_user_id] = _obj;
+                //   }
+                // }
                 
 
                 await FriendsStore.getFriendList();
@@ -450,9 +481,6 @@ const SetRemarkLabel = ({
                 }
               });
             }
-
-            console.log('search_user_info===>>>',search_user_info)
-            
 
           }}
         />
