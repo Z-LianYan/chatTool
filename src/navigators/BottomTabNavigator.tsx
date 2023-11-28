@@ -40,17 +40,17 @@ const routes=[
       tabBarLabel: '通讯录',
     }
   },
-  { 
-    component: FindPage, 
-    name: "FindPage", 
-    options: {
-      // title:'发现',// title 可用作 headerTitle 标题 tabBarLabel
-      headerTitle:'发现',
-      tabBarLabel: '发现',
-      headerShown: true,//是否隐藏头部导航
-      isShowDot: true,// 显示有消息点 (这个是自定义属性，不是组件本身的 )
-    } 
-  },
+  // { 
+  //   component: FindPage, 
+  //   name: "FindPage", 
+  //   options: {
+  //     // title:'发现',// title 可用作 headerTitle 标题 tabBarLabel
+  //     headerTitle:'发现',
+  //     tabBarLabel: '发现',
+  //     headerShown: true,//是否隐藏头部导航
+  //     isShowDot: true,// 显示有消息点 (这个是自定义属性，不是组件本身的 )
+  //   } 
+  // },
   { 
     component: MePage, 
     name: "MePage", 

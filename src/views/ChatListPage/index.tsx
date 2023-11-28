@@ -96,9 +96,10 @@ const ChatListPage = ({
   const renderCell = useCallback(()=>{
     const redArr = [];
     const login_user_id = AppStore.userInfo?.user_id;
-    console.log('FriendsStore.chatLogs[login_user_id]======>>',FriendsStore.chatLogs[login_user_id])
-    for(const key in FriendsStore.chatLogs[login_user_id]){
-      if(Array.isArray(FriendsStore.chatLogs[login_user_id][key])) continue;
+    console.log('FriendsStore.chatLogs[login_user_id]======>>',login_user_id,AppStore.userInfo?.user_name,FriendsStore.chatLogs[login_user_id]);
+    const userIdSort = FriendsStore.chatLogs[login_user_id]?.userIdSort||[];
+    for(const key of userIdSort){
+      // if(key=='userIdSort') continue;
       let len = FriendsStore.chatLogs[login_user_id][key]?.msg_contents?.length;
       redArr.push(<MyCell 
       time={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at).format("HH:mm")}

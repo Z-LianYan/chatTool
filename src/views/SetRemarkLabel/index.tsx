@@ -430,9 +430,10 @@ const SetRemarkLabel = ({
                 await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
               }
 
-              // const friends:any = await searchFriends({user_id: search_user_info.user_id});
+              const friends:any = await searchFriends({user_id: search_user_info.user_id});
               navigation.dispatch(navigation.pop());//清除内部导航堆栈(默认清除上一个并且导航到)
               runInAction(async()=>{
+                AppStore.search_user_info = friends;
                 
                 const has_val = FriendsStore.addFriendchatLogs[login_user_id] && FriendsStore.addFriendchatLogs[login_user_id][search_user_id];
                 if(!FriendsStore.chatLogs[login_user_id]) FriendsStore.chatLogs[login_user_id] = {

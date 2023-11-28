@@ -67,79 +67,9 @@ export default class SocketIoClient {
         // });
 
         /**
-         * data?.fromFriends?.type  addFirendsApply: 添加朋友申请   acceptAddFriends：接受添加好友   addFriendApplyReply： 添加好友申请回复消息
+         * data?.type  addFirendsApply: 添加朋友申请   acceptAddFriends：接受添加好友   addFriendApplyReply： 添加好友申请回复消息
         */
-        // socket.on('addFirendsApply',(data,callBack)=>{//添加好友申请消息通知
-        //     console.log('===========>>>>有添加好友消息通知',store.AppStore.userInfo.user_name,data,callBack);
-        //     runInAction(async ()=>{
-        //         if(!data?.fromFriends?.user_id) return;
-        //         if(['acceptAddFriends'].includes(data?.fromFriends?.type)) {
-        //             // store.FriendsStore.chatLogs.unshift(data?.fromFriends);
-
-        //             if(data?.fromFriends?.msg_contents){
-        //                 const login_user_id = store.AppStore.userInfo?.user_id;
-        //                 const from_user_id = data?.fromFriends?.user_id
-        //                 if(!store.FriendsStore.chatLogs[login_user_id]){
-        //                   store.FriendsStore.chatLogs[login_user_id] = {};
-        //                   store.FriendsStore.chatLogs[login_user_id][from_user_id]={
-        //                     user_id:  from_user_id,
-        //                     user_name:  data?.fromFriends?.user_name,
-        //                     avatar:  data?.fromFriends?.avatar, 
-        //                     hasNewMsg: true,
-        //                     msg_contents: [...data?.fromFriends?.msg_contents],
-        //                   }
-        //                 }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
-        //                   store.FriendsStore.chatLogs[login_user_id][from_user_id]={
-        //                     user_id:  from_user_id,
-        //                     user_name:  data?.fromFriends?.user_name,
-        //                     avatar:  data?.fromFriends?.avatar, 
-        //                     hasNewMsg: true,
-        //                     msg_contents: [...data?.fromFriends?.msg_contents],
-        //                   }
-        //                 }else if(store.FriendsStore.chatLogs[login_user_id][from_user_id]){
-        //                   const obj = _.cloneDeep(store.FriendsStore.chatLogs[login_user_id][from_user_id]);
-        //                   delete store.FriendsStore.chatLogs[login_user_id][from_user_id];
-        //                   obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,...data?.fromFriends?.msg_contents]:[...data?.fromFriends3?.msg_contents]
-        //                   let _obj = {};
-        //                   obj.hasNewMsg = true;
-        //                   _obj[from_user_id] = obj;
-        //                   _obj =  {
-        //                     ..._obj,
-        //                     ...store.FriendsStore.chatLogs[login_user_id]
-        //                   }
-        //                   store.FriendsStore.chatLogs[login_user_id] = _obj;
-        //                 }
-        //             }
-                    
-        //             await store.FriendsStore.getFriendList();
-        //             await store.FriendsStore.get_new_friends_list();
-
-        //             return;
-        //         };
-        //         console.log('addFriendApplyReply---->>>000')
-        //         if(['addFriendApplyReply'].includes(data?.fromFriends?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.user_id) {
-        //             console.log('addFriendApplyReply---->>>')
-        //             store.AppStore.search_user_info.msgs.splice(0,1);
-        //             store.AppStore.search_user_info.msgs.push(data?.fromFriends);
-        //             store.AppStore.search_user_info = {
-        //                 ...store.AppStore.search_user_info
-        //             };
-        //         };
-                
-        //         const idx = store.AppStore.addFirendsApply.findIndex(item=>item.user_id==data.fromFriends.user_id);
-        //         if(idx!=-1){
-        //             store.AppStore.addFirendsApply.splice(idx,1);
-        //             store.AppStore.addFirendsApply.push(data.fromFriends);
-        //         }else{
-        //             store.AppStore.addFirendsApply.push(data.fromFriends);
-        //         }
-        //         if(!['AddressBookPage'].includes(store.AppStore.curRouteName)) store.AppStore.tabBar.AddressBookPage.msgCnt =  store.AppStore.addFirendsApply.length;
-
-
-        //         callBack && callBack();
-        //     });
-        // })
-
+        
         // data ====>>> {
         //     "avatar": "http://zly.imgresource.com.cn/public/chat/commonAvatar.png", 
         //     "msg_content": {
@@ -180,27 +110,38 @@ export default class SocketIoClient {
                         
                     };
 
-                    
-                    
                 }else{
 
                 }
+
                 await handlerChatLog(target_obj);
 
                 if(['acceptAddFriends'].includes(data?.type)){
                     runInAction(()=>{
+                        // if(!store.FriendsStore.chatLogs[login_user_id]) store.FriendsStore.chatLogs[login_user_id] = { userIdSort: [from_user_id] };
                         if(!store.FriendsStore.chatLogs[login_user_id]){
-                            store.FriendsStore.chatLogs[login_user_id] = {};
+                            store.FriendsStore.chatLogs[login_user_id] = {
+                                userIdSort: [from_user_id]
+                            };
                             store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]);
-                            delete store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]
                         }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
+                            
                             store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]);
+                            const idx = store.FriendsStore.chatLogs[login_user_id].userIdSort.indexOf(from_user_id);
+                            if(idx!=-1) store.FriendsStore.chatLogs[login_user_id].userIdSort.splice(idx,1);
+                            store.FriendsStore.chatLogs[login_user_id].userIdSort.unshift(from_user_id);
                         }
+
+                        const addIdx = store.FriendsStore.addFriendchatLogs[login_user_id].userIdSort.indexOf(from_user_id);
+                        if(addIdx!=-1) store.FriendsStore.addFriendchatLogs[login_user_id].userIdSort.splice(addIdx,1)
+                        delete store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]
                     });
+                }else{
+                    
                 }
 
 
-                if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && isAddFriend) {
+                if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && ['addFirendsApply','addFriendApplyReply'].includes(data?.type)) {
                     runInAction(()=>{
                         let addressBookPageMsgCount = 0;
                         const addFriendchatLogs = store.FriendsStore.addFriendchatLogs[login_user_id]||{}
