@@ -85,7 +85,7 @@ const UserDetail = ({
   },[AppStore?.search_user_info,params.user_id]);
 
 
-  const login_user_id = AppStore.userInfo.user_id;
+  const login_user_id = AppStore.userInfo?.user_id;
   const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{};
   const chatLogs = addFriendchatLogs[search_user_info.user_id]?.msg_contents||[];
 
@@ -139,7 +139,8 @@ const UserDetail = ({
           // if(index!=-1) params['index'] = index;
           navigation.navigate('ChatPage',{
             user_id: search_user_info.user_id,
-            user_name: search_user_info.user_name
+            user_name: search_user_info.user_name,
+            avatar: search_user_info.avatar
           });
         }}
       />
@@ -208,7 +209,7 @@ const UserDetail = ({
           <View style={{flexDirection:'column'}}>
             {search_user_info?.f_user_name_remark && search_user_info?.user_name!=search_user_info?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{search_user_info?.user_name}</Text>}
             {
-              ([1].includes(search_user_info?.f_status) || search_user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>微信号：{search_user_info?.chat_no}</Text>
+              ([1].includes(search_user_info?.f_status) || search_user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>聊天号：{search_user_info?.chat_no}</Text>
             }
             
             <Text style={{flex:1,marginTop:5}}>地区：{search_user_info?.area}</Text>
@@ -231,7 +232,7 @@ const UserDetail = ({
         }}>
           {
             chatLogs.length? chatLogs.slice(-3).map((item:any,index:number)=>{
-              return <Text style={styles.msgContent} key={'msg'+index}>{item?.from_user_id==AppStore.userInfo.user_id?'我':item?.from_user_name}: {item?.msg_content}</Text>
+              return <Text style={styles.msgContent} key={'msg'+index}>{item?.from_user_id==AppStore.userInfo?.user_id?'我':item?.from_user_name}: {item?.msg_content}</Text>
             }):null
           }
           {
@@ -266,7 +267,6 @@ const UserDetail = ({
                   await handlerChatLog({
                     chatLogs: FriendsStore.addFriendchatLogs,
                     login_user_id: login_user_id,
-                    hasNewMsg: false,
                     data:{
                       user_id: search_user_info.user_id,
                       user_name: search_user_info.user_name,

@@ -9,15 +9,11 @@ type handlerChatLogType = {
     chatLogs:any,
     login_user_id: number,
     data: any,
-    hasNewMsg?: boolean,
-    isNewAddFriendNotRedMsg?: boolean //添加朋友时用来统计未读消息人数
 };
 export async function handlerChatLog({
     chatLogs = {},
     login_user_id,
     data,
-    hasNewMsg,
-    isNewAddFriendNotRedMsg,
 }:handlerChatLogType){
     const from_user_id = data.user_id;
     if(!chatLogs[login_user_id]){
@@ -28,7 +24,6 @@ export async function handlerChatLog({
             user_id:  data?.user_id,
             user_name:  data?.user_name,
             avatar:  data?.avatar, 
-            hasNewMsg: hasNewMsg,
             msg_contents: [data.msg_content],
         }
     }else{
@@ -41,18 +36,29 @@ export async function handlerChatLog({
                 user_id:  data?.user_id,
                 user_name:  data?.user_name,
                 avatar:  data?.avatar,
-                hasNewMsg: hasNewMsg,
                 msg_contents: [data.msg_content],
             }
         }else if(chatLogs[login_user_id][from_user_id]){
             chatLogs[login_user_id][from_user_id] = {
                 ...chatLogs[login_user_id][from_user_id],
-                hasNewMsg,
-                msg_contents: [...chatLogs[login_user_id][from_user_id].msg_contents,data.msg_content]
+                msg_contents: [...chatLogs[login_user_id][from_user_id].msg_contents,data.msg_content],
+                user_id:  data?.user_id,
+                user_name:  data?.user_name,
+                avatar:  data?.avatar,
+            }
+            if(['addFirendsApply','addFriendApplyReply'].includes(data?.type)){
+                delete chatLogs[login_user_id][from_user_id]?.newAddFriendReadMsg;
             }
         }
     }
-    
-    
-    if(isNewAddFriendNotRedMsg) chatLogs[login_user_id][from_user_id].isNewAddFriendNotRedMsg = isNewAddFriendNotRedMsg;
+}
+
+export async function chatListPageMsgCount(chatLogs:any={}) {
+    let chatListPageNotreadMsgCount = 0;
+    for(const key in chatLogs){
+        if(['userIdSort'].includes(key)) continue;
+        const msg_contents = chatLogs[key]?.msg_contents||[];
+        for(const item of msg_contents) if(!item.readMsg) chatListPageNotreadMsgCount += 1;
+    }
+    return chatListPageNotreadMsgCount;
 }

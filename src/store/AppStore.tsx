@@ -10,7 +10,7 @@ class AppStore {
   curRouteName = 'ChatListPage'; //当前tabbar 所在的路有 （用户消息数量显示）
   tabBar = {
     ChatListPage: {
-      msgCnt: 13,//消息数量 
+      msgCnt: 0,//消息数量
       isShowDot: false//tabbar是否显示有消息小点 （如果 isShowDot 为 true 消息数量msgCnt 就不会显示 ）
     },
     AddressBookPage: {
@@ -63,9 +63,6 @@ class AppStore {
 
   search_user_info = null;
 
-  addFirendsApply = [];
-
-  chatLogs = {};
   
 }
 const app = new AppStore()

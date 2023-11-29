@@ -37,17 +37,6 @@ import {
   Overlay,
   Label
 } from '../../component/teaset/index';
-import PropTypes, { number } from 'prop-types';
-import CustomListRow from '../../component/CustomListRow';
-import NavigationBar from '../../component/NavigationBar';
-import { login_out } from "../../api/user";
-import MyCell from '../../component/MyCell';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-// import SearchFriend from '../SearchFriend';
-import config from '../../config';
-import { searchFriends } from '../../api/friends';
-import { TextInput } from 'react-native-gesture-handler';
-import { runInAction } from 'mobx';
 
 import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, NEW_FIREND, VIDEO_ICON } from '../../assets/image';
 

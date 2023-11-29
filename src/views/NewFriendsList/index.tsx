@@ -57,7 +57,7 @@ const NewFriendsList = ({
   useLayoutEffect(() => {
    
   });
-  const login_user_id = AppStore.userInfo.user_id;
+  const login_user_id = AppStore.userInfo?.user_id;
   const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{}
   useEffect(()=>{
     navigation.setOptions({
@@ -72,8 +72,9 @@ const NewFriendsList = ({
     return ()=>{
       runInAction(()=>{
         for(let key in addFriendchatLogs){
-          delete addFriendchatLogs[key].isNewAddFriendNotRedMsg,
-          addFriendchatLogs[key].hasNewMsg = false;
+          if(['userIdSort'].includes(key)) continue;
+          addFriendchatLogs[key].newAddFriendReadMsg = true;
+          // addFriendchatLogs[key].readMsg = true;
         }
         AppStore.tabBar.AddressBookPage.msgCnt =  0;
       });
@@ -155,7 +156,7 @@ const NewFriendsList = ({
           // showDisNotice={true}
           showRightArrow={false}
           // rightValue="12345"
-          // msg={item.status+'-'+item.is_apply}
+          msg={item.status+'-'+item.is_apply}
           hasNewMsg={false}
           showBottomBorder={FriendsStore?.new_friends_list?.recentlyThreeDays.length==(index+1)?false:true}
           avatar={item.f_avatar}

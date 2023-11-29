@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { runInAction } from "mobx";
 import { useNavigation } from '@react-navigation/core';
 import _ from 'lodash';
-import { handlerChatLog } from "./utils/tool";
+import { chatListPageMsgCount, handlerChatLog } from "./utils/tool";
 export default class SocketIoClient {
     static getInstance(callBack){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
         if(!SocketIoClient.instance){
@@ -59,12 +59,7 @@ export default class SocketIoClient {
         socket.on('error', () => {
             console.log('#error');
         });
-
-        
-
-        // socket.on('emitEventError', (res) => {
-        //     console.log('#emitEventError',res);
-        // });
+      
 
         /**
          * data?.type  addFirendsApply: 添加朋友申请   acceptAddFriends：接受添加好友   addFriendApplyReply： 添加好友申请回复消息
@@ -86,10 +81,10 @@ export default class SocketIoClient {
         // }
         socket.on('sendClientMsg',(data,callBack)=>{//服务端发送过来的消息
             // data.type 
-            console.log('===========>>>>有消息---',store.AppStore.userInfo.user_name,data?.msg_content?.msg_unique_id);
+            console.log('===========>>>>有消息---',store.AppStore.userInfo?.user_name,data?.msg_content?.msg_unique_id);
             console.log('===========>>>>有消息---data', data);
 
-            const login_user_id = store.AppStore.userInfo.user_id;
+            const login_user_id = store.AppStore.userInfo?.user_id;
             const from_user_id = data.user_id;
             runInAction(async ()=>{// acceptAddFriends
                 const isAddFriend = ['addFirendsApply','addFriendApplyReply','acceptAddFriends'].includes(data?.type);
@@ -97,25 +92,17 @@ export default class SocketIoClient {
                     chatLogs: isAddFriend ? store.FriendsStore.addFriendchatLogs : store.FriendsStore.chatLogs,
                     login_user_id: login_user_id,
                     data: data,
-                    hasNewMsg: store.AppStore.curRouteName=='ChatPage'?false:true
                 }
-                if(isAddFriend){
-                    //处理添加好友时消息逻辑
-                    if(['addFirendsApply','addFriendApplyReply'].includes(data?.type)) target_obj.isNewAddFriendNotRedMsg = true;
+                
+                // if(isAddFriend){
+                //     //处理添加好友时消息逻辑
+                // }else{
 
-                    if(['addFirendsApply'].includes(data?.type)){
-                        
-                    }
-                    if(['addFriendApplyReply'].includes(data?.type) && store.AppStore.search_user_info && store.AppStore.search_user_info?.user_id == data?.fromFriends?.user_id) {
-                        
-                    };
-
-                }else{
-
-                }
+                // }
 
                 await handlerChatLog(target_obj);
 
+                
                 if(['acceptAddFriends'].includes(data?.type)){
                     runInAction(()=>{
                         // if(!store.FriendsStore.chatLogs[login_user_id]) store.FriendsStore.chatLogs[login_user_id] = { userIdSort: [from_user_id] };
@@ -123,6 +110,9 @@ export default class SocketIoClient {
                             store.FriendsStore.chatLogs[login_user_id] = {
                                 userIdSort: [from_user_id]
                             };
+                            
+                            // delete store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id].newAddFriendReadMsg;
+
                             store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]);
                         }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
                             
@@ -132,28 +122,32 @@ export default class SocketIoClient {
                             store.FriendsStore.chatLogs[login_user_id].userIdSort.unshift(from_user_id);
                         }
 
-                        const addIdx = store.FriendsStore.addFriendchatLogs[login_user_id].userIdSort.indexOf(from_user_id);
-                        if(addIdx!=-1) store.FriendsStore.addFriendchatLogs[login_user_id].userIdSort.splice(addIdx,1)
-                        delete store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]
+                        // const addIdx = store.FriendsStore.addFriendchatLogs[login_user_id].userIdSort.indexOf(from_user_id);
+                        // if(addIdx!=-1) store.FriendsStore.addFriendchatLogs[login_user_id].userIdSort.splice(addIdx,1)
+                        // delete store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]
                     });
-                }else{
-                    
                 }
 
 
                 if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && ['addFirendsApply','addFriendApplyReply'].includes(data?.type)) {
                     runInAction(()=>{
-                        let addressBookPageMsgCount = 0;
+                        let addressBookPageNotreadMsgCount = 0;
                         const addFriendchatLogs = store.FriendsStore.addFriendchatLogs[login_user_id]||{}
                         for(const key in addFriendchatLogs) {
-                            if(addFriendchatLogs[key].hasNewMsg) addressBookPageMsgCount += 1;
+                            if(['userIdSort'].includes(key)) continue;
+                            if(!addFriendchatLogs[key].newAddFriendReadMsg) addressBookPageNotreadMsgCount += 1;
                         }
-                        store.AppStore.tabBar.AddressBookPage.msgCnt =  addressBookPageMsgCount;
+                        store.AppStore.tabBar.AddressBookPage.msgCnt =  addressBookPageNotreadMsgCount;
                     });
                 }
                 callBack && callBack({
                     msg_unique_id: data.msg_content?.msg_unique_id
                 });
+
+                // const msgCount = await chatListPageMsgCount(store.FriendsStore.chatLogs[login_user_id]||{});
+                // runInAction(async ()=>{
+                //     store.AppStore.tabBar.ChatListPage.msgCnt =  msgCount;
+                // });
             });
         })
 

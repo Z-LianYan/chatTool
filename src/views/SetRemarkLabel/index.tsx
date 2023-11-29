@@ -123,7 +123,7 @@ const SetRemarkLabel = ({
   // },[formData])
 
   const addFriendApply = useCallback(async ()=>{
-    const login_user_id = AppStore.userInfo.user_id;
+    const login_user_id = AppStore.userInfo?.user_id;
     try{
       const msg_unique_id = uniqueMsgId(AppStore.userInfo?.user_id);
       const msg_type = 'text';
@@ -131,25 +131,26 @@ const SetRemarkLabel = ({
         await handlerChatLog({
           chatLogs: FriendsStore.addFriendchatLogs,
           login_user_id: login_user_id,
-          hasNewMsg: false,
           data:{
-            user_id: search_user_info.user_id,
-            user_name: search_user_info.user_name,
-            avatar: search_user_info.avatar,
+            user_id: search_user_info?.user_id,
+            user_name: search_user_info?.user_name,
+            avatar: search_user_info?.avatar,
             msg_content: {
               created_at: new Date(),
-              from_avatar: AppStore.userInfo.avatar,
-              from_user_id: AppStore.userInfo.user_id,
-              from_user_name: AppStore.userInfo.user_name,
+              from_avatar: AppStore.userInfo?.avatar,
+              from_user_id: AppStore.userInfo?.user_id,
+              from_user_name: AppStore.userInfo?.user_name,
               msg_content: formData.msg,
               msg_unique_id: msg_unique_id,
-              to_user_id: search_user_info.user_id,
+              to_user_id: search_user_info?.user_id,
               msg_type,
             }
           }
         });
+        runInAction(()=>{
+          FriendsStore.addFriendchatLogs[login_user_id][search_user_info?.user_id].newAddFriendReadMsg = true;
+        });
       });
-      console.log('FriendsStore.addFriendchatLogs===>>>>>>>>???',FriendsStore.addFriendchatLogs)
       const res:any = await ADD_FRIENDS_APPLY({
         ...formData,
         label_ids: (formData.labels && formData.labels.length)?formData.labels.map((it:any)=>it.label_id).join(','):null,
@@ -409,7 +410,7 @@ const SetRemarkLabel = ({
             backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
           }}
           onPress={async () => {
-            const login_user_id = AppStore.userInfo.user_id;
+            const login_user_id = AppStore.userInfo?.user_id;
             if(search_user_info?.expire<=dayjs().format('YYYY-MM-DD HH:mm:ss')){
               expireHander()
             }else{
@@ -442,9 +443,9 @@ const SetRemarkLabel = ({
 
                 if(has_val){
                   FriendsStore.chatLogs[login_user_id][search_user_id] = _.cloneDeep(FriendsStore.addFriendchatLogs[login_user_id][search_user_id]);
-                  const idx = FriendsStore.addFriendchatLogs[login_user_id].userIdSort.includes(search_user_id);
-                  if(idx!=-1) FriendsStore.addFriendchatLogs[login_user_id].userIdSort.splice(idx,1)
-                  delete FriendsStore.addFriendchatLogs[login_user_id][search_user_id];
+                  // const idx = FriendsStore.addFriendchatLogs[login_user_id].userIdSort.includes(search_user_id);
+                  // if(idx!=-1) FriendsStore.addFriendchatLogs[login_user_id].userIdSort.splice(idx,1)
+                  // delete FriendsStore.addFriendchatLogs[login_user_id][search_user_id];
                 }else{
                   FriendsStore.chatLogs[login_user_id][search_user_id] = {
                     user_id: search_user_info.user_id,

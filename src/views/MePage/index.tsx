@@ -51,7 +51,7 @@ const MePage = ({
         <View style={{flex:1,paddingHorizontal:10}}>
           <Text style={{paddingBottom: 10,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold'}}>{AppStore?.userInfo?.user_name}</Text>
           <View style={{flexDirection:'row'}}>
-            <Text style={{flex:1}}>微信号：{AppStore?.userInfo?.mobile_phone}</Text>
+            <Text style={{flex:1}}>聊天号：{AppStore?.userInfo?.chat_no}</Text>
             <View style={{flexDirection:'row'}}>
               <Image 
               style={{
@@ -73,14 +73,14 @@ const MePage = ({
       </View>
     </View>
 
-    <MyCell
+    {/* <MyCell
     style={{marginTop:10}}
     title='朋友圈' 
     avatar={FRIENDCIRCLE}
     showBottomBorder={false}
     showRightArrow={true}
     onPress={()=>{}}
-    />
+    /> */}
     <MyCell
     style={{marginTop:10}}
     title='设置' 

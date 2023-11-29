@@ -8,7 +8,7 @@
  * @format
  */
 
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import {
@@ -41,6 +41,8 @@ import {
   ListRow
 } from './teaset/index';
 import { BAN_LD,RIGHT_ARROW } from '../assets/image';
+import { runInAction } from 'mobx';
+import { CALLBACK_TYPE } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/gesture';
 
 const MyCell = ({ 
   avatar='',//头像
@@ -61,12 +63,33 @@ const MyCell = ({
     height: 34
   },
   rightWrapperStyle = {},
+  // AppStore,
+  // FriendsStore,
+  // curRouteName='',
+  // user_id
+  msgCount = 0,
 }:any) => {
     
   const colorScheme = useColorScheme();
 
   useEffect(()=>{
+    
+    
   })
+
+  // const notReadMsgCount = useCallback(()=>{
+  //   if(['ChatListPage'].includes(curRouteName) && user_id){
+  //     runInAction(()=>{
+  //       const login_user_id = AppStore?.userInfo?.user_id;
+  //       const chatLogs = FriendsStore.chatLogs[login_user_id]||{}
+  //       const user = chatLogs[user_id]||{};
+  //       const msg_contents = user.msg_contents||[];
+  //       for(const item of msg_contents){
+  //         item.readMsg = true;
+  //       }
+  //     })
+  //   }
+  // },[]);
 
   let rightWrapper = {
     ...rightWrapperStyle
@@ -95,8 +118,12 @@ const MyCell = ({
             {
               hasNewMsg && <View style={{
                 ...styles.msgDot,
+                minWidth: msgCount?17:8,
+                minHeight: msgCount?10:8,
+                borderRadius: msgCount?10:4,
+                padding: msgCount?3:0,
                 backgroundColor: MyThemed.mgDotCr,
-              }}></View>
+              }}>{msgCount ? <Text style={{color:'#fff',fontSize: 10,textAlign:'center',fontWeight:'bold'}}>{msgCount>99?'99+':msgCount}</Text>: null}</View>
             }
           </View>
         </View>
@@ -194,12 +221,12 @@ const styles = StyleSheet.create({
     borderRadius: 5
   },
   msgDot:{
-    width: 8,
-    height: 8,
+    // width: 8,
+    // height: 8,
     position:'absolute',
     right:-2,
     top:-2,
-    borderRadius: 4,
+    // borderRadius: 4,
   },
   titleMsgWrapper:{
     flex:1,
@@ -232,4 +259,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(MyCell));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(MyCell));

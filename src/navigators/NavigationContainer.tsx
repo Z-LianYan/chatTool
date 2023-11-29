@@ -22,36 +22,48 @@ import {
   DefaultTheme,
   useNavigationContainerRef 
 } from '@react-navigation/native';
+import { runInAction } from 'mobx';
+import { chatListPageMsgCount } from '../utils/tool';
 
 
-function NavigationContainerCom(props:any) {
+function NavigationContainerCom({MyThemed,AppStore,FriendsStore,children}:any) {
   const colorScheme = useColorScheme();
   const navigationRef = useNavigationContainerRef(); // You can also use a regular ref with `React.useRef()`
+
+  const login_user_id = AppStore.userInfo?.user_id;
+
+  (async function(){
+    const msgCount = await chatListPageMsgCount(FriendsStore.chatLogs[login_user_id]||{});
+    runInAction(async ()=>{
+      AppStore.tabBar.ChatListPage.msgCnt =  msgCount;
+    });
+  })()
+  
 
   return (<SafeAreaView
     style={{
       flex:1, 
-      backgroundColor: props.MyThemed[colorScheme||'light'].safeAreaViewBg
+      backgroundColor: MyThemed[colorScheme||'light'].safeAreaViewBg
     }}>
       <NavigationContainer //给react navigation 设置夜间模式和白天模式
         theme={colorScheme === 'dark' ? {
           ...DarkTheme,
           colors:{
             ...DarkTheme.colors,
-            background: props.MyThemed[colorScheme||'light'].bg,
+            background: MyThemed[colorScheme||'light'].bg,
           }
         } : {
           ...DefaultTheme,
           colors:{
             ...DefaultTheme.colors,
-            background: props.MyThemed[colorScheme||'light'].bg,
+            background: MyThemed[colorScheme||'light'].bg,
           }
         }}
         ref={navigationRef} 
         onReady={()=>{}}>
-          {props.children}
+          {children}
       </NavigationContainer>
     </SafeAreaView>
   );
 }
-export default inject("MyThemed")(observer(NavigationContainerCom));
+export default inject("MyThemed","AppStore","FriendsStore")(observer(NavigationContainerCom));

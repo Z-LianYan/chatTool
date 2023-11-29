@@ -37,7 +37,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import { LOADING_ICON } from '../../assets/image/index';
 import dayjs from 'dayjs';
 import BottomOperationBtn from './BottomOperationBtn';
-import { uniqueMsgId } from '../../utils/tool';
+import { chatListPageMsgCount, handlerChatLog, uniqueMsgId } from '../../utils/tool';
 const _ = require('lodash');
 // import { 
 //   View,
@@ -83,10 +83,20 @@ const ChatPage = ({
         setShowSkeleton(false);
       },300);
     });
+
+    runInAction(()=>{
+      const chatLogs = FriendsStore.chatLogs[login_user_id]||{}
+      const user = chatLogs[params?.user_id]||{};
+      const msg_contents = user.msg_contents||[];
+      for(const item of msg_contents){
+        item.readMsg = true;
+      }
+    })
+    
     return ()=>{
       runInAction(()=>{
         if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]){
-          FriendsStore.chatLogs[login_user_id][params?.user_id].hasNewMsg = false;
+          FriendsStore.chatLogs[login_user_id][params?.user_id].newAddFriendReadMsg = true;
         }
       });
     }
@@ -125,35 +135,25 @@ const ChatPage = ({
       msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id)
     }
     setMsgContent('');
-    runInAction(()=>{
-      if(!FriendsStore.chatLogs[login_user_id]){
-        FriendsStore.chatLogs[login_user_id] = {};
-        FriendsStore.chatLogs[login_user_id][params?.user_id]={
-          user_id:  AppStore.search_user_info?.user_id,
-          user_name:  AppStore.search_user_info?.user_name,
-          avatar:  AppStore.search_user_info?.avatar, 
-          msg_contents: [msg_row],
-        }
-      }else if(!FriendsStore.chatLogs[login_user_id][params?.user_id]){
-        FriendsStore.chatLogs[login_user_id][params?.user_id]={
-          user_id:  AppStore.search_user_info?.user_id,
-          user_name:  AppStore.search_user_info?.user_name,
-          avatar:  AppStore.search_user_info?.avatar, 
-          msg_contents: [msg_row],
-        }
-      }else if(FriendsStore.chatLogs[login_user_id][params?.user_id]){
-        const obj = _.cloneDeep(FriendsStore.chatLogs[login_user_id][params?.user_id]);
-        delete FriendsStore.chatLogs[login_user_id][params?.user_id];
-        obj.msg_contents = (obj.msg_contents && obj.msg_contents.length)? [...obj.msg_contents,msg_row]:[msg_row]
-        let _obj = {}
-        _obj[params?.user_id] = obj;
-        _obj =  {
-          ..._obj,
-          ...FriendsStore.chatLogs[login_user_id]
-        }
-        FriendsStore.chatLogs[login_user_id] = _obj;
-      }
-      // scrollRef.current.scrollTo({x: 0, y: scrollHeight+50, animated: false});
+
+    
+
+    
+
+
+    runInAction(async()=>{
+      
+      await handlerChatLog({
+        chatLogs: FriendsStore.chatLogs,
+        login_user_id: login_user_id,
+        data: {
+          user_id:  params?.user_id,
+          user_name:  params?.user_name,
+          avatar:  params?.avatar,
+          msg_content: msg_row,
+        },
+      });
+      
       setTimeout(() => {
         scrollRef.current.scrollToEnd()
       }, 200);
@@ -191,7 +191,6 @@ const ChatPage = ({
         <Label style={{color: '#000'}} size='xl' text='Overlay' />
       </View>
     </Overlay.View>
-  
   return <Vw style={styles.container}>
     {
       showSkeleton && <View style={{
@@ -226,10 +225,10 @@ const ChatPage = ({
               FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
                 return <Vw key={index+'chatPage'} style={{
                   ...styles.msgCell,
-                  justifyContent: item.from_user_id === AppStore.userInfo.user_id? 'flex-end':'flex-start',
+                  justifyContent: item.from_user_id === AppStore.userInfo?.user_id? 'flex-end':'flex-start',
                 }}>
                   {
-                    item.from_user_id === AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                    item.from_user_id === AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
                       {
                         // item.sendIng && <Text style={styles.leftLoadingIcon}>发送中...</Text>
                         item.sendIng && <Image 
@@ -266,12 +265,12 @@ const ChatPage = ({
                   <Image 
                   style={{
                     ...styles.msgCellAvatar,
-                    marginLeft: item.from_user_id === AppStore.userInfo.user_id? 10:0,
-                    marginRight: item.from_user_id !== AppStore.userInfo.user_id? 10:0,
+                    marginLeft: item.from_user_id === AppStore.userInfo?.user_id? 10:0,
+                    marginRight: item.from_user_id !== AppStore.userInfo?.user_id? 10:0,
                   }} 
                   source={{uri: item.from_avatar}}/>
                   {
-                    item.from_user_id !== AppStore.userInfo.user_id && <Vw style={styles.msgTextContainer}>
+                    item.from_user_id !== AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
                       <Vw style={styles.msgTextWrapper}>
                         <Text
                           selectable={true}
