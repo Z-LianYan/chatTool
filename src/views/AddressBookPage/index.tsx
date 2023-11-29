@@ -57,37 +57,37 @@ const AddressBookPage = ({
   }
   const login_user_id = AppStore.userInfo?.user_id;
   
-  const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{}
-  const userIdSort = FriendsStore.addFriendchatLogs[login_user_id]?.userIdSort||[];
+  const addFriendChatLogs = FriendsStore.addFriendChatLogs[login_user_id]||{}
+  const userIdSort = FriendsStore.addFriendChatLogs[login_user_id]?.userIdSort||[];
   // const lastIndex = userIdSort.length-1;
-  const beforeUser = addFriendchatLogs[userIdSort[0]];
+  const beforeUser = addFriendChatLogs[userIdSort[0]];
   
   let newAddFriendNotReadMsgCount = 0;
-  for(const key in addFriendchatLogs) {
+  for(const key in addFriendChatLogs) {
     if(['userIdSort'].includes(key)) continue;
-    if(!addFriendchatLogs[key]?.newAddFriendReadMsg) newAddFriendNotReadMsgCount += 1;
+    if(!addFriendChatLogs[key]?.newAddFriendReadMsg) newAddFriendNotReadMsgCount += 1;
   }
   
 
   return <ScrollView>
     <MyCell
-    title={beforeUser && !beforeUser?.newAddFriendReadMsg? beforeUser?.user_name : '新的朋友'} 
-    avatar={beforeUser && !beforeUser?.newAddFriendReadMsg? beforeUser?.avatar : NEW_FIREND}
-    msg={beforeUser && !beforeUser?.newAddFriendReadMsg? (beforeUser?.msg_contents?.length && beforeUser?.msg_contents[beforeUser?.msg_contents?.length-1]?.msg_content):''}
+    title={newAddFriendNotReadMsgCount ? beforeUser?.user_name : '新的朋友'} 
+    avatar={newAddFriendNotReadMsgCount? beforeUser?.avatar : NEW_FIREND}
+    msg={newAddFriendNotReadMsgCount? (beforeUser?.msg_contents?.length && beforeUser?.msg_contents[beforeUser?.msg_contents?.length-1]?.msg_content):''}
     showBottomBorder={false}
     showRightArrow={false}
     isAvatarTintColor={false}
-    rightValue={beforeUser && !beforeUser?.newAddFriendReadMsg? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
+    rightValue={ newAddFriendNotReadMsgCount? <View style={{backgroundColor: MyThemed.mgDotCr,borderRadius: 9}}>
       <Text style={{width: 18,height: 18,lineHeight:18,color: '#fff',fontSize: 10,textAlign:'center'}}>{newAddFriendNotReadMsgCount}</Text>
-    </View>:null}
+    </View>:null }
     onPress={()=>{
       navigation.navigate('NewFriendsList')
       runInAction(()=>{
         // AppStore.addFirendsApply = [];
         // AppStore.tabBar.AddressBookPage.msgCnt = 0;
-        for(let key in addFriendchatLogs){
+        for(let key in addFriendChatLogs){
           if(['userIdSort'].includes(key)) continue;
-          addFriendchatLogs[key].newAddFriendReadMsg = true;
+          addFriendChatLogs[key].newAddFriendReadMsg = true;
         }
       });
     }}/>

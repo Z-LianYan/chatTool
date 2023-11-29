@@ -58,7 +58,7 @@ const NewFriendsList = ({
    
   });
   const login_user_id = AppStore.userInfo?.user_id;
-  const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{}
+  const addFriendChatLogs = FriendsStore.addFriendChatLogs[login_user_id]||{}
   useEffect(()=>{
     navigation.setOptions({
       // headerTitle: "聊天",
@@ -71,11 +71,11 @@ const NewFriendsList = ({
     getAddressBookList();
     return ()=>{
       runInAction(()=>{
-        for(let key in addFriendchatLogs){
+        for(let key in addFriendChatLogs){
           if(['userIdSort'].includes(key)) continue;
-          addFriendchatLogs[key].newAddFriendReadMsg = true;
-          // addFriendchatLogs[key].readMsg = true;
+          addFriendChatLogs[key].newAddFriendReadMsg = true;
         }
+        FriendsStore.addFriendChatLogs[login_user_id] = addFriendChatLogs;
         AppStore.tabBar.AddressBookPage.msgCnt =  0;
       });
     }
@@ -156,7 +156,7 @@ const NewFriendsList = ({
           // showDisNotice={true}
           showRightArrow={false}
           // rightValue="12345"
-          msg={item.status+'-'+item.is_apply}
+          msg={addFriendChatLogs[item.f_user_id] && addFriendChatLogs[item.f_user_id].msg_contents?addFriendChatLogs[item.f_user_id].msg_contents.slice(-1)[0]?.msg_content:''}
           hasNewMsg={false}
           showBottomBorder={FriendsStore?.new_friends_list?.recentlyThreeDays.length==(index+1)?false:true}
           avatar={item.f_avatar}
@@ -199,7 +199,7 @@ const NewFriendsList = ({
           title={item.f_user_name}
           avatarStyle={{
             width: 44,
-            height:44
+            height: 44
           }}
           // showDisNotice={true}
           showRightArrow={false}

@@ -87,55 +87,54 @@ export default class SocketIoClient {
             const login_user_id = store.AppStore.userInfo?.user_id;
             const from_user_id = data.user_id;
             runInAction(async ()=>{// acceptAddFriends
-                const isAddFriend = ['addFirendsApply','addFriendApplyReply','acceptAddFriends'].includes(data?.type);
-                const target_obj = {
-                    chatLogs: isAddFriend ? store.FriendsStore.addFriendchatLogs : store.FriendsStore.chatLogs,
-                    login_user_id: login_user_id,
-                    data: data,
-                }
+                const isAddFriend = ['addFirendsApply','addFriendApplyReply'].includes(data?.type);
                 
-                // if(isAddFriend){
-                //     //处理添加好友时消息逻辑
-                // }else{
-
-                // }
-
-                await handlerChatLog(target_obj);
 
                 
                 if(['acceptAddFriends'].includes(data?.type)){
+                    console.log('执行了=======》〉》〉')
                     runInAction(()=>{
-                        // if(!store.FriendsStore.chatLogs[login_user_id]) store.FriendsStore.chatLogs[login_user_id] = { userIdSort: [from_user_id] };
                         if(!store.FriendsStore.chatLogs[login_user_id]){
                             store.FriendsStore.chatLogs[login_user_id] = {
                                 userIdSort: [from_user_id]
                             };
-                            
-                            // delete store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id].newAddFriendReadMsg;
-
-                            store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]);
+                            store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendChatLogs[login_user_id][from_user_id]);
                         }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
-                            
-                            store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]);
+                            store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendChatLogs[login_user_id][from_user_id]);
                             const idx = store.FriendsStore.chatLogs[login_user_id].userIdSort.indexOf(from_user_id);
                             if(idx!=-1) store.FriendsStore.chatLogs[login_user_id].userIdSort.splice(idx,1);
                             store.FriendsStore.chatLogs[login_user_id].userIdSort.unshift(from_user_id);
                         }
-
-                        // const addIdx = store.FriendsStore.addFriendchatLogs[login_user_id].userIdSort.indexOf(from_user_id);
-                        // if(addIdx!=-1) store.FriendsStore.addFriendchatLogs[login_user_id].userIdSort.splice(addIdx,1)
-                        // delete store.FriendsStore.addFriendchatLogs[login_user_id][from_user_id]
                     });
+
+
+                    await handlerChatLog({
+                        chatLogs: store.FriendsStore.chatLogs,
+                        login_user_id: login_user_id,
+                        data: data,
+                    });
+                }else{
+
+                    console.log('执行了=======》〉》〉12345')
+                    const target_obj = {
+                        chatLogs: isAddFriend ? store.FriendsStore.addFriendChatLogs : store.FriendsStore.chatLogs,
+                        login_user_id: login_user_id,
+                        data: data,
+                    }
+    
+                    await handlerChatLog(target_obj);
                 }
 
+                
 
-                if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && ['addFirendsApply','addFriendApplyReply'].includes(data?.type)) {
+
+                if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && isAddFriend) {
                     runInAction(()=>{
                         let addressBookPageNotreadMsgCount = 0;
-                        const addFriendchatLogs = store.FriendsStore.addFriendchatLogs[login_user_id]||{}
-                        for(const key in addFriendchatLogs) {
+                        const addFriendChatLogs = store.FriendsStore.addFriendChatLogs[login_user_id]||{}
+                        for(const key in addFriendChatLogs) {
                             if(['userIdSort'].includes(key)) continue;
-                            if(!addFriendchatLogs[key].newAddFriendReadMsg) addressBookPageNotreadMsgCount += 1;
+                            if(!addFriendChatLogs[key].newAddFriendReadMsg) addressBookPageNotreadMsgCount += 1;
                         }
                         store.AppStore.tabBar.AddressBookPage.msgCnt =  addressBookPageNotreadMsgCount;
                     });
@@ -144,10 +143,7 @@ export default class SocketIoClient {
                     msg_unique_id: data.msg_content?.msg_unique_id
                 });
 
-                // const msgCount = await chatListPageMsgCount(store.FriendsStore.chatLogs[login_user_id]||{});
-                // runInAction(async ()=>{
-                //     store.AppStore.tabBar.ChatListPage.msgCnt =  msgCount;
-                // });
+                
             });
         })
 

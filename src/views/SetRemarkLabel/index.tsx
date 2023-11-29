@@ -129,7 +129,7 @@ const SetRemarkLabel = ({
       const msg_type = 'text';
       runInAction(async ()=>{
         await handlerChatLog({
-          chatLogs: FriendsStore.addFriendchatLogs,
+          chatLogs: FriendsStore.addFriendChatLogs,
           login_user_id: login_user_id,
           data:{
             user_id: search_user_info?.user_id,
@@ -148,7 +148,7 @@ const SetRemarkLabel = ({
           }
         });
         runInAction(()=>{
-          FriendsStore.addFriendchatLogs[login_user_id][search_user_info?.user_id].newAddFriendReadMsg = true;
+          FriendsStore.addFriendChatLogs[login_user_id][search_user_info?.user_id].newAddFriendReadMsg = true;
         });
       });
       const res:any = await ADD_FRIENDS_APPLY({
@@ -435,17 +435,26 @@ const SetRemarkLabel = ({
               navigation.dispatch(navigation.pop());//清除内部导航堆栈(默认清除上一个并且导航到)
               runInAction(async()=>{
                 AppStore.search_user_info = friends;
-                
-                const has_val = FriendsStore.addFriendchatLogs[login_user_id] && FriendsStore.addFriendchatLogs[login_user_id][search_user_id];
-                if(!FriendsStore.chatLogs[login_user_id]) FriendsStore.chatLogs[login_user_id] = {
-                  userIdSort: [search_user_id]
-                };
+                const has_val = FriendsStore.addFriendChatLogs[login_user_id] && FriendsStore.addFriendChatLogs[login_user_id][search_user_id];
+                if(!FriendsStore.chatLogs[login_user_id]) {
+                  FriendsStore.chatLogs[login_user_id] = {
+                    userIdSort: [search_user_id]
+                  };
+                }else{
+                  if(Array.isArray(FriendsStore.chatLogs[login_user_id]?.userIdSort)){
+                    const idx = FriendsStore.chatLogs[login_user_id].userIdSort.indexOf(search_user_id);
+                    if(idx!=-1) FriendsStore.chatLogs[login_user_id].userIdSort.splice(idx,1);
+                    FriendsStore.chatLogs[login_user_id].userIdSort.unshift(search_user_id);
+                  }else{
+                    FriendsStore.chatLogs[login_user_id].userIdSort = [search_user_id];
+                  }
+                }
 
                 if(has_val){
-                  FriendsStore.chatLogs[login_user_id][search_user_id] = _.cloneDeep(FriendsStore.addFriendchatLogs[login_user_id][search_user_id]);
-                  // const idx = FriendsStore.addFriendchatLogs[login_user_id].userIdSort.includes(search_user_id);
-                  // if(idx!=-1) FriendsStore.addFriendchatLogs[login_user_id].userIdSort.splice(idx,1)
-                  // delete FriendsStore.addFriendchatLogs[login_user_id][search_user_id];
+                  const user = FriendsStore.addFriendChatLogs[login_user_id][search_user_id]||[];
+                  const msg_contents = user.msg_contents;
+                  for(const item of msg_contents) item.readMsg = true;
+                  FriendsStore.chatLogs[login_user_id][search_user_id] = _.cloneDeep(user);
                 }else{
                   FriendsStore.chatLogs[login_user_id][search_user_id] = {
                     user_id: search_user_info.user_id,
@@ -454,7 +463,6 @@ const SetRemarkLabel = ({
                     msg_contents: []
                   };
                 }
-                
 
                 await FriendsStore.getFriendList();
                 await FriendsStore.get_new_friends_list();

@@ -86,8 +86,8 @@ const UserDetail = ({
 
 
   const login_user_id = AppStore.userInfo?.user_id;
-  const addFriendchatLogs = FriendsStore.addFriendchatLogs[login_user_id]||{};
-  const chatLogs = addFriendchatLogs[search_user_info.user_id]?.msg_contents||[];
+  const addFriendChatLogs = FriendsStore.addFriendChatLogs[login_user_id]||{};
+  const chatLogs = addFriendChatLogs[search_user_info.user_id]?.msg_contents||[];
 
   const footerShowBtn = useCallback(()=>{
     // !search_user_info.expire || (dayjs(search_user_info.expire).unix() < dayjs().unix()) && 
@@ -265,7 +265,7 @@ const UserDetail = ({
                 // });
                 runInAction(async ()=>{
                   await handlerChatLog({
-                    chatLogs: FriendsStore.addFriendchatLogs,
+                    chatLogs: FriendsStore.addFriendChatLogs,
                     login_user_id: login_user_id,
                     data:{
                       user_id: search_user_info.user_id,

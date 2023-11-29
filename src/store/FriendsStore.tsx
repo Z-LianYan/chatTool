@@ -26,7 +26,7 @@ class FriendsStore {
    *  }
    * }
    * */ 
-  addFriendchatLogs = {}//添加朋友时的聊天记录
+  addFriendChatLogs = {}//添加朋友时的聊天记录
   chatLogs = {}//添加朋友后聊天记录
 
   friendsData = {
