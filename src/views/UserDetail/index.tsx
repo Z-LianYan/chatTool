@@ -27,7 +27,7 @@ import {
   View,
   Text
 } from '../../component/customThemed';
-import { Button, Label } from '../../component/teaset';
+import { Button, Label, Toast } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { searchFriends } from '../../api/friends';
@@ -161,9 +161,6 @@ const UserDetail = ({
     }
 
   },[search_user_info]);
-  
-
-  console.log('chatLogs=====>>12345',search_user_info)
 
   const showReplyBtn = useCallback(()=>{
     let hasReply = false;
@@ -174,9 +171,6 @@ const UserDetail = ({
     if([0].includes(search_user_info.f_is_apply) && chatLogs.length) return true;
     return false
   },[chatLogs])
-
-  console.log('showReplyBtn=====>>12345--',search_user_info.f_is_apply,search_user_info.user_id,showReplyBtn(),chatLogs)
-  
 
   return <ScrollView style={styles.container}>
     <NavigationBar
@@ -241,7 +235,8 @@ const UserDetail = ({
             style={styles.replyBtnWrapper}
             onPress={()=>{
               
-              replyMsgRef?.current.open(async (msg:any)=>{
+              replyMsgRef?.current.open(async (response:any)=>{
+                console.log('response=====>>>',response.status);
                 // runInAction(()=>{
                 //   if(search_user_info?.msgs?.length){
                 //     search_user_info?.msgs.splice(0,1)
@@ -263,18 +258,25 @@ const UserDetail = ({
                 //   }
                 //   AppStore.search_user_info.msgs = [...AppStore?.search_user_info?.msgs,msg];
                 // });
-                runInAction(async ()=>{
-                  await handlerChatLog({
-                    chatLogs: FriendsStore.addFriendChatLogs,
-                    login_user_id: login_user_id,
-                    data:{
-                      user_id: search_user_info.user_id,
-                      user_name: search_user_info.user_name,
-                      avatar: search_user_info.avatar,
-                      msg_content: msg
-                    }
+                if(['success'].includes(response.status)){
+                  runInAction(async ()=>{
+                    await handlerChatLog({
+                      chatLogs: FriendsStore.addFriendChatLogs,
+                      login_user_id: login_user_id,
+                      data:response.data,
+                    });
+                  })
+                }else{
+                  Toast.fail(response.msg);
+
+                  const friends:any = await searchFriends({
+                    user_id: search_user_info.user_id
                   });
-                })
+                  runInAction(async ()=>{
+                    AppStore.search_user_info = friends;
+                  });
+                }
+                
                 
               })
               

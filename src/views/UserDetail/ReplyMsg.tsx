@@ -80,13 +80,14 @@ const ReplyMsg = ({
     },function(response:any) {
       if (response && response.status === 'success') {
           console.log('Message sent successfully!',response);
-          close();
-          set_reply_content('');
-          use_ref.current?.callback && use_ref.current?.callback(response.msg_content);
+          // close();
+          // set_reply_content('');
       } else {
           console.log('Failed to send message!');
       }
-
+      close();
+      set_reply_content('');
+      use_ref.current?.callback && use_ref.current?.callback(response);
       setIsSending(false);
     });
     

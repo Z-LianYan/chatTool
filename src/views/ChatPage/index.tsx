@@ -38,6 +38,7 @@ import { LOADING_ICON } from '../../assets/image/index';
 import dayjs from 'dayjs';
 import BottomOperationBtn from './BottomOperationBtn';
 import { chatListPageMsgCount, handlerChatLog, uniqueMsgId } from '../../utils/tool';
+import { searchFriends } from '../../api/friends';
 const _ = require('lodash');
 // import { 
 //   View,
@@ -181,6 +182,19 @@ const ChatPage = ({
     });
   },[msgContent]);
 
+  const goUserDetail = useCallback(async (user_id:number)=>{
+    const friends:any = await searchFriends({user_id: user_id});
+    runInAction(()=>{
+      AppStore.search_user_info = friends;
+    });
+    navigation.navigate({
+      name: 'UserDetail',
+      params: {
+        // userInfo: friends,
+      }
+    });
+  },[]);
+
 
   const overlayView =  <Overlay.View
       style={{alignItems: 'center', justifyContent: 'center'}}
@@ -262,13 +276,18 @@ const ChatPage = ({
                     </Vw>
                     
                   }
-                  <Image 
-                  style={{
-                    ...styles.msgCellAvatar,
-                    marginLeft: item.from_user_id === AppStore.userInfo?.user_id? 10:0,
-                    marginRight: item.from_user_id !== AppStore.userInfo?.user_id? 10:0,
-                  }} 
-                  source={{uri: item.from_avatar}}/>
+                  <TouchableOpacity onPress={()=>{
+                    goUserDetail(item.from_user_id);
+                  }}>
+                    <Image 
+                    style={{
+                      ...styles.msgCellAvatar,
+                      marginLeft: item.from_user_id === AppStore.userInfo?.user_id? 10:0,
+                      marginRight: item.from_user_id !== AppStore.userInfo?.user_id? 10:0,
+                    }} 
+                    source={{uri: item.from_avatar}}/>
+                  </TouchableOpacity>
+                  
                   {
                     item.from_user_id !== AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
                       <Vw style={styles.msgTextWrapper}>

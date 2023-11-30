@@ -63,6 +63,8 @@ const SetRemarkLabel = ({
     (async function(){
       let info:any = await AsyncStorage.getItem('remarkLabel');
       info = info? JSON.parse(info) : {};
+      console.log('info========>>>>',info);
+      console.log('search_user_info========>>>>',search_user_info);
       // formData = {
       //   f_user_name_remark: search_user_info?.f_user_name_remark||(info && info[search_user_id]?.f_user_name_remark),
       //   labels: search_user_info?.labels||((info && info[search_user_id]?.labels)?info[search_user_id]?.labels:[]),
@@ -75,7 +77,7 @@ const SetRemarkLabel = ({
           des:  (info && info[search_user_id]?.des)||search_user_info?.des,
         }
         if(['addUser'].includes(op_type)){
-          formData.msg = `我是${search_user_info.msg||AppStore?.userInfo?.user_name}`
+          formData.msg = `我是${AppStore?.userInfo?.user_name}`
         }
         setInitPage(false);
       }else{
@@ -127,30 +129,6 @@ const SetRemarkLabel = ({
     try{
       const msg_unique_id = uniqueMsgId(AppStore.userInfo?.user_id);
       const msg_type = 'text';
-      runInAction(async ()=>{
-        await handlerChatLog({
-          chatLogs: FriendsStore.addFriendChatLogs,
-          login_user_id: login_user_id,
-          data:{
-            user_id: search_user_info?.user_id,
-            user_name: search_user_info?.user_name,
-            avatar: search_user_info?.avatar,
-            msg_content: {
-              created_at: new Date(),
-              from_avatar: AppStore.userInfo?.avatar,
-              from_user_id: AppStore.userInfo?.user_id,
-              from_user_name: AppStore.userInfo?.user_name,
-              msg_content: formData.msg,
-              msg_unique_id: msg_unique_id,
-              to_user_id: search_user_info?.user_id,
-              msg_type,
-            }
-          }
-        });
-        runInAction(()=>{
-          FriendsStore.addFriendChatLogs[login_user_id][search_user_info?.user_id].newAddFriendReadMsg = true;
-        });
-      });
       const res:any = await ADD_FRIENDS_APPLY({
         ...formData,
         label_ids: (formData.labels && formData.labels.length)?formData.labels.map((it:any)=>it.label_id).join(','):null,
@@ -159,7 +137,17 @@ const SetRemarkLabel = ({
         msg_unique_id: msg_unique_id,
         msg_type: msg_type
       });
-      
+      runInAction(async ()=>{
+        await handlerChatLog({
+          chatLogs: FriendsStore.addFriendChatLogs,
+          login_user_id: login_user_id,
+          data: res.data,
+        });
+        runInAction(()=>{
+          FriendsStore.addFriendChatLogs[login_user_id][search_user_info?.user_id].newAddFriendReadMsg = true;
+        });
+      });
+
       //清除缓存
       let infoObj:any = await AsyncStorage.getItem('remarkLabel');
       
