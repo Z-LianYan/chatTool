@@ -334,16 +334,18 @@ const UserDetail = ({
           });
       }}/>
     }
-    <MyCell
-    rightWrapperStyle={{paddingVertical: 20}}
-    style={{marginTop:10,}}
-    title='来源' 
-    showBottomBorder={false}
-    showRightArrow={false}
-    rightValue={search_user_info.sourceName}//来自手机号搜索,来自账号搜索
-    onPress={()=>{
-      // navigation.navigate('Set')
-    }}/>
+    {
+      search_user_info?.sourceName && <MyCell
+        rightWrapperStyle={{paddingVertical: 20}}
+        style={{marginTop:10,}}
+        title='来源' 
+        showBottomBorder={false}
+        showRightArrow={false}
+        rightValue={search_user_info.sourceName}//来自手机号搜索,来自账号搜索
+        onPress={()=>{
+          // navigation.navigate('Set')
+      }}/>
+    }
 
     
 

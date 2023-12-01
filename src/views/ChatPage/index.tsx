@@ -30,7 +30,7 @@ import { View,Text } from '../../component/customThemed';
 import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
-import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, NEW_FIREND, VIDEO_ICON } from '../../assets/image';
+import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, MORE_ICON, NEW_FIREND, VIDEO_ICON } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Label, Menu, Overlay } from '../../component/teaset';
 import { TextInput } from 'react-native-gesture-handler';
@@ -69,10 +69,32 @@ const ChatPage = ({
   useLayoutEffect(() => {
     navigation.setOptions({
       // headerLeft:'',
-      headerRight: '',
       title: params?.user_name||'',
       headerStyle: { 
         backgroundColor: MyThemed[colorScheme||'light'].bg,
+      },
+      headerRight: ()=>{
+        return <Vw style={{paddingRight: 10}}>
+          <TouchableOpacity 
+          activeOpacity={0.6}
+          onPress={()=>{
+            console.log('123456');
+            
+            navigation.navigate({
+              name: 'SetUser',
+              params: {
+              }
+            });
+          }}>
+            <Image 
+            style={{
+              width: 25,height:25,
+              tintColor: MyThemed[colorScheme||'light'].ftCr
+            }} 
+            source={MORE_ICON}/>
+          </TouchableOpacity>
+          
+        </Vw>
       }
     });
     
@@ -184,6 +206,7 @@ const ChatPage = ({
 
   const goUserDetail = useCallback(async (user_id:number)=>{
     const friends:any = await searchFriends({user_id: user_id});
+    console.log('friends=====>>>>',friends);
     runInAction(()=>{
       AppStore.search_user_info = friends;
     });

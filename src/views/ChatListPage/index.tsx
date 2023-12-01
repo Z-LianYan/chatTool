@@ -57,6 +57,7 @@ const ChatListPage = ({
       headerRight: ()=>{
         return <Vw style={{paddingRight: 10}}>
           <TouchableOpacity 
+          activeOpacity={0.6}
           onPress={()=>{
             console.log('123456');
             // fromView.measureInWindow((x:number, y:number, width:number, height:number) => {
