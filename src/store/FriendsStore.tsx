@@ -76,6 +76,29 @@ class FriendsStore {
       });
     });
   }
+
+
+  async del_friends(params?:any,text='') {
+    return new Promise((resolve, reject) => {
+      HttpUtils.post(Api.DEL_FRIENDS, params, text).then((res:any)=> {
+        switch (res.error) {
+          case 0:
+          resolve(res.data);
+          Toast.show({
+            icon: 'success',
+            duration: 2000,
+            text: res.message,
+          });
+          break;
+        default:
+          Toast.fail(res.message);
+          reject(res);
+          break;
+        }
+      });
+    });
+  }
+
   
 }
 const friend_Store = new FriendsStore()

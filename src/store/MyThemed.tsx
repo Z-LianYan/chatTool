@@ -61,10 +61,10 @@ class MyThemed {
 
     btnDangerColor: '#e6a23c',//type='danger' 背景颜色
     btnDangerBorderColor: '#e6a23c',//type='danger' 边框颜色
-    btnDangerTitleColor: '#fff', //type='danger' title颜色
+    btnDangerTitleColor: '#e987a1', //type='danger' title颜色
     
     btnLinkColor: 'rgba(0, 0, 0, 0)',//type='link' 背景颜色
-    btnLinkBorderColor: 'rgba(0, 0, 0, 0)',//type='link' 边框颜色
+    btnLinkBorderColor: 'rgba(0, 0, 0, 0)',//type='link' 边框颜色 
     btnLinkTitleColor: primaryColorDark,//type='link' title颜色
     //button组件 ----end
  
@@ -105,7 +105,7 @@ class MyThemed {
     
     btnDangerColor: '#e6a23c', //type='danger' 背景颜色
     btnDangerBorderColor: "#e6a23c", //type='danger' 边框颜色
-    btnDangerTitleColor: '#fff', //type='danger' title颜色
+    btnDangerTitleColor: '#e987a1', //type='danger' title颜色 
 
     btnLinkColor: 'rgba(0, 0, 0, 0)', //type='link' 背景颜色
     btnLinkBorderColor: 'rgba(0, 0, 0, 0)',//type='link' 边框颜色

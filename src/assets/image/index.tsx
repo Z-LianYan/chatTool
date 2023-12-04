@@ -36,3 +36,4 @@ export const CLOSE_FLASH = require('./close-flash.png');
 export const OPEN_FLASH = require('./open-flash.png');
 export const TURN_CAPTURE = require('./turn-capture.png');
 export const MORE_ICON = require('./more.png');
+export const SEND_FAIL = require('./send-fail.png');

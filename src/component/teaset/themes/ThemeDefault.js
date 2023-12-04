@@ -56,8 +56,8 @@ export default {
   btnTitleColor: primaryColor,
   btnPrimaryTitleColor: '#fff',
   btnSecondaryTitleColor: '#fff',
-  btnDangerTitleColor: '#fff',
-  btnLinkTitleColor: primaryColor,
+  btnDangerTitleColor: '#e987a1',
+  btnLinkTitleColor: primaryColor, 
   //Button - border color
   btnBorderColor: primaryColor,
   btnPrimaryBorderColor: primaryColor,

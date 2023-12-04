@@ -12,6 +12,7 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
+  Switch,
 } from 'react-native';
 
 import { 
@@ -34,6 +35,7 @@ const SetUser = ({
 }:any) => {
     
   const colorScheme = useColorScheme();
+  const [remind,setRemind] = useState<boolean>(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -71,7 +73,13 @@ const SetUser = ({
     title='提醒' 
     showBottomBorder={false}
     showRightArrow={false}
-    rightValue={'未完成'}
+    rightValue={<Switch
+      trackColor={{ false: "#767577", true: MyThemed[colorScheme||'light'].primaryColor }}
+      onValueChange={(val)=>{
+        setRemind(val);
+      }}
+      value={remind}
+    />}
     onPress={()=>{
       // navigation.navigate('Set')
     }}/>

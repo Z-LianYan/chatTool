@@ -1,5 +1,5 @@
 import React, { useState,useEffect, useCallback, useRef } from 'react';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation,StackActions } from '@react-navigation/core';
 import { observer, inject } from 'mobx-react'
 import {
   SafeAreaView,
@@ -12,8 +12,10 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
-  View as Vw
+  View as Vw,
+  Alert
 } from 'react-native';
+
 
 import { 
   NavigationContainer,
@@ -54,7 +56,6 @@ const UserDetail = ({
   const replyMsgRef:{current:any} = useRef();
 
   const [search_user_info,set_search_user_info] = useState<any>({});
-  
   useEffect(()=>{
     // const unsubscribe = navigation.addListener('state', async() => {
     //   // 处理路由变化的逻辑
@@ -87,7 +88,7 @@ const UserDetail = ({
 
   const login_user_id = AppStore.userInfo?.user_id;
   const addFriendChatLogs = FriendsStore.addFriendChatLogs[login_user_id]||{};
-  const chatLogs = addFriendChatLogs[search_user_info.user_id]?.msg_contents||[];
+  const add_msg_contents = addFriendChatLogs[search_user_info.user_id]?.msg_contents||[];
 
   const footerShowBtn = useCallback(()=>{
     // !search_user_info.expire || (dayjs(search_user_info.expire).unix() < dayjs().unix()) && 
@@ -119,31 +120,86 @@ const UserDetail = ({
       }}
     />
     if([1].includes(search_user_info?.f_status) || search_user_info.user_id===userInfo?.user_id){
-      return <Button
-        title={'发送消息'}
-        type="default"
-        disabled={false}
-        titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
-        style={{
-          marginTop:10,
-          height: 55,
-          borderWidth:0,
-          backgroundColor: MyThemed[colorScheme||'light'].ctBg,
-        }}
-        onPress={() => {
-          
-          // let index = FriendsStore.chatLogs.findIndex((item:any)=>item.from_user_id===search_user_info.user_id);
-          // const params = {
-          //   title: search_user_info.user_name
-          // }
-          // if(index!=-1) params['index'] = index;
-          navigation.navigate('ChatPage',{
-            user_id: search_user_info.user_id,
-            user_name: search_user_info.user_name,
-            avatar: search_user_info.avatar
-          });
-        }}
-      />
+      return <Vw>
+        <Button
+          title={'发送消息'}
+          type="default"
+          disabled={false}
+          titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
+          style={{
+            marginTop:10,
+            height: 55,
+            borderWidth:0,
+            backgroundColor: MyThemed[colorScheme||'light'].ctBg,
+          }}
+          onPress={() => {
+            navigation.navigate('ChatPage',{
+              user_id: search_user_info.user_id,
+              user_name: search_user_info.user_name,
+              avatar: search_user_info.avatar
+            });
+          }}
+        />
+        <Button
+          title={'删除'}
+          type="danger"
+          disabled={false}
+          titleStyle={{
+            // color: MyThemed[colorScheme||'light'].ftCr3
+          }}
+          style={{
+            marginTop:10,
+            height: 55,
+            borderWidth:0,
+            backgroundColor: MyThemed[colorScheme||'light'].ctBg,
+          }}
+          onPress={() => {
+            Alert.alert(
+              "删除联系人",
+              `将联系人 ”${search_user_info?.f_user_name_remark||search_user_info?.user_name}“ 删除，将同时删除与该联系人的聊天记录`,
+              [
+                { 
+                  text: "取消", 
+                  onPress: async () => {},
+                  style: "cancel"
+                },
+                { 
+                  text: "删除", 
+                  onPress: async () => {
+                    runInAction(async ()=>{
+                      try{
+                        const res = await FriendsStore.del_friends({
+                          f_user_id: search_user_info.user_id,
+                        });
+
+                        delete addFriendChatLogs[search_user_info.user_id];
+                        const addUserIdSort = addFriendChatLogs?.userIdSort||[];
+                        const addIdx = addUserIdSort.indexOf(search_user_info.user_id);
+                        addUserIdSort.splice(addIdx,1);
+
+                        const chatLogs = FriendsStore.chatLogs[login_user_id] || {}
+                        delete chatLogs[search_user_info.user_id];
+                        const userIdSort = chatLogs?.userIdSort||[];
+                        const idx = userIdSort.indexOf(search_user_info.user_id);
+                        userIdSort.splice(idx,1);
+
+                        await FriendsStore.getFriendList();
+                        await FriendsStore.get_new_friends_list();
+                        
+                        navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
+                        navigation.navigate('ChatListPage');
+                      }catch(err:any){
+                        console.log('err----->>>',err.message)
+                      }
+                    })
+                  },
+                  style: "destructive"
+                }
+              ]
+            );
+          }}
+        />
+      </Vw>
     }else{
       return <Button
         title={'添加到通讯录'}
@@ -164,13 +220,13 @@ const UserDetail = ({
 
   const showReplyBtn = useCallback(()=>{
     let hasReply = false;
-    for(const item of chatLogs) {
+    for(const item of add_msg_contents) {
       if(item.from_user_id==search_user_info.user_id) hasReply =  true;
     }
     if(hasReply && [1].includes(search_user_info.f_is_apply)) return true;
-    if([0].includes(search_user_info.f_is_apply) && chatLogs.length) return true;
+    if([0].includes(search_user_info.f_is_apply) && add_msg_contents.length) return true;
     return false
-  },[chatLogs])
+  },[add_msg_contents])
 
   return <ScrollView style={styles.container}>
     <NavigationBar
@@ -215,7 +271,7 @@ const UserDetail = ({
     </View>
 
     {
-      ([0].includes(search_user_info?.f_status) && chatLogs.length) ? <View style={{
+      ([0].includes(search_user_info?.f_status) && add_msg_contents.length) ? <View style={{
         ...styles.applyMsgWrapper,
       }}>
 
@@ -225,7 +281,7 @@ const UserDetail = ({
           // borderColor: MyThemed[colorScheme||'light'].ftcr2
         }}>
           {
-            chatLogs.length? chatLogs.slice(-3).map((item:any,index:number)=>{
+            add_msg_contents.length? add_msg_contents.slice(-3).map((item:any,index:number)=>{
               return <Text style={styles.msgContent} key={'msg'+index}>{item?.from_user_id==AppStore.userInfo?.user_id?'我':item?.from_user_name}: {item?.msg_content}</Text>
             }):null
           }
@@ -236,28 +292,6 @@ const UserDetail = ({
             onPress={()=>{
               
               replyMsgRef?.current.open(async (response:any)=>{
-                console.log('response=====>>>',response.status);
-                // runInAction(()=>{
-                //   if(search_user_info?.msgs?.length){
-                //     search_user_info?.msgs.splice(0,1)
-                //   }else{
-                //     search_user_info.msgs = []
-                //   }
-                //   set_search_user_info({
-                //     ...search_user_info,
-                //     msgs: [
-                //       ...search_user_info?.msgs,
-                //       msg,
-                //     ]
-                //   });
-                  
-                //   if(AppStore?.search_user_info?.msgs?.length){
-                //     // params.userInfo.msgs.splice(0,1)
-                //   }else{
-                //     AppStore.search_user_info.msgs = [];
-                //   }
-                //   AppStore.search_user_info.msgs = [...AppStore?.search_user_info?.msgs,msg];
-                // });
                 if(['success'].includes(response.status)){
                   runInAction(async ()=>{
                     await handlerChatLog({
