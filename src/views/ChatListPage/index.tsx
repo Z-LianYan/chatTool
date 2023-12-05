@@ -133,7 +133,7 @@ const ChatListPage = ({
             setTimeout(() => {
               navigation.navigate('ChatPage',{
                 user_id: key,
-                user_name: FriendsStore.chatLogs[login_user_id][key]?.user_name,
+                user_name: FriendsStore.chatLogs[login_user_id][key]?.f_user_name_remark||FriendsStore.chatLogs[login_user_id][key]?.user_name,
                 avatar: FriendsStore.chatLogs[login_user_id][key]?.avatar
               });
             });
