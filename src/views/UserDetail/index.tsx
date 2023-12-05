@@ -136,7 +136,7 @@ const UserDetail = ({
           onPress={() => {
             navigation.navigate('ChatPage',{
               user_id: search_user_info.user_id,
-              user_name: search_user_info.user_name,
+              user_name: search_user_info?.f_user_name_remark||search_user_info?.user_name,
               avatar: search_user_info.avatar
             });
           }}

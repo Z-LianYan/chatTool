@@ -52,6 +52,7 @@ const AddressBookPage = ({
   },[])
   type itemType = {
     user_name: string,
+    f_user_name_remark: string,
     avatar: string,
     user_id: number,
   }
@@ -102,7 +103,7 @@ const AddressBookPage = ({
       FriendsStore?.friendsData?.rows?.map((item:itemType,index:number)=>{
         return <MyCell
           key={index+item.user_name}
-          title={item.user_name}
+          title={item.f_user_name_remark||item.user_name}
           avatar={item.avatar}
           showBottomBorder={index!=FriendsStore?.friendsData.rows.length-1}
           onPress={async ()=>{
