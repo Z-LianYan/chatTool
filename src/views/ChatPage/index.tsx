@@ -37,7 +37,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import { LOADING_ICON } from '../../assets/image/index';
 import dayjs from 'dayjs';
 import BottomOperationBtn from './BottomOperationBtn';
-import { chatListPageMsgCount, handlerChatLog, uniqueMsgId } from '../../utils/tool';
+import { handlerChatLog, uniqueMsgId } from '../../utils/tool';
 import { searchFriends } from '../../api/friends';
 const _ = require('lodash');
 // import { 
@@ -98,8 +98,11 @@ const ChatPage = ({
     
   });
   useEffect(()=>{
+    runInAction(()=>{
+      AppStore.curRouteName = 'ChatListPage';
+    });
     setTimeout(() => {
-      scrollRef.current.scrollToEnd();
+      scrollRef.current?.scrollToEnd();
       setTimeout(()=>{
         setShowSkeleton(false);
       },300);
@@ -175,7 +178,7 @@ const ChatPage = ({
       });
       
       setTimeout(() => {
-        scrollRef.current.scrollToEnd()
+        scrollRef.current?.scrollToEnd()
       }, 200);
       sockitIo?.getSocketIo()?.emit('sendServerMsg',{ 
         msg_type: msg_row.msg_type, 
@@ -349,7 +352,7 @@ const ChatPage = ({
                         color: MyThemed[colorScheme||'light'].ftCr2,
                         textAlign:'center'
                       }}>{
-                        FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id] && (FriendsStore.chatLogs[login_user_id][params?.user_id].user_name)}
+                        AppStore?.search_user_info?.f_user_name_remark || AppStore?.search_user_info?.user_name } 
                         已开启朋友验证，你还不是他（她）朋友。请先发送朋友验证请求，对方验证通过后，才能聊天。<Text 
                       style={{
                         color: MyThemed[colorScheme||'light'].ftCr3,
@@ -358,15 +361,9 @@ const ChatPage = ({
                         const friends:any = await searchFriends({user_id: item.to_user_id});
                         runInAction(()=>{
                           AppStore.search_user_info = friends;
-                          // navigation.navigate('SetRemarkLabel',{
-                          //   // search_user_info: search_user_info,
-                          //   op_type: 'toVerify',
-                          //   user_id: item.to_user_id,
-                          // });
                           navigation.navigate({
                             name: 'SetRemarkLabel',
                             params:{
-                              search_user_info: friends,
                               op_type: 'addUser'
                             }
                           })
@@ -412,7 +409,7 @@ const ChatPage = ({
           onFocus={async ()=>{
             setShowBottomOperationBtn(false);
             setTimeout(() => {
-              scrollRef.current.scrollToEnd()
+              scrollRef.current?.scrollToEnd()
             },200);
           }}
           onSubmitEditing={async ()=>{}}/>

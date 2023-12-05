@@ -91,8 +91,9 @@ const UserDetail = ({
   const add_msg_contents = addFriendChatLogs[search_user_info.user_id]?.msg_contents||[];
 
   const footerShowBtn = useCallback(()=>{
+    console.log('search_user_info=====>>>>999',search_user_info)
     // !search_user_info.expire || (dayjs(search_user_info.expire).unix() < dayjs().unix()) && 
-    if(search_user_info.f_status==0 && [1].includes(search_user_info.f_is_apply)) return <Button
+    if((search_user_info.f_status===0 && [1].includes(search_user_info.f_is_apply))) return <Button
       title={'添加到通讯录'}
       type="default"
       disabled={false}
@@ -175,13 +176,19 @@ const UserDetail = ({
                         delete addFriendChatLogs[search_user_info.user_id];
                         const addUserIdSort = addFriendChatLogs?.userIdSort||[];
                         const addIdx = addUserIdSort.indexOf(search_user_info.user_id);
-                        addUserIdSort.splice(addIdx,1);
+                        runInAction(()=>{
+                          addUserIdSort.splice(addIdx,1);
+                        })
+                        
 
                         const chatLogs = FriendsStore.chatLogs[login_user_id] || {}
                         delete chatLogs[search_user_info.user_id];
                         const userIdSort = chatLogs?.userIdSort||[];
                         const idx = userIdSort.indexOf(search_user_info.user_id);
-                        userIdSort.splice(idx,1);
+                        runInAction(()=>{
+                          userIdSort.splice(idx,1);
+                        })
+                        
 
                         await FriendsStore.getFriendList();
                         await FriendsStore.get_new_friends_list();
@@ -301,7 +308,7 @@ const UserDetail = ({
                     });
                   })
                 }else{
-                  Toast.fail(response.msg);
+                  // Toast.fail(response.msg);
 
                   const friends:any = await searchFriends({
                     user_id: search_user_info.user_id

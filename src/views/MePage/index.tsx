@@ -26,6 +26,7 @@ import {
   View,
   Text
 } from '../../component/customThemed';
+import { runInAction } from 'mobx';
 const MePage = ({ 
   MyThemed,
   AppStore,
@@ -35,6 +36,9 @@ const MePage = ({
   const colorScheme = useColorScheme();
 
   useEffect(()=>{
+    runInAction(()=>{
+      AppStore.curRouteName = 'MePage';
+    });
   })
   return <ScrollView style={styles.container}>
     <View style={{

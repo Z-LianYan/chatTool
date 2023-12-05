@@ -90,6 +90,10 @@ const ChatListPage = ({
   // const navigationState = navigation.getState();
   // const routeName = navigationState.routeNames[navigationState.index]
   useEffect(()=>{
+    runInAction(()=>{
+      AppStore.curRouteName = 'ChatListPage';
+    })
+    
     // navigation.setOptions({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
@@ -105,20 +109,21 @@ const ChatListPage = ({
       let len = msg_contents?.length;
       let msgCount = 0;
 
-      for(const item of msg_contents) if(!item.readMsg) msgCount+=1;
+      for(const item of msg_contents) if(!item.readMsg && item.msg_type) msgCount+=1;
 
       console.log('msg_contents====>>>',msgCount,msg_contents)
 
       redArr.push(<MyCell 
         msgCount={msgCount}
         time={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
-        title={FriendsStore.chatLogs[login_user_id][key]?.user_name} 
+        title={FriendsStore.chatLogs[login_user_id][key]?.f_user_name_remark||FriendsStore.chatLogs[login_user_id][key]?.user_name} 
         avatarStyle={{
           width: 44,
           height: 44
         }}
         key={key+'chatList'}
         showDisNotice={false}
+        showBottomBorder={!(key===userIdSort[userIdSort.length-1])}
         msg={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.msg_content}
         hasNewMsg={msgCount?true:false}
         avatar={FriendsStore.chatLogs[login_user_id][key]?.avatar} 

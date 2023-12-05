@@ -74,7 +74,7 @@ export function ADD_FRIENDS_APPLY(params?:any,text='添加中...') {
       switch (res.error) {
         case 0:
           resolve(res.data);
-          Toast.show({
+          if(res.message) Toast.show({
             icon: 'success',
             duration: 2000,
             text: res.message,

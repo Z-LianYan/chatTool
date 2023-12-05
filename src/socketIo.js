@@ -88,46 +88,43 @@ export default class SocketIoClient {
             const from_user_id = data.user_id;
             runInAction(async ()=>{// acceptAddFriends
                 const isAddFriend = ['addFirendsApply','addFriendApplyReply'].includes(data?.type);
-                
-
-                
                 if(['acceptAddFriends'].includes(data?.type)){
-                    console.log('执行了=======》〉》〉')
-                    runInAction(()=>{
-                        if(!store.FriendsStore.chatLogs[login_user_id]){
-                            store.FriendsStore.chatLogs[login_user_id] = {
-                                userIdSort: [from_user_id]
-                            };
-                            store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendChatLogs[login_user_id][from_user_id]);
-                        }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
-                            store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(store.FriendsStore.addFriendChatLogs[login_user_id][from_user_id]);
-                            const idx = store.FriendsStore.chatLogs[login_user_id].userIdSort.indexOf(from_user_id);
-                            if(idx!=-1) store.FriendsStore.chatLogs[login_user_id].userIdSort.splice(idx,1);
-                            store.FriendsStore.chatLogs[login_user_id].userIdSort.unshift(from_user_id);
-                        }
-                    });
+                    console.log('执行了=======》〉》〉',from_user_id,store.FriendsStore.addFriendChatLogs[login_user_id])
+                    runInAction(async ()=>{
+                        const addFriendChatLogs = store.FriendsStore.addFriendChatLogs[login_user_id]||{};
+                        const addUser = addFriendChatLogs[from_user_id];
+                        if(addUser) {
+                            if(!store.FriendsStore.chatLogs[login_user_id]){
+                                store.FriendsStore.chatLogs[login_user_id] = {
+                                    userIdSort: [from_user_id]
+                                };
+                                store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(addUser);
+                            }else if(!store.FriendsStore.chatLogs[login_user_id][from_user_id]){
+                                store.FriendsStore.chatLogs[login_user_id][from_user_id] = _.cloneDeep(addUser);
+                                const idx = store.FriendsStore.chatLogs[login_user_id].userIdSort.indexOf(from_user_id);
+                                if(idx!=-1) store.FriendsStore.chatLogs[login_user_id].userIdSort.splice(idx,1);
+                                store.FriendsStore.chatLogs[login_user_id].userIdSort.unshift(from_user_id);
+                            }
+                        };
 
-
-                    await handlerChatLog({
-                        chatLogs: store.FriendsStore.chatLogs,
-                        login_user_id: login_user_id,
-                        data: data,
+                        await handlerChatLog({
+                            chatLogs: store.FriendsStore.chatLogs,
+                            login_user_id: login_user_id,
+                            data: data,
+                        });
                     });
                 }else{
-
-                    console.log('执行了=======》〉》〉12345')
                     const target_obj = {
                         chatLogs: isAddFriend ? store.FriendsStore.addFriendChatLogs : store.FriendsStore.chatLogs,
                         login_user_id: login_user_id,
                         data: data,
                     }
-    
                     await handlerChatLog(target_obj);
                 }
 
                 
 
-
+                console.log('login_user_id====>>',login_user_id,store.AppStore.curRouteName);
                 if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && isAddFriend) {
                     runInAction(()=>{
                         let addressBookPageNotreadMsgCount = 0;
