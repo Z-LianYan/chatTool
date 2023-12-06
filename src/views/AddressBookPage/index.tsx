@@ -84,8 +84,6 @@ const AddressBookPage = ({
     onPress={()=>{
       navigation.navigate('NewFriendsList')
       runInAction(()=>{
-        // AppStore.addFirendsApply = [];
-        // AppStore.tabBar.AddressBookPage.msgCnt = 0;
         for(let key in addFriendChatLogs){
           if(['userIdSort'].includes(key)) continue;
           addFriendChatLogs[key].newAddFriendReadMsg = true;

@@ -305,6 +305,7 @@ const UserDetail = ({
                       chatLogs: FriendsStore.addFriendChatLogs,
                       login_user_id: login_user_id,
                       data:response.data,
+                      type: 'addFriendsApply'
                     });
                   })
                 }else{

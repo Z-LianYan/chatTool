@@ -62,7 +62,7 @@ export default class SocketIoClient {
       
 
         /**
-         * data?.type  addFirendsApply: 添加朋友申请   acceptAddFriends：接受添加好友   addFriendApplyReply： 添加好友申请回复消息
+         * data?.type  addFriendsApply: 添加朋友申请   acceptAddFriends：接受添加好友   addFriendApplyReply： 添加好友申请回复消息
         */
         
         // data ====>>> {
@@ -75,7 +75,7 @@ export default class SocketIoClient {
         //         "我是1618", "msg_unique_id": "1320231127183541744958", 
         //         "to_user_id": 15
         //     }, 
-        //     "type": "addFirendsApply", 
+        //     "type": "addFriendsApply", 
         //     "user_id": 13, 
         //     "user_name": "1618"
         // }
@@ -87,7 +87,7 @@ export default class SocketIoClient {
             const login_user_id = store.AppStore.userInfo?.user_id;
             const from_user_id = data.user_id;
             runInAction(async ()=>{// acceptAddFriends
-                const isAddFriend = ['addFirendsApply','addFriendApplyReply'].includes(data?.type);
+                const isAddFriend = ['addFriendsApply','addFriendApplyReply'].includes(data?.type);
                 if(['acceptAddFriends'].includes(data?.type)){
                     console.log('执行了=======》〉》〉',from_user_id,store.FriendsStore.addFriendChatLogs[login_user_id])
                     runInAction(async ()=>{
@@ -111,6 +111,7 @@ export default class SocketIoClient {
                             chatLogs: store.FriendsStore.chatLogs,
                             login_user_id: login_user_id,
                             data: data,
+                            type: data?.type
                         });
                     });
                 }else{
@@ -118,6 +119,7 @@ export default class SocketIoClient {
                         chatLogs: isAddFriend ? store.FriendsStore.addFriendChatLogs : store.FriendsStore.chatLogs,
                         login_user_id: login_user_id,
                         data: data,
+                        type: data?.type
                     }
                     await handlerChatLog(target_obj);
                 }

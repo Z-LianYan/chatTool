@@ -2,6 +2,14 @@ import dayjs from 'dayjs';
 import store from '../store/index';
 import _ from 'lodash';
 
+const getFinalRowMsg =  function(msg_contents:any[]){
+    let len = msg_contents.length-1;
+    if(len<0) return null;
+    for(let i=len;i>=0;i--){
+      if(msg_contents[i].msg_type || msg_contents[i].type=='time') return msg_contents[i];
+    }
+    return null;
+}
 export function uniqueMsgId(user_id:string){
     return (user_id?String(user_id):'') + dayjs().format('YYYYMMDDHHmmssSSS')+String(Math.floor(Math.random()*1000))
 }
@@ -9,24 +17,33 @@ type handlerChatLogType = {
     chatLogs:any,
     login_user_id: number,
     data: any,
+    type?: string,//type: 'addFriendsApply'
 };
 export async function handlerChatLog({
     chatLogs = {},
     login_user_id,
     data,
+    type = ''
 }:handlerChatLogType){
-    console.log('chatLogs====>>>',chatLogs)
     const from_user_id = data.user_id;
+    if(!data.msg_content) return;
+    const addTypes = ['addFriendsApply','addFriendApplyReply','acceptAddFriends'];
+    const time = {
+        type: 'time',
+        created_at: data?.msg_content?.created_at,
+    }
     if(!chatLogs[login_user_id]){
         chatLogs[login_user_id] = {
             userIdSort: [from_user_id]
         };
+        const msg_contents = [data.msg_content];
+        if(!addTypes.includes(type)) msg_contents.unshift(time);
         chatLogs[login_user_id][from_user_id] = {
             user_id:  data?.user_id,
             user_name:  data?.user_name,
             f_user_name_remark: data?.f_user_name_remark,
             avatar:  data?.avatar, 
-            msg_contents: [data.msg_content],
+            msg_contents: msg_contents,
         }
     }else{
         if(!Array.isArray(chatLogs[login_user_id].userIdSort)){
@@ -37,23 +54,35 @@ export async function handlerChatLog({
         chatLogs[login_user_id].userIdSort.unshift(from_user_id);
 
         if(!chatLogs[login_user_id][from_user_id]){
+            const msg_contents = [data.msg_content];
+            if(!addTypes.includes(type)) msg_contents.unshift(time) 
             chatLogs[login_user_id][from_user_id]={
                 user_id:  data?.user_id,
                 user_name:  data?.user_name,
                 f_user_name_remark: data?.f_user_name_remark,
                 avatar:  data?.avatar,
-                msg_contents: [data.msg_content],
+                msg_contents: msg_contents,
             }
         }else if(chatLogs[login_user_id][from_user_id]){
+            const msg_contents = [...chatLogs[login_user_id][from_user_id].msg_contents];
+            if(!addTypes.includes(type)){
+                const finalRowMsg = getFinalRowMsg(msg_contents);
+                // const max_len = msg_contents.length;
+                // const max_msg = msg_contents[max_len-1];
+                const minute = dayjs(data?.msg_content?.created_at).diff(finalRowMsg.created_at,'minute');
+                if(minute>3) msg_contents.push(time); 
+            }
+            msg_contents.push(data.msg_content);
             chatLogs[login_user_id][from_user_id] = {
                 ...chatLogs[login_user_id][from_user_id],
-                msg_contents: [...chatLogs[login_user_id][from_user_id].msg_contents,data.msg_content],
+                // msg_contents: [...chatLogs[login_user_id][from_user_id].msg_contents,data.msg_content],
+                msg_contents: msg_contents,
                 user_id:  data?.user_id,
                 user_name:  data?.user_name,
                 f_user_name_remark: data?.f_user_name_remark,
                 avatar:  data?.avatar,
             }
-            if(['addFirendsApply','addFriendApplyReply'].includes(data?.type)){
+            if(['addFriendsApply','addFriendApplyReply'].includes(data?.type)){
                 delete chatLogs[login_user_id][from_user_id]?.newAddFriendReadMsg;
             }
         }
@@ -69,3 +98,63 @@ export async function chatListPageMsgCount(chatLogs:any={}) {
     }
     return chatListPageNotreadMsgCount;
 }
+
+
+
+function handerHour(hour:any){
+    if(hour<6) return '凌晨';
+    if(hour===6) return '早上';
+    if(hour<12) return '上午';
+    if(hour===12) return '中午';
+    if(hour<18) return '下午';
+    if(hour<=23) return '晚上';
+}
+function week(day:any){
+    switch(day){
+        case 0:
+            return '周日';
+        case 1:
+            return "周一";
+        case 2:
+            return "周二";
+        case 3:
+            return "周三";
+        case 4:
+            return "周四";
+        case 5:
+            return "周五";
+        case 6:
+            return "周六";
+    }
+}
+
+export function formatTime(time:string){
+    const year = dayjs(time).year(),
+        month = dayjs(time).month(),
+        date = dayjs(time).date(),
+        hour = dayjs(time).hour(),
+        minute = dayjs(time).minute(),
+        second = dayjs(time).second(),
+        day = dayjs(time).day(),
+        full_date = dayjs(time).format('YYYY-MM-DD'),
+
+        cur_year = dayjs().year(),
+        cur_month = dayjs().month(),
+        cur_date = dayjs().date(),
+        cur_hour = dayjs().hour(),
+        cur_minute = dayjs().minute(),
+        cur_second = dayjs().second(),
+        cur_day = dayjs().day(),
+        cur_full_date = dayjs().format('YYYY-MM-DD'),
+        dif = dayjs(cur_full_date).diff(full_date,'day');
+    if(dif===0) {
+        return dayjs(time).format('HH:mm')
+    }else if(dif===1){
+        return "昨天 " + dayjs(time).format('HH:mm')
+    }else if(dif==2){
+        return week(day) + " " + dayjs(time).format('HH:mm');
+    }else{
+        return dayjs(time).format((dif>2 && year==cur_year)?'M月D日':'YYYY年M月D日') +" "+ handerHour(hour) +" "+ dayjs(time).format('HH:mm');
+    }
+}
+

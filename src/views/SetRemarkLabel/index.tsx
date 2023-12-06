@@ -154,7 +154,9 @@ const SetRemarkLabel = ({
           chatLogs: FriendsStore.addFriendChatLogs,
           login_user_id: login_user_id,
           data: res.data,
+          type: 'addFriendsApply'
         });
+        
         runInAction(()=>{
           FriendsStore.addFriendChatLogs[login_user_id][search_user_info?.user_id].newAddFriendReadMsg = true;
         });
@@ -438,6 +440,7 @@ const SetRemarkLabel = ({
               runInAction(async()=>{
                 AppStore.search_user_info = friends;
                 const has_val = FriendsStore.addFriendChatLogs[login_user_id] && FriendsStore.addFriendChatLogs[login_user_id][search_user_id];
+                console.log('msg_contents.push(data.msg_content);====>>>1111',JSON.stringify(has_val));
                 if(!FriendsStore.chatLogs[login_user_id]) {
                   FriendsStore.chatLogs[login_user_id] = {
                     userIdSort: [search_user_id]
@@ -456,6 +459,11 @@ const SetRemarkLabel = ({
                   const user = FriendsStore.addFriendChatLogs[login_user_id][search_user_id]||[];
                   const msg_contents = user.msg_contents;
                   for(const item of msg_contents) item.readMsg = true;
+                  const time = {
+                    type: 'time',
+                    created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                  }
+                  msg_contents.unshift(time)
                   FriendsStore.chatLogs[login_user_id][search_user_id] = _.cloneDeep(user);
                 }else{
                   FriendsStore.chatLogs[login_user_id][search_user_id] = {

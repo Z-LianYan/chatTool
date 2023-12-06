@@ -49,6 +49,10 @@ const ChatListPage = ({
   
   const colorScheme = useColorScheme();
 
+  const login_user_id = AppStore.userInfo?.user_id;
+  const chatLogs = FriendsStore.chatLogs[login_user_id]||{};
+  const userIdSort = chatLogs?.userIdSort||[];
+
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
@@ -98,24 +102,29 @@ const ChatListPage = ({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
     // });
   })
-  const login_user_id = AppStore.userInfo?.user_id;
-  const chatLogs = FriendsStore.chatLogs[login_user_id]||{};
-  const userIdSort = chatLogs?.userIdSort||[];
+
+  const getFinalRowMsg = useCallback((msg_contents:any=[])=>{
+    let len = msg_contents.length-1;
+    if(len<0) return null;
+    for(let i=len;i>=0;i--){
+      if(msg_contents[i].msg_type) return msg_contents[i];
+    }
+    return null;
+  },[]);
+  
   const renderCell = useCallback(()=>{
     const redArr = [];
-    
+    console.log('FriendsStore.chatLogs[login_user_id]=============>>>',AppStore.userInfo?.user_id,FriendsStore.chatLogs[login_user_id]);
     for(const key of userIdSort){
       const msg_contents = chatLogs[key]?.msg_contents||[];
       let len = msg_contents?.length;
       let msgCount = 0;
 
       for(const item of msg_contents) if(!item.readMsg && item.msg_type) msgCount+=1;
-
-      console.log('msg_contents====>>>',msgCount,msg_contents)
-
+      const finalRowMsg = getFinalRowMsg(msg_contents);
       redArr.push(<MyCell 
         msgCount={msgCount}
-        time={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at && dayjs(FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.created_at).format("HH:mm")}
+        time={finalRowMsg?.created_at && dayjs(finalRowMsg?.created_at).format("HH:mm")}
         title={FriendsStore.chatLogs[login_user_id][key]?.f_user_name_remark||FriendsStore.chatLogs[login_user_id][key]?.user_name} 
         avatarStyle={{
           width: 44,
@@ -124,7 +133,7 @@ const ChatListPage = ({
         key={key+'chatList'}
         showDisNotice={false}
         showBottomBorder={!(key===userIdSort[userIdSort.length-1])}
-        msg={FriendsStore.chatLogs[login_user_id][key]?.msg_contents[len-1]?.msg_content}
+        msg={finalRowMsg?.msg_content}
         hasNewMsg={msgCount?true:false}
         avatar={FriendsStore.chatLogs[login_user_id][key]?.avatar} 
         onPress={()=>{

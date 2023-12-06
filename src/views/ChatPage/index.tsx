@@ -37,7 +37,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import { LOADING_ICON } from '../../assets/image/index';
 import dayjs from 'dayjs';
 import BottomOperationBtn from './BottomOperationBtn';
-import { handlerChatLog, uniqueMsgId } from '../../utils/tool';
+import { formatTime, handlerChatLog, uniqueMsgId } from '../../utils/tool';
 import { searchFriends } from '../../api/friends';
 const _ = require('lodash');
 // import { 
@@ -64,6 +64,11 @@ const ChatPage = ({
   const [showBottomOperationBtn,setShowBottomOperationBtn] = useState<boolean>(false);
   
   const login_user_id = AppStore?.userInfo?.user_id;
+
+  const chatLogs = FriendsStore.chatLogs[login_user_id]||{};
+  const user = chatLogs[params?.user_id]||{}
+  const msg_contents = user.msg_contents||[];
+
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
@@ -109,9 +114,6 @@ const ChatPage = ({
     });
 
     runInAction(()=>{
-      const chatLogs = FriendsStore.chatLogs[login_user_id]||{}
-      const user = chatLogs[params?.user_id]||{};
-      const msg_contents = user.msg_contents||[];
       for(const item of msg_contents){
         item.readMsg = true;
       }
@@ -126,9 +128,9 @@ const ChatPage = ({
     }
   })
   
-  const sendMsg = useCallback(async ()=>{
+  const sendMsg = useCallback(async (msgRow?:any)=>{
     const _msgContent = msgContent?.trim();
-    if(!_msgContent){
+    if(!_msgContent && !msgRow){
       Alert.alert(
         "提示",
         "不能发送空白消息",
@@ -144,9 +146,7 @@ const ChatPage = ({
       return;
     }
     
-    // return;
-    if(!msgContent) return;
-    const msg_row = {
+    const msg_row = msgRow||{
       from_user_id: AppStore.userInfo?.user_id,
       to_user_id: params?.user_id,
       msg_content: msgContent,
@@ -158,11 +158,6 @@ const ChatPage = ({
       msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id)
     }
     setMsgContent('');
-
-    
-
-    
-
 
     runInAction(async()=>{
       
@@ -191,12 +186,14 @@ const ChatPage = ({
         runInAction(()=>{
           const chatLogs =  FriendsStore.chatLogs[login_user_id]||{};
           const msg_contents = chatLogs[params?.user_id].msg_contents||[];
-          // if (["success"].includes(response?.status) && response.msg_content) {
+          if (["success"].includes(response?.status) && response.msg_content) {
             
-          // } else {
-          //   // console.log('Failed to send message! SEND_FAIL ' ); 
-            
-          // }
+          } else if(['addFriendVerify'].includes(response?.status)){
+            // console.log('Failed to send message! SEND_FAIL ' ); 
+            FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.push({
+              type: 'addFriendVerify',
+            })
+          }
           for(const item of msg_contents){
             if(response.msg_unique_id == item.msg_unique_id) {
               item.sendIng = false;
@@ -222,8 +219,150 @@ const ChatPage = ({
       }
     });
   },[]);
-
-
+  const renderAddFriendVerify = useCallback((item:any,index:number)=>{
+    return  <Vw key={index+'chatPage'} style={{paddingVertical:15}}>
+      <Text 
+        style={{
+          // ...styles.typeText,
+          color: MyThemed[colorScheme||'light'].ftCr2,
+          textAlign:'center',
+          lineHeight: 20
+        }}>{
+          AppStore?.search_user_info?.f_user_name_remark || AppStore?.search_user_info?.user_name } 
+          已开启朋友验证，你还不是他（她）朋友。请先发送朋友验证请求，对方验证通过后，才能聊天。<TouchableOpacity 
+          activeOpacity={0.6}
+          onPress={async ()=>{
+            console.log('12345')
+              const friends:any = await searchFriends({user_id: params?.user_id});
+              console.log('')
+              runInAction(()=>{
+                AppStore.search_user_info = friends;
+                navigation.navigate({
+                  name: 'SetRemarkLabel',
+                  params:{
+                    op_type: 'addUser'
+                  }
+                })
+              });
+          }}>
+            <Text 
+            style={{
+              color: MyThemed[colorScheme||'light'].ftCr3,
+            }}>发送朋友验证</Text>
+        </TouchableOpacity>
+      </Text>
+    </Vw>
+  },[msg_contents]);
+  const renderTime = useCallback((item:any,index:number)=>{
+    return <Text key={index+'chatPage'} style={{
+      ...styles.typeText,
+      color: MyThemed[colorScheme||'light'].ftCr2,
+    }}>{formatTime(item.created_at)}</Text>
+  },[]);
+  
+  const renderMsg = useCallback(()=>{
+    return msg_contents?.map((item:any,index:number)=>{
+      if(['time'].includes(item.type)) return renderTime(item,index)
+      if(['addFriendVerify'].includes(item.type)) return  renderAddFriendVerify(item,index);
+      return <Vw key={index+'chatPage'} style={{
+        ...styles.msgCell,
+        justifyContent: item.from_user_id === AppStore.userInfo?.user_id? 'flex-end':'flex-start',
+      }}>
+        {
+          item.from_user_id === AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
+            {
+              item.sendIng ? <Image 
+              style={{
+                ...styles.leftLoadingIcon,
+              }} 
+              source={LOADING_ICON}/>:(['addFriendVerify'].includes(item.sendStatus) && <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={()=>{
+                  console.log('23456789');
+                  runInAction(()=>{
+                    const im = msg_contents[index];
+                    im.created_at = dayjs().format('YYYY-MM-DD HH:mm:ss');
+                    im.sendIng = true;
+                    im.msg_unique_id = uniqueMsgId(AppStore.userInfo?.user_id);
+                    msg_contents.splice(index,1);
+                    sendMsg(im);
+                  });
+                }}
+              >
+                <Image 
+                style={{
+                  ...styles.leftLoadingIcon,
+                }} 
+                source={SEND_FAIL}/>
+              </TouchableOpacity>)
+            }
+            <Vw style={styles.msgTextWrapper}>
+              <Text
+                selectable={true}
+                style={{
+                  ...styles.msgText,
+                  backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
+                  color: MyThemed['light'].ftCr
+                }}
+              >{item.msg_content}</Text>
+            </Vw>
+            <Vw style={{
+              borderWidth: 8,
+              // borderColor: 'transparent',
+              borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
+              borderTopColor: 'transparent',
+              borderRightColor: 'transparent',
+              borderBottomColor: 'transparent',
+              position: 'absolute',
+              right: -16,
+              top: 10,
+              // marginTop: -8,
+            }}></Vw>
+          </Vw>
+          
+        }
+        <TouchableOpacity onPress={()=>{
+          goUserDetail(item.from_user_id);
+        }}>
+          <Image 
+          style={{
+            ...styles.msgCellAvatar,
+            marginLeft: item.from_user_id === AppStore.userInfo?.user_id? 10:0,
+            marginRight: item.from_user_id !== AppStore.userInfo?.user_id? 10:0,
+          }} 
+          source={{uri: item.from_avatar}}/>
+        </TouchableOpacity>
+        
+        {
+          item.from_user_id !== AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
+            <Vw style={styles.msgTextWrapper}>
+              <Text
+                selectable={true}
+                style={{
+                  ...styles.msgText,
+                  // textAlign: 'center',
+                  backgroundColor:  MyThemed[colorScheme||'light'].ctBg
+                }}
+              >{item.msg_content}</Text>
+            </Vw>
+            <Vw style={{
+              borderWidth: 8,
+              // borderColor: 'transparent',
+              borderLeftColor: 'transparent',
+              borderTopColor: 'transparent',
+              borderRightColor: MyThemed[colorScheme||'light'].ctBg,
+              borderBottomColor: 'transparent',
+              position: 'absolute',
+              left: -16,
+              top: 10,
+              // marginTop: -8,
+            }}></Vw>
+          </Vw>
+        }
+      </Vw>
+    })
+  },[msg_contents]);
+  
   const overlayView =  <Overlay.View
       style={{alignItems: 'center', justifyContent: 'center'}}
       modal={false}
@@ -261,121 +400,10 @@ const ChatPage = ({
           onPress={()=>{
             setShowBottomOperationBtn(false);
           }}>
-
             <Vw style={{height: 30}}></Vw>
             {
-              FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]?.msg_contents?.map((item:any,index:number)=>{
-                return <Vw key={index+'chatPage'}>
-                  <Vw style={{
-                    ...styles.msgCell,
-                    justifyContent: item.from_user_id === AppStore.userInfo?.user_id? 'flex-end':'flex-start',
-                  }}>
-                    {
-                      item.from_user_id === AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
-                        {
-                          item.sendIng ? <Image 
-                          style={{
-                            ...styles.leftLoadingIcon,
-                          }} 
-                          source={LOADING_ICON}/>:(['addFriendVerify'].includes(item.sendStatus) && <Image 
-                          style={{
-                            ...styles.leftLoadingIcon,
-                          }} 
-                          source={SEND_FAIL}/>)
-                        }
-                        <Vw style={styles.msgTextWrapper}>
-                          <Text
-                            selectable={true}
-                            style={{
-                              ...styles.msgText,
-                              backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
-                              color: MyThemed['light'].ftCr
-                            }}
-                          >{item.msg_content}</Text>
-                        </Vw>
-                        <Vw style={{
-                          borderWidth: 8,
-                          // borderColor: 'transparent',
-                          borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
-                          borderTopColor: 'transparent',
-                          borderRightColor: 'transparent',
-                          borderBottomColor: 'transparent',
-                          position: 'absolute',
-                          right: -16,
-                          top: 10,
-                          // marginTop: -8,
-                        }}></Vw>
-                      </Vw>
-                      
-                    }
-                    <TouchableOpacity onPress={()=>{
-                      goUserDetail(item.from_user_id);
-                    }}>
-                      <Image 
-                      style={{
-                        ...styles.msgCellAvatar,
-                        marginLeft: item.from_user_id === AppStore.userInfo?.user_id? 10:0,
-                        marginRight: item.from_user_id !== AppStore.userInfo?.user_id? 10:0,
-                      }} 
-                      source={{uri: item.from_avatar}}/>
-                    </TouchableOpacity>
-                    
-                    {
-                      item.from_user_id !== AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
-                        <Vw style={styles.msgTextWrapper}>
-                          <Text
-                            selectable={true}
-                            style={{
-                              ...styles.msgText,
-                              // textAlign: 'center',
-                              backgroundColor:  MyThemed[colorScheme||'light'].ctBg
-                            }}
-                          >{item.msg_content}</Text>
-                        </Vw>
-                        <Vw style={{
-                          borderWidth: 8,
-                          // borderColor: 'transparent',
-                          borderLeftColor: 'transparent',
-                          borderTopColor: 'transparent',
-                          borderRightColor: MyThemed[colorScheme||'light'].ctBg,
-                          borderBottomColor: 'transparent',
-                          position: 'absolute',
-                          left: -16,
-                          top: 10,
-                          // marginTop: -8,
-                        }}></Vw>
-                      </Vw>
-                    }
-                  </Vw>
-                  {
-                    ['addFriendVerify'].includes(item.sendStatus) &&<Text style={{
-                        color: MyThemed[colorScheme||'light'].ftCr2,
-                        textAlign:'center'
-                      }}>{
-                        AppStore?.search_user_info?.f_user_name_remark || AppStore?.search_user_info?.user_name } 
-                        已开启朋友验证，你还不是他（她）朋友。请先发送朋友验证请求，对方验证通过后，才能聊天。<Text 
-                      style={{
-                        color: MyThemed[colorScheme||'light'].ftCr3,
-                      }}
-                      onPress={async ()=>{
-                        const friends:any = await searchFriends({user_id: item.to_user_id});
-                        runInAction(()=>{
-                          AppStore.search_user_info = friends;
-                          navigation.navigate({
-                            name: 'SetRemarkLabel',
-                            params:{
-                              op_type: 'addUser'
-                            }
-                          })
-                        });
-                        
-                      }}>发送朋友验证</Text>
-                    </Text>
-                  }
-                </Vw>
-              })
+              renderMsg()
             }
-            
           </TouchableOpacity>
         </ScrollView>
         <Vw style={{
@@ -541,6 +569,11 @@ const styles = StyleSheet.create({
     height: 30,
     // fontSize: 10,
   },
+  typeText: {
+    textAlign: 'center',
+    fontSize: 12,
+    paddingVertical: 15,
+  }
 });
 
 export default inject("AppStore","MyThemed","FriendsStore")(observer(ChatPage));
