@@ -463,7 +463,15 @@ const SetRemarkLabel = ({
                     type: 'time',
                     created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
                   }
-                  msg_contents.unshift(time)
+                  msg_contents.unshift(time);
+                  msg_contents.push({
+                    type:'des',
+                    des: '以上是打招呼的内容'
+                  });
+                  msg_contents.push({
+                    type:'des',
+                    des: `你已添加了${user?.user_name},现在可以开始聊天了`
+                  });
                   FriendsStore.chatLogs[login_user_id][search_user_id] = _.cloneDeep(user);
                 }else{
                   FriendsStore.chatLogs[login_user_id][search_user_id] = {
@@ -471,10 +479,15 @@ const SetRemarkLabel = ({
                     user_name: res?.data?.user_name,
                     avatar: res?.data?.avatar,
                     f_user_name_remark: res?.data?.f_user_name_remark,
-                    msg_contents: res?.data?.msg_content||[]
+                    msg_contents: [{
+                      type:'des',
+                      des: `你已添加了${res?.data?.user_name},现在可以开始聊天了`
+                    }]
                   };
                 }
+                console.log('------->>login_user_id',FriendsStore.chatLogs[login_user_id]);
 
+                console.log('FriendsStore.chatLogs[login_user_id][search_user_id]===========>>>',FriendsStore.chatLogs[login_user_id][search_user_id]);
                 await FriendsStore.getFriendList();
                 await FriendsStore.get_new_friends_list();
               });

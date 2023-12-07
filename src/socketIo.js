@@ -38,8 +38,12 @@ export default class SocketIoClient {
             console.log('#connect,', id,res);
             SocketIoClient.callBack && SocketIoClient.callBack();
             // 监听自身 id 以实现 p2p 通讯
-            socket.on(id, (msg) => {
-              console.log('#receive,', msg);
+            // socket.on(id, (msg) => {
+            //   console.log('#receive,', msg);
+            // });
+
+            runInAction(async ()=>{
+                store.AppStore.connecting = true;
             });
         });
         
@@ -49,7 +53,21 @@ export default class SocketIoClient {
         // 系统事件
         socket.on('disconnect', (msg) => {
             console.log('#disconnect', msg);
-            delete SocketIoClient.instance;
+            delete SocketIoClient?.instance;
+            runInAction(async ()=>{
+                store.AppStore.connecting = false;
+            });
+        });
+        
+        /**
+         * 1.低级连接无法建立
+         * 2.服务器在中间件功能中拒绝连接
+         */
+        socket.on("connect_error", (msg) => {
+            console.log('#connect_error', msg);
+            setTimeout(() => {
+              socket.connect();
+            }, 1000);
         });
           
         socket.on('disconnecting', () => {
@@ -63,22 +81,26 @@ export default class SocketIoClient {
 
         /**
          * data?.type  addFriendsApply: 添加朋友申请   acceptAddFriends：接受添加好友   addFriendApplyReply： 添加好友申请回复消息
+         * 
+         *   data ====>>> {
+                "avatar": "http://zly.imgresource.com.cn/public/chat/commonAvatar.png", 
+                "msg_content": {
+                    "created_at": "2023-11-27T10:35:42.000Z", 
+                    "from_avatar": "http://zly.imgresource.com.cn/public/chat/commonAvatar.png", 
+                    "from_user_id": 13, 
+                    "from_user_name": "1618", 
+                    "msg_content": "我是1618", 
+                    "msg_unique_id": "1320231127183541744958", 
+                    "to_user_id": 15,
+                    "msg_type": "text"
+                }, 
+                "type": "addFriendsApply", 
+                "user_id": 13, 
+                "user_name": "1618",
+                "f_user_name_remark":""
+            }
+         * 
         */
-        
-        // data ====>>> {
-        //     "avatar": "http://zly.imgresource.com.cn/public/chat/commonAvatar.png", 
-        //     "msg_content": {
-        //         "created_at": "2023-11-27T10:35:42.000Z", 
-        //         "from_avatar": "http://zly.imgresource.com.cn/public/chat/commonAvatar.png", 
-        //         "from_user_id": 13, 
-        //         "from_user_name": "1618", "msg_content": 
-        //         "我是1618", "msg_unique_id": "1320231127183541744958", 
-        //         "to_user_id": 15
-        //     }, 
-        //     "type": "addFriendsApply", 
-        //     "user_id": 13, 
-        //     "user_name": "1618"
-        // }
         socket.on('sendClientMsg',(data,callBack)=>{//服务端发送过来的消息
             // data.type 
             console.log('===========>>>>有消息---',store.AppStore.userInfo?.user_name,data?.msg_content?.msg_unique_id);
@@ -124,9 +146,6 @@ export default class SocketIoClient {
                     await handlerChatLog(target_obj);
                 }
 
-                
-
-                console.log('login_user_id====>>',login_user_id,store.AppStore.curRouteName);
                 if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && isAddFriend) {
                     runInAction(()=>{
                         let addressBookPageNotreadMsgCount = 0;

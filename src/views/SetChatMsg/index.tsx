@@ -28,7 +28,7 @@ import {
   Text
 } from '../../component/customThemed';
 import { SegmentedBar } from '../../component/teaset';
-const SetUser = ({ 
+const SetChatMsg = ({ 
   MyThemed,
   AppStore,
   navigation
@@ -36,6 +36,8 @@ const SetUser = ({
     
   const colorScheme = useColorScheme();
   const [remind,setRemind] = useState<boolean>(false);
+  const [notDisturb,setNotDisturb] = useState<boolean>(false);
+  const [msgTop,setMsgTop] = useState<boolean>(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -55,7 +57,13 @@ const SetUser = ({
     title='消息免打扰' 
     showBottomBorder={false}
     showRightArrow={false}
-    rightValue={'未完成'}
+    rightValue={<Switch
+      trackColor={{ false: "#767577", true: MyThemed[colorScheme||'light'].primaryColor }}
+      onValueChange={(val)=>{
+        setNotDisturb(val);
+      }}
+      value={notDisturb}
+    />}
     onPress={()=>{
       // navigation.navigate('Set')
     }}/>
@@ -64,7 +72,13 @@ const SetUser = ({
     title='置顶聊天' 
     showBottomBorder={false}
     showRightArrow={false}
-    rightValue={'未完成'}
+    rightValue={<Switch
+      trackColor={{ false: "#767577", true: MyThemed[colorScheme||'light'].primaryColor }}
+      onValueChange={(val)=>{
+        setMsgTop(val);
+      }}
+      value={msgTop}
+    />}
     onPress={()=>{
       // navigation.navigate('Set')
     }}/>
@@ -108,4 +122,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(SetUser));
+export default inject("AppStore","MyThemed")(observer(SetChatMsg));

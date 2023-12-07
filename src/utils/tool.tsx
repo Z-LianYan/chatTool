@@ -26,8 +26,9 @@ export async function handlerChatLog({
     type = ''
 }:handlerChatLogType){
     const from_user_id = data.user_id;
+    
     if(!data.msg_content) return;
-    const addTypes = ['addFriendsApply','addFriendApplyReply','acceptAddFriends'];
+    const addTypes = ['addFriendsApply','addFriendApplyReply'];
     const time = {
         type: 'time',
         created_at: data?.msg_content?.created_at,
@@ -37,7 +38,7 @@ export async function handlerChatLog({
             userIdSort: [from_user_id]
         };
         const msg_contents = [data.msg_content];
-        if(!addTypes.includes(type)) msg_contents.unshift(time);
+        if(!addTypes.includes(type))  msg_contents.unshift(time);
         chatLogs[login_user_id][from_user_id] = {
             user_id:  data?.user_id,
             user_name:  data?.user_name,
@@ -45,6 +46,7 @@ export async function handlerChatLog({
             avatar:  data?.avatar, 
             msg_contents: msg_contents,
         }
+        
     }else{
         if(!Array.isArray(chatLogs[login_user_id].userIdSort)){
             chatLogs[login_user_id].userIdSort = [];
@@ -67,23 +69,25 @@ export async function handlerChatLog({
             const msg_contents = [...chatLogs[login_user_id][from_user_id].msg_contents];
             if(!addTypes.includes(type)){
                 const finalRowMsg = getFinalRowMsg(msg_contents);
-                // const max_len = msg_contents.length;
-                // const max_msg = msg_contents[max_len-1];
                 const minute = dayjs(data?.msg_content?.created_at).diff(finalRowMsg.created_at,'minute');
-                if(minute>3) msg_contents.push(time); 
+                if(['acceptAddFriends'].includes(type)){
+                    msg_contents.unshift(time); 
+                    msg_contents.push({
+                        type: 'des',
+                        des: '以上是打招呼的内容'
+                    })
+                }else if(minute>3) {
+                    msg_contents.push(time); 
+                }
             }
             msg_contents.push(data.msg_content);
             chatLogs[login_user_id][from_user_id] = {
                 ...chatLogs[login_user_id][from_user_id],
-                // msg_contents: [...chatLogs[login_user_id][from_user_id].msg_contents,data.msg_content],
                 msg_contents: msg_contents,
                 user_id:  data?.user_id,
                 user_name:  data?.user_name,
                 f_user_name_remark: data?.f_user_name_remark,
                 avatar:  data?.avatar,
-            }
-            if(['addFriendsApply','addFriendApplyReply'].includes(data?.type)){
-                delete chatLogs[login_user_id][from_user_id]?.newAddFriendReadMsg;
             }
         }
     }

@@ -84,7 +84,7 @@ const ChatPage = ({
           activeOpacity={0.6}
           onPress={()=>{
             navigation.navigate({
-              name: 'SetUser',
+              name: 'SetChatMsg',
               params: {
               }
             });
@@ -175,33 +175,40 @@ const ChatPage = ({
       setTimeout(() => {
         scrollRef.current?.scrollToEnd()
       }, 200);
-      sockitIo?.getSocketIo()?.emit('sendServerMsg',{ 
+      sockitIo?.getSocketIo()?.timeout(15000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误
         msg_type: msg_row.msg_type, 
         msg_content: msg_row.msg_content,
         to_user_id: msg_row.to_user_id,
         msg_unique_id: msg_row.msg_unique_id
-      },function(response:any) {
+      },function(err:any,response:any) {
+        const chatLogs =  FriendsStore.chatLogs[login_user_id]||{};
+        const msg_contents = chatLogs[params?.user_id].msg_contents||[];
+        console.log('err------>>>',err);
         console.log('服务端回调事件---------》〉》',response);
-        if(!login_user_id || !params?.user_id) return;
+       
         runInAction(()=>{
-          const chatLogs =  FriendsStore.chatLogs[login_user_id]||{};
-          const msg_contents = chatLogs[params?.user_id].msg_contents||[];
+          for(const item of msg_contents){
+            if(msg_row?.msg_unique_id == item.msg_unique_id) {
+              item.sendIng = false;
+              item.sendStatus = err?'serverNotCallBack':response?.status;
+            }
+          }
+          if(err) return;
+
+          if(!login_user_id || !params?.user_id) return;
           if (["success"].includes(response?.status) && response.msg_content) {
             
           } else if(['addFriendVerify'].includes(response?.status)){
-            // console.log('Failed to send message! SEND_FAIL ' ); 
             FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.push({
               type: 'addFriendVerify',
             })
           }
-          for(const item of msg_contents){
-            if(response.msg_unique_id == item.msg_unique_id) {
-              item.sendIng = false;
-              item.sendStatus = response?.status;
-            }
-          }
-
-         
+          // for(const item of msg_contents){
+          //   if(response?.msg_unique_id == item.msg_unique_id) {
+          //     item.sendIng = false;
+          //     item.sendStatus = response?.status;
+          //   }
+          // }
         });
       });
     });
@@ -259,12 +266,20 @@ const ChatPage = ({
       color: MyThemed[colorScheme||'light'].ftCr2,
     }}>{formatTime(item.created_at)}</Text>
   },[]);
+
+  const renderDes = useCallback((item:any,index:number)=>{
+    return <Text key={index+'chatPage'} style={{
+      ...styles.typeText,
+      color: MyThemed[colorScheme||'light'].ftCr2,
+    }}>{item.des}</Text>
+  },[]);
   
   const renderMsg = useCallback(()=>{
     return msg_contents?.map((item:any,index:number)=>{
-      if(['time'].includes(item.type)) return renderTime(item,index)
+      if(['des'].includes(item.type)) return renderDes(item,index);
+      if(['time'].includes(item.type)) return renderTime(item,index);
       if(['addFriendVerify'].includes(item.type)) return  renderAddFriendVerify(item,index);
-      return <Vw key={index+'chatPage'} style={{
+      return <Vw key={item.msg_unique_id+'chatPage'} style={{
         ...styles.msgCell,
         justifyContent: item.from_user_id === AppStore.userInfo?.user_id? 'flex-end':'flex-start',
       }}>
@@ -275,7 +290,7 @@ const ChatPage = ({
               style={{
                 ...styles.leftLoadingIcon,
               }} 
-              source={LOADING_ICON}/>:(['addFriendVerify'].includes(item.sendStatus) && <TouchableOpacity
+              source={LOADING_ICON}/>:(['addFriendVerify','serverNotCallBack'].includes(item.sendStatus) && <TouchableOpacity
                 activeOpacity={0.6}
                 onPress={()=>{
                   console.log('23456789');
@@ -363,15 +378,15 @@ const ChatPage = ({
     })
   },[msg_contents]);
   
-  const overlayView =  <Overlay.View
-      style={{alignItems: 'center', justifyContent: 'center'}}
-      modal={false}
-      overlayOpacity={0}
-      >
-      <View style={{backgroundColor: '#fff', padding: 40, borderRadius: 15, alignItems: 'center'}}>
-        <Label style={{color: '#000'}} size='xl' text='Overlay' />
-      </View>
-    </Overlay.View>
+  // const overlayView =  <Overlay.View
+  //     style={{alignItems: 'center', justifyContent: 'center'}}
+  //     modal={false}
+  //     overlayOpacity={0}
+  //     >
+  //     <View style={{backgroundColor: '#fff', padding: 40, borderRadius: 15, alignItems: 'center'}}>
+  //       <Label style={{color: '#000'}} size='xl' text='Overlay' />
+  //     </View>
+  //   </Overlay.View>
   return <Vw style={styles.container}>
     {
       showSkeleton && <View style={{
@@ -406,6 +421,8 @@ const ChatPage = ({
             }
           </TouchableOpacity>
         </ScrollView>
+
+
         <Vw style={{
           ...styles.bottomInputWrapper,
           borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
@@ -547,7 +564,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     textAlignVertical: "top",
-    fontSize: 20
+    fontSize: 15
   },
   add_cir_icon:{
     marginLeft: 20,

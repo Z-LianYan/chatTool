@@ -30,7 +30,7 @@ import { View,Text } from '../../component/customThemed';
 import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
-import { ADD_CIR, ADD_USER, NEW_FIREND } from '../../assets/image';
+import { ADD_CIR, ADD_USER, NEW_FIREND, SEND_FAIL } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
 import dayjs from 'dayjs';
@@ -48,6 +48,8 @@ const ChatListPage = ({
   const sockitIo = SocketIoClient.getInstance();
   
   const colorScheme = useColorScheme();
+
+  const [initPage,setInitPage] = useState<boolean>(true);
 
   const login_user_id = AppStore.userInfo?.user_id;
   const chatLogs = FriendsStore.chatLogs[login_user_id]||{};
@@ -97,6 +99,10 @@ const ChatListPage = ({
     runInAction(()=>{
       AppStore.curRouteName = 'ChatListPage';
     })
+
+    setTimeout(() => {
+      setInitPage(false)
+    }, 2000);
     
     // navigation.setOptions({
     //   headerTitle: "聊天"+(AppStore.tabBar[routeName||'']?.msgCnt?`(${AppStore.tabBar[routeName||''].msgCnt})`:''),
@@ -114,7 +120,6 @@ const ChatListPage = ({
   
   const renderCell = useCallback(()=>{
     const redArr = [];
-    console.log('FriendsStore.chatLogs[login_user_id]=============>>>',AppStore.userInfo?.user_id,FriendsStore.chatLogs[login_user_id]);
     for(const key of userIdSort){
       const msg_contents = chatLogs[key]?.msg_contents||[];
       let len = msg_contents?.length;
@@ -171,21 +176,18 @@ const ChatListPage = ({
     avatar={'https://pic.rmb.bdstatic.com/bjh/down/2f007a84f278b90f0683c6aae764d6f7.png'}
     onPress={()=>{
       navigation.navigate('ChatPage',{});
-    }}/>
-    <MyCell 
-    time='12:59'
-    title='标题' 
-    avatarStyle={{
-      width: 44,
-      height: 44
-    }}
-    showDisNotice={true}
-    msg='1234567898765积分个懒人沙发就是浪费的时刻就放假睡懒觉饭都是废话lkl互粉啦放假啦大家福利都放假了就放辣椒来得及放辣椒的费拉达斯见风使舵了人家饿了人家了'
-    hasNewMsg={true}
-    avatar="http://zly.imgresource.com.cn/public/chat/commonAvatar.png"
-    onPress={()=>{
-      navigation.navigate('ChatPage',{});
     }}/> */}
+
+    {
+      !AppStore.connecting && !initPage && <Vw style={styles.netError}>
+          <Image 
+            style={{
+              ...styles.netErrorImg,
+            }} 
+            source={SEND_FAIL}/>
+        <Tt style={styles.netErrorTxt}>当前无法连接网络，可检查网络设置是否正常。</Tt>
+      </Vw>
+    }
 
     {
       renderCell()
@@ -205,6 +207,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     height: 200,
     lineHeight: 200
+  },
+  netError:{
+    paddingVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    backgroundColor: '#fdeeeb'
+  },
+  netErrorImg:{
+    width: 20,
+    height: 20,
+    marginRight: 15
+  },
+  netErrorTxt:{
+    color: '#7a6a6a'
   }
 });
 

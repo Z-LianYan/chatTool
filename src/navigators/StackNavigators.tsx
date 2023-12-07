@@ -37,7 +37,7 @@ import SetRemarkLabel from '../views/SetRemarkLabel';
 import SetLabel from '../views/SetLabel';
 import NewFriendsList from '../views/NewFriendsList';
 import ChatPage from '../views/ChatPage';
-import SetUser from '../views/SetUser';
+import SetChatMsg from '../views/SetChatMsg';
 
 const routes=[
     { 
@@ -156,8 +156,8 @@ const routes=[
         } 
     },
     { 
-        component: SetUser, 
-        name: "SetUser",
+        component: SetChatMsg, 
+        name: "SetChatMsg",
         options: {
             headerShown: true,
             title: '聊天信息',
