@@ -42,7 +42,10 @@ import SocketIoClient from '../../socketIo';
 
 
 const SetPage = ({AppStore,navigation,AppVersions}:any) => {
-  const sockitIo = SocketIoClient.getInstance();
+  const sockitIo = SocketIoClient.getInstance({
+    callBack: ()=>{},
+    navigation: navigation
+  });
     
   const colorScheme = useColorScheme();
 
@@ -68,6 +71,7 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
           })
           // navigation.popToTop()
           await AsyncStorage.removeItem('token');
+          await AsyncStorage.removeItem('userInfo');
           sockitIo.getSocketIo()?.disconnect();
         } }
       ]

@@ -32,7 +32,7 @@ import {
   ListRow,
   Toast
 } from '../../component/teaset/index';
-import PropTypes, { number } from 'prop-types';
+import PropTypes, { any, number } from 'prop-types';
 import CustomListRow from '../../component/CustomListRow';
 import NavigationBar from '../../component/NavigationBar';
 import { login_out } from "../../api/user";
@@ -48,13 +48,13 @@ const VersionPage = ({app,navigation,AppVersions}:any) => {
   const [versionName, setVersionName] = React.useState('');
 
   useEffect(()=>{
-    console.log('res===>>哈哈哈哈哈');
     AppVersions.checkAppUpdate().then((res:any)=>{
       console.log('res===>>',res);
       setVersionCode(res?.versionCode);
       setVersionName(res?.versionName);
+    }).catch((err:any)=>{
+      console.log('====222--err',err)
     });
-    
   },[])
 
   async function onLoginOut() {

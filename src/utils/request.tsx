@@ -69,28 +69,29 @@ service.interceptors.response.use(
   }
 );
 export function post(url:string, data?:any, text?:string,headers={}) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     hideLoading();
     if (text) isLoading(text);
-    service({
-      url: url,
-      // url: url + `?versionCode=${AppVersions.versionCode}&versionName=${AppVersions.versionName}&unique_id=${AppVersions.unique_id}&device_id=${AppVersions.device_id}`,
-      method: "POST",
-      data: data,
-      headers,
-    })
-      .then((res) => {
-        resolve(res.data);
-        if (text) hideLoading();
-        if(res.data.error==400){
-          data.navigation && data.navigation.navigate('LoginPage');
-          AppStore.setUserInfo(null);
-        }
-      })
-      .catch((err) => {
-        reject(err);
-        if (text) hideLoading();
+    try{
+      const res = await service({
+        url: url,
+        // url: url + `?versionCode=${AppVersions.versionCode}&versionName=${AppVersions.versionName}&unique_id=${AppVersions.unique_id}&device_id=${AppVersions.device_id}`,
+        method: "POST",
+        data: data,
+        headers,
       });
+      resolve(res?.data);
+      if (text) hideLoading();
+      if(res?.data?.error==400){
+        data.navigation && data.navigation.navigate('LoginPage');
+        AppStore.setUserInfo(null);
+      }
+    }catch(err){
+      console.log('000----err',err);
+      reject(err);
+      if (text) hideLoading();
+    }
+    
   });
 }
 

@@ -45,7 +45,6 @@ const ChatListPage = ({
   navigation,
   FriendsStore,
 }:any) => {
-  const sockitIo = SocketIoClient.getInstance();
   
   const colorScheme = useColorScheme();
 
@@ -209,9 +208,10 @@ const styles = StyleSheet.create({
     lineHeight: 200
   },
   netError:{
-    paddingVertical: 10,
+    paddingVertical: 6,
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#fdeeeb'
   },
   netErrorImg:{
@@ -220,7 +220,8 @@ const styles = StyleSheet.create({
     marginRight: 15
   },
   netErrorTxt:{
-    color: '#7a6a6a'
+    color: '#7a6a6a',
+    fontSize: 12
   }
 });
 

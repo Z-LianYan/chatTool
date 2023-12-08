@@ -38,6 +38,7 @@ import SetLabel from '../views/SetLabel';
 import NewFriendsList from '../views/NewFriendsList';
 import ChatPage from '../views/ChatPage';
 import SetChatMsg from '../views/SetChatMsg';
+import SocketIoClient from '../socketIo';
 
 const routes=[
     { 
@@ -193,6 +194,18 @@ function StackNavigators(props:any){
     const { MyThemed } = props;
     let navigation:any = useNavigation();
     const colorScheme = useColorScheme();
+    useEffect(()=>{
+        console.log("props.token=======>>>",props.AppStore.userInfo?.user_name,props.token);
+        if(props.token){
+            const sockitIo = SocketIoClient.getInstance({
+                callBack: ()=>{
+
+                },
+                navigation: navigation
+            });
+        }
+    },[]);
+    
     return <Stack.Navigator
         screenOptions={{
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,//切换路由时的显示和隐藏的动画方式

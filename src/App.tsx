@@ -30,7 +30,7 @@ import {
   DefaultTheme,
   useNavigationContainerRef 
 } from '@react-navigation/native';
-// import { useNavigation } from '@react-navigation/core';
+import { useNavigation } from '@react-navigation/core';
 
 
 // console.log('DefaultTheme--->>',DefaultTheme)
@@ -52,8 +52,12 @@ function App(): JSX.Element {
           const _token:any = await AsyncStorage.getItem('token');
           if(_token){
             setToken(_token);
-            await getUserInfo();
-            const sockitIo = SocketIoClient.getInstance(()=>{});
+            try{
+              await getUserInfo();
+            }catch(err){
+
+            }
+            
           }
           setTokenComplete(true);
       })();
@@ -64,12 +68,14 @@ function App(): JSX.Element {
       const result:any = await get_user_info();
       if(result) {
         store.AppStore.setUserInfo(result);
-      }else{
-        setToken('');
+        await AsyncStorage.setItem('userInfo',JSON.stringify(result));
       }
     }catch(err:any){
-      console.log('----error',err.message);
-      setToken('');
+      let userInfo = await AsyncStorage.getItem('userInfo');
+      if(userInfo) {
+        userInfo = JSON.parse(userInfo);
+        store.AppStore.setUserInfo(userInfo);
+      }
     }
   },[]);
 

@@ -73,14 +73,18 @@ const Login = (props:any) => {
       }
       const result:any = await userLogin(form_data);
       AppStore.setUserInfo(result);
+      await AsyncStorage.setItem('userInfo',JSON.stringify(result));
       if(result && result.token){
         await AsyncStorage.setItem('token',result.token);
-        const sockitIo = SocketIoClient.getInstance(()=>{
-          if(route.params && route.params.toUrl){
-            props.navigation.replace(route.params.toUrl);
-            return;
-          }
-          props.navigation.replace('AppTabBar',{});
+        const sockitIo = SocketIoClient.getInstance({
+          callBack: ()=>{
+            if(route.params && route.params.toUrl){
+              props.navigation.replace(route.params.toUrl);
+              return;
+            }
+            props.navigation.replace('AppTabBar',{});
+          },
+          navigation
         });
       }else{
         Toast.message('服务端未返回token');

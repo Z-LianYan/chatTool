@@ -3,14 +3,21 @@ import config from './config';
 import store from './store/index';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { runInAction } from "mobx";
-import { useNavigation } from '@react-navigation/core';
 import _ from 'lodash';
 import { chatListPageMsgCount, handlerChatLog } from "./utils/tool";
+import { login_out } from "./api/user";
+import { useNavigation,StackActions } from '@react-navigation/core';
 export default class SocketIoClient {
-    static getInstance(callBack){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
+    static getInstance({
+        callBack,
+        navigation = ''
+    }){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
+    console.log('callBack==>>>',navigation)
         if(!SocketIoClient.instance){
+            console.log('实例化======》〉')
             SocketIoClient.instance = new SocketIoClient();
             SocketIoClient.callBack = callBack;
+            SocketIoClient.navigation = navigation;
         }else{
             callBack && callBack();
         }
@@ -28,14 +35,14 @@ export default class SocketIoClient {
         const socket = socket_io_client(`${config.HOST}/chat`,{
             // 实际使用中可以在这里传递参数
             query: {
-                token: await AsyncStorage.getItem('token')
+                token: await AsyncStorage.getItem('token'),
             },
             transports: ['websocket'],
         });
         SocketIoClient.socketIo = socket;
         socket.on('connect', (res) => {
             const id = socket.id;
-            console.log('#connect,', id,res);
+            console.log('#connect,', id,res,userInfo?.user_name);
             SocketIoClient.callBack && SocketIoClient.callBack();
             // 监听自身 id 以实现 p2p 通讯
             // socket.on(id, (msg) => {
@@ -52,7 +59,7 @@ export default class SocketIoClient {
         })
         // 系统事件
         socket.on('disconnect', (msg) => {
-            console.log('#disconnect', msg);
+            console.log('#disconnect--->>', msg);
             delete SocketIoClient?.instance;
             runInAction(async ()=>{
                 store.AppStore.connecting = false;
@@ -163,6 +170,29 @@ export default class SocketIoClient {
 
                 
             });
+        });
+
+
+        socket.on('outLogin',async (data,callBack)=>{
+            console.log('outLogin====>>',data, SocketIoClient?.navigation);
+            
+            // await login_out();
+            store.AppStore.setUserInfo(null);
+            SocketIoClient?.navigation?.dispatch(StackActions.popToTop());//清除内部导航堆栈
+            if(SocketIoClient.navigation.replace){
+                SocketIoClient.navigation.replace('LoginPage',{
+                    hidBackBtn: true
+                })
+            }else{
+                SocketIoClient.navigation.navigate('LoginPage',{
+                    hidBackBtn: true
+                })
+            }
+            
+            await AsyncStorage.removeItem('token');
+            await AsyncStorage.removeItem('userInfo');
+            callBack && callBack();
+            // socket?.disconnect(); //服务端执行断开
         })
 
 

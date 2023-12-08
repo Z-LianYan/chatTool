@@ -37,9 +37,13 @@ import { uniqueMsgId } from '../../utils/tool';
 const ReplyMsg = ({ 
   MyThemed,
   AppStore,
-  to_user_id
+  to_user_id,
+  navigation
 }:any,ref:any) => {
-  const sockitIo = SocketIoClient.getInstance()
+  const sockitIo = SocketIoClient.getInstance({
+    callBack: ()=>{},
+    navigation: navigation
+  })
   
   const use_ref = useRef<any>();
   const colorScheme = useColorScheme();

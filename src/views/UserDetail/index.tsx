@@ -47,9 +47,6 @@ const UserDetail = ({
 }:any) => {
   // console.log('AppStore.search_user_info=======>>',AppStore.search_user_info);
   const { params } = route;
-  const sockitIo = SocketIoClient.getInstance()
-  
-  
     
   const colorScheme = useColorScheme();
   const { userInfo } = AppStore;

@@ -92,10 +92,10 @@ export function login_out(params?:any) {
 
 
 export function get_user_info(params?:any,text="") {
-  return new Promise((resolve, reject) => {
-    HttpUtils.post(Api.GET_USER_INFO, params, text).then((res:any) => {
-      console.log('res--->>会员信息',res)
-      switch (res.error) {
+  return new Promise(async (resolve, reject) => {
+    try{
+      const res:any = await HttpUtils.post(Api.GET_USER_INFO, params, text);
+      switch (res?.error) {
         case 0:
           resolve(res.data);
           break;
@@ -103,7 +103,10 @@ export function get_user_info(params?:any,text="") {
           reject(res);
           break;
       }
-    });
+    }catch(err){
+      reject(err);
+    }
+    
   });
 }
 

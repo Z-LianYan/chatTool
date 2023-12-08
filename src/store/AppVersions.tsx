@@ -8,6 +8,7 @@ import {
   Platform
 } from 'react-native';
 import { useState } from 'react';
+import { reject } from 'lodash';
 export default class AppVersions {
   constructor() {
     // 建议使用这种方式，自动识别类型，不需要再加前缀
@@ -34,7 +35,6 @@ export default class AppVersions {
         runInAction(()=>{
           // this.versionCode = res.data.versionCode;
         });
-        console.log('=========>>>',res.data);
         switch (res.error) {
           case 0:
             resolve(res.data);
@@ -43,8 +43,10 @@ export default class AppVersions {
             reject(res.data);
             break;
         }
-      });
-    });
+      }).catch(err=>{
+        reject(err)
+      });;
+    })
   }
   
 }

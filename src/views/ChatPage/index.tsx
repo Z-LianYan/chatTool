@@ -54,7 +54,10 @@ const ChatPage = ({
   const scrollRef:{current:any} = useRef();
   const inputRef:{current:any} = useRef();
   
-  const sockitIo = SocketIoClient.getInstance();
+  const sockitIo = SocketIoClient.getInstance({
+    callBack: ()=>{},
+    navigation
+  });
   const { params } = route;
   
   const colorScheme:any = useColorScheme();

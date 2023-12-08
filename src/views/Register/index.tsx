@@ -48,7 +48,7 @@ const RegisterPage = (props:any) => {
   
   let [mobile_phone,set_mobile_phone] = useState(process.env.NODE_ENV=='development'?'13536681616':'');
   let [verify_code,set_verify_code] = useState(process.env.NODE_ENV=='development'?'1234':'');
-  let [user_name,set_user_name] = useState(process.env.NODE_ENV=='development'?'lend':'');
+  let [user_name,set_user_name] = useState();
   let [sex,set_sex] = useState(true);
   let [password,set_password] = useState('');
   let [password_comfirm,set_password_comfirm] = useState('');
@@ -125,7 +125,7 @@ const RegisterPage = (props:any) => {
       clearIntervalDis();
       delete result.token
       props.AppStore.setUserInfo(result);
-      
+      await AsyncStorage.setItem('userInfo',JSON.stringify(result));
       props.navigation.goBack();
     }catch(err:any){
       console.log(err.message)
