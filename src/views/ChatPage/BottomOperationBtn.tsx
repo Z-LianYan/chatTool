@@ -44,8 +44,7 @@ import {launchCamera, launchImageLibrary,} from 'react-native-image-picker';
 import CameraModal from '../../component/CameraModal';
 import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera} from 'react-native-vision-camera';
 
-
-const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
+const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions,onSendMsg}:any,ref:any) => {
   const camera_modal = useRef<any>();
   const use_ref = useRef<any>();
   const colorScheme:any = useColorScheme();
@@ -73,18 +72,21 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:a
 
   const handLaunchImageLibrary = useCallback(async (callBack:any)=>{
     try{
-      callBack && callBack()
+      
       const result:any = await launchImageLibrary({
         mediaType: 'mixed',
         quality: 1,
         selectionLimit: 0,
-        includeBase64: true,
-        includeExtra: true
+        // includeBase64: true,
+        // includeExtra: true
       });
       console.log('includeBase64========>>>>',result);
       if(result && result.assets) {
         // await uploadImage(result.assets)
       }
+
+      // callBack && callBack(result)
+      onSendMsg && onSendMsg(result);
     }finally{
       // callBack && callBack()
     }

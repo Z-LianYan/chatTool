@@ -39,6 +39,7 @@ import dayjs from 'dayjs';
 import BottomOperationBtn from './BottomOperationBtn';
 import { formatTime, handlerChatLog, uniqueMsgId } from '../../utils/tool';
 import { searchFriends } from '../../api/friends';
+import { result } from 'lodash';
 const _ = require('lodash');
 // import { 
 //   View,
@@ -131,18 +132,17 @@ const ChatPage = ({
     }
   })
   
-  const sendMsg = useCallback(async (msgRow?:any)=>{
-    const _msgContent = msgContent?.trim();
+  const sendMsg = useCallback(async ({
+    msg_type = 'text',
+    msg_content = '',
+    msgRow = null,
+  })=>{
+    const _msgContent = msg_content?.trim();
     if(!_msgContent && !msgRow){
       Alert.alert(
         "提示",
         "不能发送空白消息",
         [
-          // {
-          //   text: "",
-          //   onPress: () => console.log("Cancel Pressed"),
-          //   style: "cancel"
-          // },
           { text: "确定", onPress: async () => {}}
         ]
       );
@@ -152,11 +152,11 @@ const ChatPage = ({
     const msg_row = msgRow||{
       from_user_id: AppStore.userInfo?.user_id,
       to_user_id: params?.user_id,
-      msg_content: msgContent,
+      msg_content: msg_content,
       created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       from_user_name: AppStore?.userInfo?.user_name,
       from_avatar: AppStore?.userInfo?.avatar,
-      msg_type: 'text',
+      msg_type: msg_type,
       sendIng: true,
       msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id)
     }
@@ -296,14 +296,16 @@ const ChatPage = ({
               source={LOADING_ICON}/>:(['addFriendVerify','serverNotCallBack'].includes(item.sendStatus) && <TouchableOpacity
                 activeOpacity={0.6}
                 onPress={()=>{
-                  console.log('23456789');
                   runInAction(()=>{
                     const im = msg_contents[index];
                     im.created_at = dayjs().format('YYYY-MM-DD HH:mm:ss');
                     im.sendIng = true;
                     im.msg_unique_id = uniqueMsgId(AppStore.userInfo?.user_id);
                     msg_contents.splice(index,1);
-                    sendMsg(im);
+                    sendMsg({
+                      msg_type:'text',
+                      msgRow:im,
+                    });
                   });
                 }}
               >
@@ -468,7 +470,10 @@ const ChatPage = ({
               backgroundColor: MyThemed[colorScheme||'light'].primaryColor,
             }}
             onPress={async ()=>{
-              await sendMsg()
+              await sendMsg({
+                msg_type:'text',
+                msg_content: msgContent
+              })
             }}>
               <Text style={styles.sen_btn_txt}>发送</Text>
             </TouchableOpacity>:<TouchableOpacity 
@@ -507,7 +512,13 @@ const ChatPage = ({
 
     </Vw>
     {
-      showBottomOperationBtn && <BottomOperationBtn/>
+      showBottomOperationBtn && <BottomOperationBtn onSendMsg={async (result:any)=>{
+        console.log('------>>sendMsg',result)
+        await sendMsg({
+          msg_type:'text',
+          msg_content: ''
+        })
+      }}/>
     }
   </Vw>;
 };
