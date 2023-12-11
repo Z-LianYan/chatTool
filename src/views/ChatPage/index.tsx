@@ -133,87 +133,134 @@ const ChatPage = ({
   })
   
   const sendMsg = useCallback(async ({
-    msg_type = 'text',
-    msg_content = '',
-    msgRow = null,
-  })=>{
-    const _msgContent = msg_content?.trim();
-    if(!_msgContent && !msgRow){
-      Alert.alert(
-        "提示",
-        "不能发送空白消息",
-        [
-          { text: "确定", onPress: async () => {}}
-        ]
-      );
-      return;
-    }
-    
-    const msg_row = msgRow||{
-      from_user_id: AppStore.userInfo?.user_id,
-      to_user_id: params?.user_id,
-      msg_content: msg_content,
-      created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-      from_user_name: AppStore?.userInfo?.user_name,
-      from_avatar: AppStore?.userInfo?.avatar,
-      msg_type: msg_type,
-      sendIng: true,
-      msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id)
-    }
-    setMsgContent('');
-
+    msgRows = [],
+  }:any)=>{
+    const msg_rows:any[] = []
     runInAction(async()=>{
-      
-      await handlerChatLog({
-        chatLogs: FriendsStore.chatLogs,
-        login_user_id: login_user_id,
-        data: {
-          user_id:  params?.user_id,
-          user_name:  params?.user_name,
-          avatar:  params?.avatar,
-          msg_content: msg_row,
-        },
-      });
-      
+      for(const item of msgRows){
+        const _msgContent = (item as any).msg_content?.trim();
+        if(!_msgContent && !_msgContent){
+          Alert.alert(
+            "提示",
+            "不能发送空白消息",
+            [
+              { text: "确定", onPress: async () => {}}
+            ]
+          );
+          return;
+        }
+
+        const msg_row = {
+          from_user_id: AppStore.userInfo?.user_id,
+          to_user_id: params?.user_id,
+          msg_content: (item as any).msg_content,
+          created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+          from_user_name: AppStore?.userInfo?.user_name,
+          from_avatar: AppStore?.userInfo?.avatar,
+          msg_type: (item as any).msg_type||'text',
+          sendIng: true,
+          msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id)
+        }
+        msg_rows.push(msg_row);
+        runInAction(async()=>{
+          await handlerChatLog({
+            chatLogs: FriendsStore.chatLogs,
+            login_user_id: login_user_id,
+            data: {
+              user_id:  params?.user_id,
+              user_name:  params?.user_name,
+              avatar:  params?.avatar,
+              msg_content: msg_row,
+            },
+          });
+          setTimeout(() => {
+            scrollRef.current?.scrollToEnd()
+          });
+        })
+
+        sockitIo?.getSocketIo()?.timeout(5000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误 err
+          msg_type: msg_row.msg_type, 
+          msg_content: msg_row.msg_content,
+          to_user_id: msg_row.to_user_id,
+          msg_unique_id: msg_row.msg_unique_id
+        },function(err:any,response:any) {
+          const chatLogs =  FriendsStore.chatLogs[login_user_id]||{};
+          const msg_contents = chatLogs[params?.user_id].msg_contents||[];
+          console.log('err------>>>',err);
+          console.log('服务端回调事件---------》〉》',response);
+          
+          runInAction(()=>{
+            for(const item of msg_contents){
+              if(msg_row?.msg_unique_id == item.msg_unique_id) {
+                console.log('123456=====000')
+                item.sendIng = false;
+                item.sendStatus = err?'serverNotCallBack':response?.status;
+              }
+            }
+            console.log('msg_contents======>>>',msg_contents);
+            if(err) return;
+            if(!login_user_id || !params?.user_id) return;
+            if (["success"].includes(response?.status) && response.msg_content) {
+              
+            } else if(['addFriendVerify'].includes(response?.status)){
+              FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.push({
+                type: 'addFriendVerify',
+              })
+            }
+            // for(const item of msg_contents){
+            //   if(response?.msg_unique_id == item.msg_unique_id) {
+            //     item.sendIng = false;
+            //     item.sendStatus = response?.status;
+            //   }
+            // }
+          });
+        });
+      }
       setTimeout(() => {
         scrollRef.current?.scrollToEnd()
       }, 200);
-      sockitIo?.getSocketIo()?.timeout(15000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误
-        msg_type: msg_row.msg_type, 
-        msg_content: msg_row.msg_content,
-        to_user_id: msg_row.to_user_id,
-        msg_unique_id: msg_row.msg_unique_id
-      },function(err:any,response:any) {
-        const chatLogs =  FriendsStore.chatLogs[login_user_id]||{};
-        const msg_contents = chatLogs[params?.user_id].msg_contents||[];
-        console.log('err------>>>',err);
-        console.log('服务端回调事件---------》〉》',response);
-       
-        runInAction(()=>{
-          for(const item of msg_contents){
-            if(msg_row?.msg_unique_id == item.msg_unique_id) {
-              item.sendIng = false;
-              item.sendStatus = err?'serverNotCallBack':response?.status;
-            }
-          }
-          if(err) return;
-
-          if(!login_user_id || !params?.user_id) return;
-          if (["success"].includes(response?.status) && response.msg_content) {
-            
-          } else if(['addFriendVerify'].includes(response?.status)){
-            FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.push({
-              type: 'addFriendVerify',
-            })
-          }
-          // for(const item of msg_contents){
-          //   if(response?.msg_unique_id == item.msg_unique_id) {
-          //     item.sendIng = false;
-          //     item.sendStatus = response?.status;
-          //   }
-          // }
-        });
-      });
+      
+      setMsgContent('');
+      // for(const item of msg_rows){
+      //   sockitIo?.getSocketIo()?.timeout(5000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误 err
+      //     msg_type: item.msg_type, 
+      //     msg_content: item.msg_content,
+      //     to_user_id: item.to_user_id,
+      //     msg_unique_id: item.msg_unique_id
+      //   },function(err:any,response:any) {
+      //     const chatLogs =  FriendsStore.chatLogs[login_user_id]||{};
+      //     const msg_contents = chatLogs[params?.user_id].msg_contents||[];
+      //     console.log('err------>>>',err);
+      //     console.log('服务端回调事件---------》〉》',response);
+          
+      //     runInAction(()=>{
+      //       for(const item of msg_contents){
+      //         if(item?.msg_unique_id == item.msg_unique_id) {
+      //           console.log('123456=====000')
+      //           item.sendIng = false;
+      //           item.sendStatus = err?'serverNotCallBack':response?.status;
+      //         }
+      //       }
+      //       console.log('msg_contents======>>>',msg_contents);
+      //       if(err) return;
+      //       if(!login_user_id || !params?.user_id) return;
+      //       if (["success"].includes(response?.status) && response.msg_content) {
+              
+      //       } else if(['addFriendVerify'].includes(response?.status)){
+      //         FriendsStore.chatLogs[login_user_id][params?.user_id].msg_contents.push({
+      //           type: 'addFriendVerify',
+      //         })
+      //       }
+      //       // for(const item of msg_contents){
+      //       //   if(response?.msg_unique_id == item.msg_unique_id) {
+      //       //     item.sendIng = false;
+      //       //     item.sendStatus = response?.status;
+      //       //   }
+      //       // }
+      //     });
+      //   });
+      // }
+      
     });
   },[msgContent]);
 
@@ -298,14 +345,24 @@ const ChatPage = ({
                 onPress={()=>{
                   runInAction(()=>{
                     const im = msg_contents[index];
-                    im.created_at = dayjs().format('YYYY-MM-DD HH:mm:ss');
-                    im.sendIng = true;
-                    im.msg_unique_id = uniqueMsgId(AppStore.userInfo?.user_id);
+                    // im.created_at = dayjs().format('YYYY-MM-DD HH:mm:ss');
+                    // im.sendIng = true;
+                    // im.msg_unique_id = uniqueMsgId(AppStore.userInfo?.user_id);
                     msg_contents.splice(index,1);
-                    sendMsg({
-                      msg_type:'text',
-                      msgRow:im,
+                    // sendMsg({
+                    //   msg_type:'text',
+                    //   msgRow:im,
+                    // });
+                    sendMsg( {
+                      msgRows: [
+                        {
+                          msg_type: im.msg_type,
+                          msg_content: im.msg_content,
+                        }
+                      ]
                     });
+
+                   
                   });
                 }}
               >
@@ -317,30 +374,44 @@ const ChatPage = ({
               </TouchableOpacity>)
             }
             <Vw style={styles.msgTextWrapper}>
-              <Text
-                selectable={true}
+              {
+                ['text'].includes(item.msg_type) && <Text
+                  selectable={true}
+                  style={{
+                    ...styles.msgText,
+                    backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
+                    color: MyThemed['light'].ftCr
+                  }}
+                >{item.msg_content}</Text>
+              }
+              {
+                ['img'].includes(item.msg_type) && <Image 
                 style={{
-                  ...styles.msgText,
-                  backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
-                  color: MyThemed['light'].ftCr
-                }}
-              >{item.msg_content}</Text>
+                  width: 80,
+                  height: 120
+                }} 
+                source={{uri: item.msg_content}}/>
+              }
             </Vw>
-            <Vw style={{
-              borderWidth: 8,
-              // borderColor: 'transparent',
-              borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
-              borderTopColor: 'transparent',
-              borderRightColor: 'transparent',
-              borderBottomColor: 'transparent',
-              position: 'absolute',
-              right: -16,
-              top: 10,
-              // marginTop: -8,
-            }}></Vw>
+            {
+              ['text'].includes(item.msg_type) && <Vw style={{
+                borderWidth: 8,
+                // borderColor: 'transparent',
+                borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
+                borderTopColor: 'transparent',
+                borderRightColor: 'transparent',
+                borderBottomColor: 'transparent',
+                position: 'absolute',
+                right: -16,
+                top: 10,
+                // marginTop: -8,
+              }}></Vw>
+            }
           </Vw>
           
         }
+
+
         <TouchableOpacity onPress={()=>{
           goUserDetail(item.from_user_id);
         }}>
@@ -352,31 +423,45 @@ const ChatPage = ({
           }} 
           source={{uri: item.from_avatar}}/>
         </TouchableOpacity>
+
+
         
         {
           item.from_user_id !== AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
             <Vw style={styles.msgTextWrapper}>
-              <Text
-                selectable={true}
+              {
+                 <Text
+                  selectable={true}
+                  style={{
+                    ...styles.msgText,
+                    // textAlign: 'center',
+                    backgroundColor:  MyThemed[colorScheme||'light'].ctBg
+                  }}
+                >{item.msg_content}</Text>
+              }
+              {/* {
+                ['img'].includes(item.msg_type) && <Image 
                 style={{
-                  ...styles.msgText,
-                  // textAlign: 'center',
-                  backgroundColor:  MyThemed[colorScheme||'light'].ctBg
-                }}
-              >{item.msg_content}</Text>
+                  width: 80,
+                  height: 120
+                }} 
+                source={{uri: item.msg_content}}/>
+              } */}
             </Vw>
-            <Vw style={{
-              borderWidth: 8,
-              // borderColor: 'transparent',
-              borderLeftColor: 'transparent',
-              borderTopColor: 'transparent',
-              borderRightColor: MyThemed[colorScheme||'light'].ctBg,
-              borderBottomColor: 'transparent',
-              position: 'absolute',
-              left: -16,
-              top: 10,
-              // marginTop: -8,
-            }}></Vw>
+            {
+              <Vw style={{
+                borderWidth: 8,
+                // borderColor: 'transparent',
+                borderLeftColor: 'transparent',
+                borderTopColor: 'transparent',
+                borderRightColor: MyThemed[colorScheme||'light'].ctBg,
+                borderBottomColor: 'transparent',
+                position: 'absolute',
+                left: -16,
+                top: 10,
+                // marginTop: -8,
+              }}></Vw>
+            }
           </Vw>
         }
       </Vw>
@@ -471,8 +556,12 @@ const ChatPage = ({
             }}
             onPress={async ()=>{
               await sendMsg({
-                msg_type:'text',
-                msg_content: msgContent
+                msgRows: [
+                  {
+                    msg_type: 'text',
+                    msg_content: msgContent,
+                  }
+                ]
               })
             }}>
               <Text style={styles.sen_btn_txt}>发送</Text>
@@ -513,11 +602,20 @@ const ChatPage = ({
     </Vw>
     {
       showBottomOperationBtn && <BottomOperationBtn onSendMsg={async (result:any)=>{
-        console.log('------>>sendMsg',result)
-        await sendMsg({
-          msg_type:'text',
-          msg_content: ''
+        const assets = result.assets||[];
+        const msgRows = [];
+        for(const item of assets){
+          msgRows.push({
+            msg_type: 'img',
+            msg_content: item.uri,
+          })
+        }
+
+        if(msgRows.length)  await sendMsg({
+          msgRows: msgRows
         })
+
+        
       }}/>
     }
   </Vw>;
