@@ -140,7 +140,7 @@ const ChatPage = ({
     var index = str.lastIndexOf(".");
     return str.slice(index);
   }
-  const uploadImage = useCallback(async (file:any[])=>{
+  const uploadImage = useCallback(async (file:any)=>{
     return new Promise(async (resolve,reject)=>{
       // console.log('压缩----》〉前',file)
       // const data:any = await qiniu.compressImage(file, {
