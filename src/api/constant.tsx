@@ -1,6 +1,5 @@
-export const GET_UPLOAD_QINIU_CONFIG = "/getUploadQiniuConfig"; //获取上传七牛配置
+export const GET_UPLOAD_QINIU_CONFIG = "/chat/getUploadQiniuConfig"; //获取上传七牛配置
 export const UPLOAD_FILE = "/uploadFile"; //上传文件
-
 
 
 

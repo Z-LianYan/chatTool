@@ -112,9 +112,17 @@ const ChatListPage = ({
     let len = msg_contents.length-1;
     if(len<0) return null;
     for(let i=len;i>=0;i--){
-      if(msg_contents[i].msg_type) return msg_contents[i];
+      if(msg_contents[i]?.msg_type) return msg_contents[i];
     }
     return null;
+  },[]);
+
+  const handerMsgShow = useCallback((finalRowMsg:any)=>{
+    return ['img'].includes(finalRowMsg?.msg_type)?'[图片]'
+      :['video'].includes(finalRowMsg?.msg_type)?"[视频]"
+      :['emo'].includes(finalRowMsg?.msg_type)?"[表情]"
+      :['audio'].includes(finalRowMsg?.msg_type)?"[语音]"
+      :finalRowMsg?.msg_content;
   },[]);
   
   const renderCell = useCallback(()=>{
@@ -124,7 +132,7 @@ const ChatListPage = ({
       let len = msg_contents?.length;
       let msgCount = 0;
 
-      for(const item of msg_contents) if(!item.readMsg && item.msg_type) msgCount+=1;
+      for(const item of msg_contents) if(!item.readMsg && item?.msg_type) msgCount+=1;
       const finalRowMsg = getFinalRowMsg(msg_contents);
       redArr.push(<MyCell 
         msgCount={msgCount}
@@ -137,7 +145,7 @@ const ChatListPage = ({
         key={key+'chatList'}
         showDisNotice={false}
         showBottomBorder={!(key===userIdSort[userIdSort.length-1])}
-        msg={finalRowMsg?.msg_content}
+        msg={handerMsgShow(finalRowMsg)}
         hasNewMsg={msgCount?true:false}
         avatar={FriendsStore.chatLogs[login_user_id][key]?.avatar} 
         onPress={()=>{

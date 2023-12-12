@@ -12,9 +12,7 @@ export default class SocketIoClient {
         callBack,
         navigation = ''
     }){   /*单例 （无论调用getInstance静态方法多少次，只实例化一次Db，constructor也只执行一次）*/
-    console.log('callBack==>>>',navigation)
         if(!SocketIoClient.instance){
-            console.log('实例化======》〉')
             SocketIoClient.instance = new SocketIoClient();
             SocketIoClient.callBack = callBack;
             SocketIoClient.navigation = navigation;

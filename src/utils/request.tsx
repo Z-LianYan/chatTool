@@ -87,8 +87,7 @@ export function post(url:string, data?:any, text?:string,headers={}) {
         AppStore.setUserInfo(null);
       }
     }catch(err){
-      console.log('000----err',err);
-      reject(err);
+      reject(err); 
       if (text) hideLoading();
     }
     

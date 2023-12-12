@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import store from '../store/index';
 import _ from 'lodash';
+import { runInAction } from 'mobx';
 
 const getFinalRowMsg =  function(msg_contents:any[]){
     let len = msg_contents.length-1;
@@ -25,72 +26,79 @@ export async function handlerChatLog({
     data,
     type = ''
 }:handlerChatLogType){
-    const from_user_id = data.user_id;
+    return new Promise((resolve,reject)=>{
+        runInAction(()=>{
+            const from_user_id = data.user_id;
     
-    if(!data.msg_content) return;
-    const addTypes = ['addFriendsApply','addFriendApplyReply'];
-    const time = {
-        type: 'time',
-        created_at: data?.msg_content?.created_at,
-    }
-    if(!chatLogs[login_user_id]){
-        chatLogs[login_user_id] = {
-            userIdSort: [from_user_id]
-        };
-        const msg_contents = [data.msg_content];
-        if(!addTypes.includes(type))  msg_contents.unshift(time);
-        chatLogs[login_user_id][from_user_id] = {
-            user_id:  data?.user_id,
-            user_name:  data?.user_name,
-            f_user_name_remark: data?.f_user_name_remark,
-            avatar:  data?.avatar, 
-            msg_contents: msg_contents,
-        }
-        
-    }else{
-        if(!Array.isArray(chatLogs[login_user_id].userIdSort)){
-            chatLogs[login_user_id].userIdSort = [];
-        }
-        const idx = chatLogs[login_user_id].userIdSort.indexOf(from_user_id);
-        if(idx!=-1) chatLogs[login_user_id].userIdSort.splice(idx,1);
-        chatLogs[login_user_id].userIdSort.unshift(from_user_id);
-
-        if(!chatLogs[login_user_id][from_user_id]){
-            const msg_contents = [data.msg_content];
-            if(!addTypes.includes(type)) msg_contents.unshift(time) 
-            chatLogs[login_user_id][from_user_id]={
-                user_id:  data?.user_id,
-                user_name:  data?.user_name,
-                f_user_name_remark: data?.f_user_name_remark,
-                avatar:  data?.avatar,
-                msg_contents: msg_contents,
+            if(!data.msg_content) return;
+            const addTypes = ['addFriendsApply','addFriendApplyReply'];
+            const time = {
+                type: 'time',
+                created_at: data?.msg_content?.created_at,
             }
-        }else if(chatLogs[login_user_id][from_user_id]){
-            const msg_contents = [...chatLogs[login_user_id][from_user_id].msg_contents];
-            if(!addTypes.includes(type)){
-                const finalRowMsg = getFinalRowMsg(msg_contents);
-                const minute = dayjs(data?.msg_content?.created_at).diff(finalRowMsg.created_at,'minute');
-                if(['acceptAddFriends'].includes(type)){
-                    msg_contents.unshift(time); 
-                    msg_contents.push({
-                        type: 'des',
-                        des: '以上是打招呼的内容'
-                    })
-                }else if(minute>3) {
-                    msg_contents.push(time); 
+            if(!chatLogs[login_user_id]){
+                chatLogs[login_user_id] = {
+                    userIdSort: [from_user_id]
+                };
+                const msg_contents = [data.msg_content];
+                if(!addTypes.includes(type))  msg_contents.unshift(time);
+                chatLogs[login_user_id][from_user_id] = {
+                    user_id:  data?.user_id,
+                    user_name:  data?.user_name,
+                    f_user_name_remark: data?.f_user_name_remark,
+                    avatar:  data?.avatar, 
+                    msg_contents: msg_contents,
+                }
+                
+            }else{
+                if(!Array.isArray(chatLogs[login_user_id].userIdSort)){
+                    chatLogs[login_user_id].userIdSort = [];
+                }
+                const idx = chatLogs[login_user_id].userIdSort.indexOf(from_user_id);
+                if(idx!=-1) chatLogs[login_user_id].userIdSort.splice(idx,1);
+                chatLogs[login_user_id].userIdSort.unshift(from_user_id);
+
+                if(!chatLogs[login_user_id][from_user_id]){
+                    const msg_contents = [data.msg_content];
+                    if(!addTypes.includes(type)) msg_contents.unshift(time) 
+                    chatLogs[login_user_id][from_user_id]={
+                        user_id:  data?.user_id,
+                        user_name:  data?.user_name,
+                        f_user_name_remark: data?.f_user_name_remark,
+                        avatar:  data?.avatar,
+                        msg_contents: msg_contents,
+                    }
+                }else if(chatLogs[login_user_id][from_user_id]){
+                    const msg_contents = [...chatLogs[login_user_id][from_user_id].msg_contents];
+                    if(!addTypes.includes(type)){
+                        const finalRowMsg = getFinalRowMsg(msg_contents);
+                        const minute = dayjs(data?.msg_content?.created_at).diff(finalRowMsg.created_at,'minute');
+                        if(['acceptAddFriends'].includes(type)){
+                            msg_contents.unshift(time); 
+                            msg_contents.push({
+                                type: 'des',
+                                des: '以上是打招呼的内容'
+                            })
+                        }else if(minute>3) {
+                            msg_contents.push(time); 
+                        }
+                    }
+                    msg_contents.push(data.msg_content);
+                    chatLogs[login_user_id][from_user_id] = {
+                        ...chatLogs[login_user_id][from_user_id],
+                        msg_contents: msg_contents,
+                        user_id:  data?.user_id,
+                        user_name:  data?.user_name,
+                        f_user_name_remark: data?.f_user_name_remark,
+                        avatar:  data?.avatar,
+                    }
                 }
             }
-            msg_contents.push(data.msg_content);
-            chatLogs[login_user_id][from_user_id] = {
-                ...chatLogs[login_user_id][from_user_id],
-                msg_contents: msg_contents,
-                user_id:  data?.user_id,
-                user_name:  data?.user_name,
-                f_user_name_remark: data?.f_user_name_remark,
-                avatar:  data?.avatar,
-            }
-        }
-    }
+            resolve({
+                error: 0
+            })
+        })
+    })
 }
 
 export async function chatListPageMsgCount(chatLogs:any={}) {
