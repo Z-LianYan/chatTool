@@ -202,7 +202,10 @@ const ChatListPage = ({
 
    
     {
-      !userIdSort.length && <Text style={styles.emptyContent}>没有聊天记录</Text>
+      !userIdSort.length && <Text style={{
+        ...styles.emptyContent,
+        color: MyThemed[colorScheme||'light'].ftCr2
+      }}>没有聊天记录</Text>
     }
 
     

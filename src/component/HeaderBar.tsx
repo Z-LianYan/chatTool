@@ -46,7 +46,6 @@ import {
 import PropTypes, { number } from 'prop-types';
 // import { useHeaderHeight } from '@react-navigation/elements';
 
-import { get_film_hot } from '../api/film';
 type TypeProps = {
   title?:number|string|Element,
   style?:object,

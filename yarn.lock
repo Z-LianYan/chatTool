@@ -5707,6 +5707,11 @@ react-native-update@^8.1.0:
   dependencies:
     nanoid "^3.3.3"
 
+react-native-video@^6.0.0-alpha.11:
+  version "6.0.0-alpha.11"
+  resolved "https://registry.npmmirror.com/react-native-video/-/react-native-video-6.0.0-alpha.11.tgz#4f104ffa24eec5c0f8e314dd11a4dace3c8464c6"
+  integrity sha512-Z1FqIkNBqQWdBVKoh5WlmM01LIVhxlOsddKVV9IzMJ3EDl8PAU4ln7hdo85RHCHhgWSHzathPDo0UK7gPB48MA==
+
 react-native-vision-camera@^3.6.6:
   version "3.6.6"
   resolved "https://registry.npmmirror.com/react-native-vision-camera/-/react-native-vision-camera-3.6.6.tgz#c018c21566e7a6cbfe8078cb8e7430bb2d54b301"

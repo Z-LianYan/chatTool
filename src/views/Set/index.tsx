@@ -63,7 +63,12 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
           style: "cancel"
         },
         { text: "确定", onPress: async () => {
-          await login_out();
+          try{
+            await login_out();
+          }catch(err){
+
+          }
+          
           AppStore.setUserInfo(null);
           navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
           navigation.replace('LoginPage',{

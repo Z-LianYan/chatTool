@@ -107,10 +107,11 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         resolve(200);
       }
       if(['not-determined'].includes(microphonePermission)){//您的应用尚未请求用户许可
-        const newCameraPermission = await Camera.getMicrophonePermissionStatus()
-        if(['denied'].includes(newCameraPermission)) resolve(400);
-        if(['granted'].includes(newCameraPermission)) resolve(200);
-        if(['restricted'].includes(newCameraPermission)) {
+        const requestMicrophonePermission = await Camera.requestMicrophonePermission();
+        console.log('newCameraPermission===>>>',requestMicrophonePermission)
+        if(['denied'].includes(requestMicrophonePermission)) resolve(400);
+        if(['granted'].includes(requestMicrophonePermission)) resolve(200);
+        if(['restricted'].includes(requestMicrophonePermission)) {
           Alert.alert(
             "权限申请",
             "您的应用程序无法使用麦克风，因为该功能已受到限制",
@@ -228,7 +229,8 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
                       console.log('0000----',use_ref.current.isCapture);
 
                       const res = await onUseMicrophonePermission();
-                      if(res!=200) return;
+                      console.log('res===000>>>',res);
+                      if(res!=200) return use_ref.current.isCapture = false;
                       onCapture()
                     }}
                     onPressOut={async ()=>{

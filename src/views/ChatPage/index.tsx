@@ -282,7 +282,7 @@ const ChatPage = ({
       const msg_contents = chatLogs[params?.user_id].msg_contents||[];
       console.log('1234567890--==666',msg_rows)
       for(const _item of msg_rows){
-        if(['img'].includes(_item?.msg_type)){
+        if(['img','video'].includes(_item?.msg_type)){
           const upload_res:any = await uploadImage(_item.file);
           if(upload_res.error===0) {
             _item.msg_content = upload_res.uri
@@ -460,8 +460,10 @@ const ChatPage = ({
         const assets = result.assets||[];
         const msgRows = [];
         for(const item of assets){
+          const index = item.uri.lastIndexOf('.');
+          const suffix = item.uri.slice(index);
           msgRows.push({
-            msg_type: 'img',
+            msg_type: [suffix].includes('.mp4')?'video':'img',
             msg_content: item.uri,
             file: item
           })

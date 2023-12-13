@@ -36,6 +36,7 @@
     "react-native-safe-area-context": "^4.7.1",
     "react-native-screens": "^3.23.0",
     "react-native-update": "^8.1.0",
+    "react-native-video": "^6.0.0-alpha.11",
     "react-native-vision-camera": "^3.6.6",
     "react-timer-mixin": "^0.13.4",
     "rebound": "^0.1.0",

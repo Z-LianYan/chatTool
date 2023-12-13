@@ -51,6 +51,8 @@ import { searchFriends } from '../../api/friends';
 import { runInAction } from 'mobx';
 import { conformsTo } from 'lodash';
 import ImageViewer from '../../component/ImageViewer';
+import Video, {VideoRef} from 'react-native-video';
+import ImageVideo from '../../component/ImageVideo';
 
 const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMsg,params}:any,ref:any) => {
   const use_ref = useRef<any>();
@@ -60,6 +62,8 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
   const user = chatLogs[params?.user_id]||{}
   const msg_contents = user.msg_contents||[];
   const refImageViewer:{current:any} = useRef();
+
+  const videoRef:{current:any} = useRef<VideoRef>(null);
 
   useEffect(()=>{
     
@@ -199,11 +203,25 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   }}
                 >{item.msg_content}</Text>
               }
-              {
-                ['img'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
+
+{
+                ['img','video'].includes(item?.msg_type) && <ImageVideo item={item} onClick={()=>{
+                  console.log("it");
+                  if(['img'].includes(item?.msg_type)){
+                    refImageViewer.current.open({
+                      index: imgs.findIndex((it:any)=>it.url==item.msg_content),
+                      imgs: imgs
+                    })
+                  }
+                }}/>
+              }
+              {/* {
+                ['img','video'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
                 onPress={()=>{
+                  // console.log('---------00000',imgs.findIndex((it:any)=>it.url==item.msg_content),item.msg_content,imgs);
+                  // return;
                   refImageViewer.current.open({
-                    index:0,
+                    index: imgs.findIndex((it:any)=>it.url==item.msg_content),
                     imgs: imgs,
                   })
                 }}>
@@ -215,7 +233,37 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   }} 
                   source={{uri: item.msg_content}}/>
                 </TouchableOpacity>
-              }
+              } */}
+              {/* {
+                
+                ['video'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
+                onPress={()=>{
+                  console.log('12345')
+                  videoRef.current.presentFullscreenPlayer()
+                }}>
+                  <Video 
+                    // poster=""//视频加载时显示的图像
+                    paused={true}
+                    pictureInPicture={true}
+                    // Can be a URL or a local file.
+                    source={{uri: item.msg_content}}
+                    // Store reference  
+                    ref={videoRef}
+                    // Callback when remote video is buffering                                      
+                    onBuffer={(value)=>{
+                      console.log('onBuffer=====>>>',value)
+                    }}
+                    // Callback when video cannot be loaded              
+                    onError={(onError)=>{
+                      console.log('onError=====>>>',onError)
+                    }}               
+                    style={{
+                      width: 80,
+                      height: 120
+                    }}
+                  />
+                </TouchableOpacity>
+              } */}
             </Vw>
             {
               ['text'].includes(item?.msg_type) && <Vw style={{
@@ -263,25 +311,23 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   }}
                 >{item.msg_content}</Text>
               }
-              {
-                ['img'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
-                onPress={()=>{
-                  // console.log('12');
-                  // <AlbumView
-                  // style={{flex: 1}}
-                  // control={true}
-                  // images={[
-                  //   require('../../assets/image/address-book-activate.png'),
-                  //   require('../../assets/image/friendCircle.png'),
-                  // ]}
-                  // thumbs={[
-                  //   require('../../assets/image/address-book-activate.png'),
-                  //   require('../../assets/image/friendCircle.png'),
-                  // ]}
-                  // />
 
+              {
+                ['img','video'].includes(item?.msg_type) && <ImageVideo item={item} onClick={()=>{
+                  console.log("it");
+                  if(['img'].includes(item?.msg_type)){
+                    refImageViewer.current.open({
+                      index: imgs.findIndex((it:any)=>it.url==item.msg_content),
+                      imgs: imgs
+                    })
+                  }
+                }}/>
+              }
+              {/* {
+                ['img','video'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
+                onPress={()=>{
                   refImageViewer.current.open({
-                    index:0,
+                    index: imgs.findIndex((it:any)=>it.url==item.msg_content),
                     imgs: imgs
                   })
                 }}>
@@ -291,9 +337,41 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                     width: 80,
                     height: 120
                   }} 
-                  source={{uri: item.msg_content}}/>
+                  source={{uri: item.msg_content+(['video'].includes(item?.msg_type)?'?vframe/jpg/offset/0':'')}}/>
                 </TouchableOpacity>
-              }
+              } */}
+
+              {/* {
+                
+                ['video'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
+                onPress={()=>{
+                  videoRef.current.presentFullscreenPlayer()
+                  console.log('videoRef====>>>',videoRef)
+                }}>
+                  <Video 
+                    // poster=""//视频加载时显示的图像
+                    paused={true}
+                    pictureInPicture={true}
+                    
+                    // Can be a URL or a local file.
+                    source={{uri: item.msg_content}}
+                    // Store reference  
+                    ref={videoRef}
+                    // Callback when remote video is buffering                                      
+                    onBuffer={(value)=>{
+                      console.log('onBuffer=====>>>',value)
+                    }}
+                    // Callback when video cannot be loaded              
+                    onError={(onError)=>{
+                      console.log('onError=====>>>',onError)
+                    }}               
+                    style={{
+                      width: 80,
+                      height: 120
+                    }}
+                  />
+                </TouchableOpacity>
+              } */}
             </Vw>
             {
               ['text'].includes(item?.msg_type) && <Vw style={{

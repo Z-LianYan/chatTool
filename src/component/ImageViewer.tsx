@@ -23,7 +23,7 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
-  View as Viw,
+  View as Vw,
   Text as Txt,
   Modal,
   RefreshControl,
@@ -69,6 +69,7 @@ const ImageViewerComponent = ({
   const [currentIndex,setCurrentIndex] = useState(0);
   const [images,setImages] = useState([])
   useEffect(()=>{
+    // StatusBar.setHidden(true);
   })
 
   const renderStart = useCallback(()=>{
@@ -76,6 +77,7 @@ const ImageViewerComponent = ({
   },[])
 
   const open = useCallback(({imgs,index}:any)=>{
+    // StatusBar.setHidden(true);
     if(!imgs || !imgs.length) return
     setCurrentIndex(index);
     setImages(imgs);//imgs [{url:''}]
@@ -92,11 +94,7 @@ const ImageViewerComponent = ({
   }));
 
   const renderLoad = useCallback(()=>{
-    return (
-      <View style={{ marginTop: (ScreenHeight / 2) - 20 }}>
-          <ActivityIndicator animating={true} size={"large"} />
-      </View>
-  )
+    return <ActivityIndicator animating={true} size={"large"} />
   },[]);
 
   const savePhoto = useCallback((url:string)=>{
@@ -104,18 +102,22 @@ const ImageViewerComponent = ({
   },[]);
 
   return <Modal
-  animationType={"slide"}
+  animationType={"none"}// slide,fade,none
   transparent={true}
   visible={visibleModal}
-  // statusBarTranslucent={true}//确定您的模态是否应位于系统状态栏下。
+  statusBarTranslucent={true}//确定您的模态是否应位于系统状态栏下。
   onRequestClose={()=>{
     close()
   }}
   >
+    
     <ImageViewer 
+    renderIndicator={(a,b)=>{
+        return <Text style={{color:'#fff'}}></Text>
+    }}
     imageUrls={images}
     enableImageZoom={true} // 是否开启手势缩放
-    saveToLocalByLongPress={false} //是否开启长按保存
+    saveToLocalByLongPress={true} //是否开启长按保存
     index={currentIndex} // 初始显示第几张
     // failImageSource={} // 加载失败图片
     loadingRender={renderLoad}
