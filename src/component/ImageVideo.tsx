@@ -180,7 +180,8 @@ const styles = StyleSheet.create({
     tintColor: '#fff'
   },
   progressTxt:{
-    fontSize: 10
+    fontSize: 10,
+    color: '#fff'
   }
 });
 

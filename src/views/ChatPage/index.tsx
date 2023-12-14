@@ -230,6 +230,13 @@ const ChatPage = ({
   const sendMsg = useCallback(async ({
     msgRows = [],
   }:any)=>{
+    const tip = Toast.show({
+      text: '',
+      icon: <ActivityIndicator size='large' color={MyThemed[colorScheme||'light'].ctBg} />,
+      position: 'center',
+      duration: 200000,
+      modal: true
+    });
     runInAction(async()=>{
       let msg_rows = []
       for(const item of msgRows){
@@ -274,9 +281,11 @@ const ChatPage = ({
         
         
       }
+      
       setTimeout(() => {
-        scrollRef.current?.scrollToEnd()
+        scrollRef.current?.scrollToEnd();
       }, 200);
+      Toast.hide(tip);
 
       const chatLogs =  FriendsStore.chatLogs[login_user_id]||{};
       const msg_contents = chatLogs[params?.user_id].msg_contents||[];
@@ -321,7 +330,7 @@ const ChatPage = ({
       }
 
       msg_rows = [];
-      
+
     });
   },[msgContent]);
 

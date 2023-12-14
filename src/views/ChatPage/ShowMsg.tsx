@@ -51,7 +51,7 @@ import { searchFriends } from '../../api/friends';
 import { runInAction } from 'mobx';
 import { conformsTo } from 'lodash';
 import ImageViewer from '../../component/ImageViewer';
-import Video, {VideoRef} from 'react-native-video';
+import Video, {VideoRef,ResizeMode,PosterResizeModeType} from 'react-native-video';
 import ImageVideo from '../../component/ImageVideo';
 
 const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMsg,params}:any,ref:any) => {
@@ -64,7 +64,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
   const refImageViewer:{current:any} = useRef();
 
   const videoRef:{current:any} = useRef<VideoRef>(null);
-
+  const [videoSourceUri,setVideoSourceUri] = useState<string>('')
   useEffect(()=>{
     
   },[]);
@@ -213,6 +213,15 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                       imgs: imgs
                     })
                   }
+                  if(['video'].includes(item?.msg_type)){
+                    setVideoSourceUri(item?.msg_content)
+                    console.log('videoRef.current====>>>play',videoRef.current)
+                    setTimeout(() => {
+                      // videoRef.current?.resume()
+                      videoRef.current?.presentFullscreenPlayer()
+                      // videoRef.current?.play()
+                    }, 100);
+                  }
                 }}/>
               }
               {/* {
@@ -321,6 +330,13 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                       imgs: imgs
                     })
                   }
+                  if(['video'].includes(item?.msg_type)){
+                    setVideoSourceUri(item?.msg_content)
+                    // videoRef.current?.play()
+                    setTimeout(() => {
+                      videoRef.current?.presentFullscreenPlayer()
+                    }, 100);
+                  }
                 }}/>
               }
               {/* {
@@ -395,9 +411,52 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
   
 
   return <Vw>
-    <ImageViewer ref={refImageViewer}/>
     {
       renderMsg()
+    }
+    <ImageViewer ref={refImageViewer}/>
+
+    {
+      videoSourceUri && <Video 
+        resizeMode={ResizeMode.CONTAIN}
+        muted={false}//控制音频是否静音
+        posterResizeMode={PosterResizeModeType.CONTAIN}
+        poster={videoSourceUri+'?vframe/jpg/offset/0'}//视频加载时显示的图像
+        // repeat={true}
+        // paused={true}
+        // pictureInPicture={true}
+        // reportBandwidth={true}
+
+        // fullscreen={true}
+        // hideShutterView={true}
+        // Can be a URL or a local file.
+        source={{uri: videoSourceUri}}
+        // Store reference  
+        ref={videoRef}
+        controls={true}
+        // Callback when remote video is buffering                                      
+        onBuffer={(value)=>{
+          console.log('onBuffer=====>>>',value)
+        }}
+        // Callback when video cannot be loaded              
+        onError={(onError)=>{
+          console.log('onError=====>>>',onError)
+        }}  
+        onEnd={()=>{
+          console.log('onEnd=====>>>')
+        }} 
+        onFullscreenPlayerDidDismiss={()=>{
+          console.log('onFullscreenPlayerDidDismiss=====>>>')
+          // setVideoSourceUri("")
+          videoRef.current?.pause();
+          videoRef.current?.dismissFullscreenPlayer();
+        }}         
+        style={{
+          position: 'absolute'
+          // width: '100%',
+          // height: 700
+        }}
+      />
     }
   </Vw>;
 };
