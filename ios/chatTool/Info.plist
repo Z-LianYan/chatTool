@@ -8,6 +8,11 @@
 	<!-- optionally, if you want to record audio: -->
 	<key>NSMicrophoneUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your Microphone.</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>$(PRODUCT_NAME) 需要访问您的相册权限。</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>$(PRODUCT_NAME) 需要访问您的相册权限.</string>
 	
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>

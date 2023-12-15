@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.19.1",
+    "@react-native-camera-roll/camera-roll": "^7.2.1",
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/stack": "^6.3.17",
@@ -40,6 +41,7 @@
     "react-native-vision-camera": "^3.6.6",
     "react-timer-mixin": "^0.13.4",
     "rebound": "^0.1.0",
+    "rn-fetch-blob": "^0.12.0",
     "socket.io-client": "^4.7.2"
   },
   "devDependencies": {

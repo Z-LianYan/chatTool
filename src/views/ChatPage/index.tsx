@@ -18,6 +18,7 @@ import {
   View as Vw,
   Alert,
   Dimensions,
+  Keyboard,
 } from 'react-native';
 
 import { 
@@ -70,6 +71,7 @@ const ChatPage = ({
   const [msgContent,setMsgContent] = useState<string>();
   const [showSkeleton,setShowSkeleton] = useState<boolean>(true);
   const [textInputHeight,setTextInputHeight] = useState<number>(40);
+  // const [keyboardHeight,setkeyboardHeight] = useState<number>(0);
   const [showBottomOperationBtn,setShowBottomOperationBtn] = useState<boolean>(false);
   
   const login_user_id = AppStore?.userInfo?.user_id;
@@ -112,6 +114,11 @@ const ChatPage = ({
     
   });
   useEffect(()=>{
+
+    // Keyboard.addListener('keyboardDidShow', (e)=>{
+    //   console.log('keyboardDidShow===>>>',e.endCoordinates.height)
+    //   setkeyboardHeight(e.endCoordinates.height||300)
+    // })
     runInAction(()=>{
       AppStore.curRouteName = 'ChatListPage';
     });
@@ -230,6 +237,7 @@ const ChatPage = ({
   const sendMsg = useCallback(async ({
     msgRows = [],
   }:any)=>{
+    console.log('msgRows===>>>',msgRows);
     const tip = Toast.show({
       text: '',
       icon: <ActivityIndicator size='large' color={MyThemed[colorScheme||'light'].ctBg} />,
@@ -403,7 +411,8 @@ const ChatPage = ({
             if(contentSize.height>300) return;
             setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
           }}
-          onFocus={async ()=>{
+          onFocus={async (val)=>{
+            console.log('-------->>>val',val)
             setShowBottomOperationBtn(false);
             setTimeout(() => {
               scrollRef.current?.scrollToEnd()
@@ -464,15 +473,39 @@ const ChatPage = ({
 
     </Vw>
     {
-      showBottomOperationBtn && <BottomOperationBtn onSendMsg={async (result:any)=>{
+      showBottomOperationBtn && <BottomOperationBtn onSendMsg={async (result:any,type:string)=>{
+        console.log('type----->result',result,type,result.path)
+        const msgRows = [];
+        if(['camera'].includes(type)){
+          result.uri = result.path;
+          
+          const index = result.uri.lastIndexOf('.');
+          const suffix = result.uri.slice(index);
+          delete result.path;
+          msgRows.push({
+            msg_type: ['.mov','.mp4'].includes(suffix)?'video':'img',
+            msg_content: result.uri,
+            file: [result]
+          })
+          
+          console.log('type----->result----')
+
+          if(msgRows.length)  await sendMsg({
+            msgRows: msgRows
+          });
+
+          return;
+        }
+
+
         console.log('result====>>>',result);
         const assets = result.assets||[];
-        const msgRows = [];
+       
         for(const item of assets){
           const index = item.uri.lastIndexOf('.');
           const suffix = item.uri.slice(index);
           msgRows.push({
-            msg_type: [suffix].includes('.mp4')?'video':'img',
+            msg_type: ['.mov','.mp4'].includes(suffix)?'video':'img',
             msg_content: item.uri,
             file: item
           })

@@ -162,12 +162,18 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         onRecordingFinished: (video) => {
           console.log("onRecordingFinished=========>>>",video);
           use_ref.current.complete = true;
+
+          use_ref.current.callBack && use_ref.current.callBack(video)
         },
         onRecordingError: (error) => {
           console.error('onRecordingError===========>>>>>>',error)
         }
       });
+
       console.log('video======>>>',_video)
+
+     
+      
   },[]);
 
   const takePhotos = useCallback(async ()=>{
@@ -180,6 +186,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
       });
       use_ref.current.complete = true;
       console.log('photo======>>>',photo)
+      use_ref.current.callBack && use_ref.current.callBack(photo)
   },[])
 
   
@@ -239,7 +246,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
                         await camera?.current?.stopRecording()
                         use_ref.current.isCapture = false;
                       }
-                      use_ref.current.callBack && use_ref.current.callBack()
+                      // use_ref.current.callBack && use_ref.current.callBack()
                     }}
                     onPress={async ()=>{
                       takePhotos();

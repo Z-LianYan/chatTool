@@ -185,8 +185,10 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions,onSendMsg}
     onPress={async ()=>{
       const res = await onUseCameraPermission()
       if(res!=200) return;
-      camera_modal.current.open(()=>{
-        console.log('回调了====》〉》')
+      camera_modal.current.open((data:any)=>{
+        console.log('回调了====》〉》',data)
+
+        onSendMsg && onSendMsg(data,'camera');
       })
     }}>
       <Image 

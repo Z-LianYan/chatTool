@@ -2,7 +2,10 @@ import dayjs from 'dayjs';
 import store from '../store/index';
 import _ from 'lodash';
 import { runInAction } from 'mobx';
+import { Toast } from '../component/teaset';
 
+import RNFetchBlob from "rn-fetch-blob";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 const getFinalRowMsg =  function(msg_contents:any[]){
     let len = msg_contents.length-1;
     if(len<0) return null;
@@ -170,3 +173,55 @@ export function formatTime(time:string){
     }
 }
 
+
+
+
+
+export function isLocalFile (path:any) {
+    // 本地⽂件路径的常⻅前缀
+    const localFilePrefixes = ['file://', '/'];
+    // 检查⽂件路径是否以本地⽂件前缀开始
+    for (const prefix of localFilePrefixes) {
+    if (path.startsWith(prefix)) {
+    return true; // 是本地⽂件
+    }
+    }
+    // 如果不是本地⽂件前缀开头，则可能是⽹络⽂件
+    return false;
+  };
+  export async function saveToCameraRoll(imageUrl:any) {
+    if(isLocalFile(imageUrl)) {
+      console.log('哈哈哈哈😂',imageUrl)
+      // 使⽤ CameraRoll 保存图⽚到相册
+      // CameraRoll.saveToCameraRoll(imageUrl, 'photo')
+      const result:any = CameraRoll.save(imageUrl, { type: "auto" });
+      console.log('1111111---->>',result);
+      if(result){
+        console.log('1111111')
+        Toast.message('已成功保存到相册');
+      }else{
+        Toast.fail('保存失败');
+      }
+      return
+    }
+    try {
+      // const index = imageUrl.lastIndexOf('.');
+      // const suffix = imageUrl.slice(index+1);
+      // 下载⽹络图⽚到本地
+      const response = await RNFetchBlob.config({
+        fileCache: true,
+        // appendExt: suffix, // 可以根据需要更改⽂件扩展名 
+      }).fetch('GET', imageUrl);
+      const imagePath = response.path();
+      console.log("imagePath========>>>",imagePath);
+      // 将本地图⽚保存到相册
+      const result:any = CameraRoll.save(imagePath, { type: "auto" });
+      if (result) {
+        Toast.message('已成功保存到相册');
+      } else {
+        Toast.fail('保存失败');
+      }
+    } catch (error) {
+      Toast.fail('保存失败');
+    }
+  }
