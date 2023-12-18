@@ -160,13 +160,13 @@ const ChatPage = ({
       // console.log('压缩----》〉',data)
       // file = data.dist;
       try{
-        console.log('=====>>>tokenConfig----');
+        console.log('=====>>>tokenConfig----',file);
 
         const tokenConfig:any = await get_upload_qiuniu_config();
 
         console.log('=====>>>tokenConfig',tokenConfig);
         
-        const key = `public/chatLogs/${dayjs().format('YYYYMMDD')}/${dayjs().format('HHmmssSSS')+String(Math.floor(Math.random() * 10000))+getExtName(file.fileName)}`;; // 上传后文件资源名以设置的 key 为主，如果 key 为 null 或者 undefined，则文件资源名会以 hash 值作为资源名。
+        const key = `public/chatLogs/${dayjs().format('YYYYMMDD')}/${dayjs().format('HHmmssSSS')+String(Math.floor(Math.random() * 10000)) + getExtName(file.uri)}`; // 上传后文件资源名以设置的 key 为主，如果 key 为 null 或者 undefined，则文件资源名会以 hash 值作为资源名。
         let config = {
           useCdnDomain: true, //表示是否使用 cdn 加速域名，为布尔值，true 表示使用，默认为 false。
           region: qiniu.region.z2, // 根据具体提示修改上传地区,当为 null 或 undefined 时，自动分析上传域名区域
@@ -301,12 +301,14 @@ const ChatPage = ({
       for(const _item of msg_rows){
         if(['img','video'].includes(_item?.msg_type)){
           const upload_res:any = await uploadImage(_item.file);
+          console.log('upload_res===>>>',upload_res)
           if(upload_res.error===0) {
             _item.msg_content = upload_res.uri
           }else{
 
           }
         }
+        console.log('_item===>',_item)
 
         sockitIo?.getSocketIo()?.timeout(5000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误 err
           msg_type: _item?.msg_type, 
