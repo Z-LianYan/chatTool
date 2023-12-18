@@ -69,7 +69,6 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     use_ref.current = {
       callBack: callBack,
       isCapture: false,
-      complete: false
     };
     
     // const _ov = Overlay.show(overlayView);
@@ -154,7 +153,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         flash: "on",//off,on
         onRecordingFinished: (video) => {
           console.log("onRecordingFinished=========>>>",video);
-          use_ref.current.complete = true;
+          setComplete(true)
 
           use_ref.current.callBack && use_ref.current.callBack(video)
         },
@@ -170,14 +169,14 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   },[]);
 
   const takePhotos = useCallback(async ()=>{
-      // console.log('12345')
+      console.log('12345')
       const photo = await cameraRef?.current?.takePhoto({
         qualityPrioritization: 'speed',
         flash: 'on',
         enableShutterSound: false,
         enableAutoRedEyeReduction: true,
       });
-      use_ref.current.complete = true;
+      setComplete(true)
       console.log('photo======>>>',photo)
       use_ref.current.callBack && use_ref.current.callBack(photo)
   },[])
@@ -209,9 +208,10 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           device && <Camera
           ref={cameraRef}
           style={{
-            width: 300,
-            height: 300,
+            width: "100%",
+            height: "100%",
           }}
+          resizeMode='contain'
           device={device}
           isActive={true}
           photo={true}
@@ -224,9 +224,9 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         }
 
 
-        {/* <Vw style={styles.bottomBtn}>
+        <Vw style={styles.bottomBtn}>
           {
-            !use_ref.current?.complete ?  <Vw>
+            !complete ?  <Vw>
                   <Text style={styles.captureTxt}>轻触拍照，长按摄像</Text>
                   <Vw style={styles.bottomBtnWrapper}>
                     <TouchableOpacity
@@ -278,10 +278,12 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
                 activeOpacity={0.6}
                 style={styles.convertWrapper}
                 >
-                  <Text>完成</Text>
+                  <Text onPress={()=>{
+                    setComplete(false)
+                  }}>完成</Text>
             </TouchableOpacity>
           }
-        </Vw> */}
+        </Vw>
             
         <TouchableOpacity
         style={styles.closeBtnWrapper} 
@@ -306,7 +308,7 @@ const styles = StyleSheet.create({
     position:'relative',
     width: '100%',
     height: '100%',
-    // backgroundColor: 'red',
+    backgroundColor: '#000',
     justifyContent: 'center'
   },
   containerContent:{
