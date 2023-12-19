@@ -44,16 +44,24 @@ import { TextInput } from 'react-native-gesture-handler';
 import { runInAction } from 'mobx';
 
 
-import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera} from 'react-native-vision-camera';
+import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera, CameraCaptureError} from 'react-native-vision-camera';
 import { CLOSE_CIRCLE_ICON, CLOSE_FLASH, OPEN_FLASH, TURN_CAPTURE } from '../assets/image';
+import ImageViewer2 from './ImageViewer2';
 
 const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
   const use_ref = useRef<any>();
+  const imageViewer2Ref = useRef<any>();
   const colorScheme = useColorScheme();
-
+  
  
   const overlay_view_ref:{current:any} = useRef();
-  const device = useCameraDevice('back');//受权后才会有
+  const device = useCameraDevice('back',{
+    physicalDevices: [
+      'ultra-wide-angle-camera',
+      'wide-angle-camera',
+      'telephoto-camera'
+    ]
+  });//受权后才会有
   const cameraRef = useRef<Camera>(null);
 
   const [visibleModal,setVisibleModal] = useState(false)
@@ -170,29 +178,60 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
 
   const takePhotos = useCallback(async ()=>{
       console.log('12345')
-      const photo = await cameraRef?.current?.takePhoto({
-        qualityPrioritization: 'speed',
-        flash: 'on',
-        enableShutterSound: false,
-        enableAutoRedEyeReduction: true,
-      });
-      setComplete(true)
-      console.log('photo======>>>',photo)
-      use_ref.current.callBack && use_ref.current.callBack(photo)
+      try{
+        const photo = await cameraRef?.current?.takePhoto({
+          qualityPrioritization: 'speed',
+          flash: 'on',// 'auto' | 'off'
+          enableShutterSound: false,
+          enableAutoRedEyeReduction: true,
+        });
+        setComplete(true)
+        console.log('photo======>>>',photo)
+        if(!photo) return;
+        // imageViewer2Ref.current.open(()=>{
+        //   console.log('imageViewer2Ref====>>>');
+        // })
+
+        const overlayKey = <Overlay.View
+        onCloseRequest={()=>{
+          Overlay.hide(overlayKey)
+        }}
+        zIndex={123456}
+        style={{
+            alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Text style={{color: '#fff',width: 200,height:500,backgroundColor:'red'}}>123456</Text>
+        </Overlay.View>
+
+        Overlay.show(overlayKey)
+
+
+
+        // use_ref.current.callBack && use_ref.current.callBack(photo)
+      }catch(e){
+        console.log('e=====>>>',e)
+        if (e instanceof CameraCaptureError) {
+          switch (e.code) {
+            case "capture/file-io-error":
+              console.error("Failed to write photo to disk!")
+              break
+            default:
+              console.error(e)
+              break
+          }
+        }
+      }
+      
   },[])
 
-  // const overlayView = <Overlay.View
-  //   style={{alignItems: 'center', justifyContent: 'center'}}
-  //   modal={false}
-  //   overlayOpacity={1}
-  //   >
-    
-     
+  const onFocus = useCallback(async (tapEvent:any)=>{
+    console.log('tapEvent==>>',tapEvent)
+    await cameraRef?.current?.focus({
+      x: tapEvent.x,
+      y: tapEvent.y
+    })
+  },[])
 
-    
-    
-    
-  // </Overlay.View>
 
   return <Modal
   animationType={"fade"}// slide,fade,none
@@ -203,15 +242,21 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     close()
   }}>
     <TouchableOpacity activeOpacity={1} style={styles.container}>
-      <Vw style={styles.containerContent}>
+      <TouchableOpacity activeOpacity={1} style={styles.containerContent} onPress={(e:any)=>{
+        // console.log('e========>>>>',e.nativeEvent.locationX,e.nativeEvent.locationY);
+        // console.log('e========>>>>pageY',e.nativeEvent.pageX,e.nativeEvent.pageY);
+        // onFocus({
+        //   x: e.nativeEvent.locationX,
+        //   y:e.nativeEvent.locationY
+        // })
+      }}>
         {
           device && <Camera
           ref={cameraRef}
           style={{
-            width: "100%",
-            height: "100%",
+            flex: 1,
           }}
-          resizeMode='contain'
+          resizeMode='cover'
           device={device}
           isActive={true}
           photo={true}
@@ -278,9 +323,11 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
                 activeOpacity={0.6}
                 style={styles.convertWrapper}
                 >
-                  <Text onPress={()=>{
+                  <Text 
+                  onPress={()=>{
                     setComplete(false)
-                  }}>完成</Text>
+                  }}
+                  style={{color:'#fff'}}>完成</Text>
             </TouchableOpacity>
           }
         </Vw>
@@ -296,16 +343,16 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
             source={CLOSE_CIRCLE_ICON}
           />
         </TouchableOpacity>
-      </Vw>
+      </TouchableOpacity>
     </TouchableOpacity>
-  </Modal>;
 
-  
+
+    <ImageViewer2 ref={imageViewer2Ref}/>
+  </Modal>;
 };
 
 const styles = StyleSheet.create({
   container:{
-    position:'relative',
     width: '100%',
     height: '100%',
     backgroundColor: '#000',
@@ -315,13 +362,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     height: '80%',
-    // top: '50%',
-    // left: 0,
-    // right: 0,
-    // bottom: 0,
-    // marginTop: '-50%',
-    // marginLeft: "-50%",
-    backgroundColor:'red',
   },
   bottomBtn:{
     position: 'absolute',

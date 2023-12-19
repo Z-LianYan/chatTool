@@ -308,7 +308,6 @@ const ChatPage = ({
 
           }
         }
-        console.log('_item===>',_item)
 
         sockitIo?.getSocketIo()?.timeout(5000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误 err
           msg_type: _item?.msg_type, 
@@ -414,7 +413,7 @@ const ChatPage = ({
             setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
           }}
           onFocus={async (val)=>{
-            console.log('-------->>>val',val)
+            // console.log('-------->>>val',val)
             setShowBottomOperationBtn(false);
             setTimeout(() => {
               scrollRef.current?.scrollToEnd()
@@ -479,7 +478,7 @@ const ChatPage = ({
         console.log('type----->result',result,type,result.path)
         const msgRows = [];
         if(['camera'].includes(type)){
-          result.uri = result.path;
+          result.uri = `file://${result.path}`;
           
           const index = result.uri.lastIndexOf('.');
           const suffix = result.uri.slice(index);
@@ -487,10 +486,10 @@ const ChatPage = ({
           msgRows.push({
             msg_type: ['.mov','.mp4'].includes(suffix)?'video':'img',
             msg_content: result.uri,
-            file: [result]
+            file: result
           })
           
-          console.log('type----->result----')
+          console.log('type----->result----',msgRows)
 
           if(msgRows.length)  await sendMsg({
             msgRows: msgRows
