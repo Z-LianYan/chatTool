@@ -47,6 +47,8 @@ import { runInAction } from 'mobx';
 import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera, CameraCaptureError} from 'react-native-vision-camera';
 import { CLOSE_CIRCLE_ICON, CLOSE_FLASH, OPEN_FLASH, TURN_CAPTURE } from '../assets/image';
 import ImageViewer2 from './ImageViewer2';
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import { result } from 'lodash';
 
 const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
   const use_ref = useRef<any>();
@@ -65,8 +67,6 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   const cameraRef = useRef<Camera>(null);
 
   const [visibleModal,setVisibleModal] = useState(false)
-
-  const [complete,setComplete] = useState<boolean>(false)
 
   useEffect(()=>{
     
@@ -158,12 +158,18 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
 
   const onCapture = useCallback(()=>{
       const _video = cameraRef?.current?.startRecording({
-        flash: "on",//off,on
+        flash: "off",//off,on
         onRecordingFinished: (video) => {
           console.log("onRecordingFinished=========>>>",video);
-          setComplete(true)
-
-          use_ref.current.callBack && use_ref.current.callBack(video)
+          // use_ref.current.callBack && use_ref.current.callBack(video)
+          imageViewer2Ref.current.open({
+            videoUri: 'file://'+video.path,
+          },(file:any)=>{
+            console.log('imageViewer2Ref====>>>file',file);
+            use_ref.current.callBack && use_ref.current.callBack(file);
+            close();
+            
+          })
         },
         onRecordingError: (error) => {
           console.error('onRecordingError===========>>>>>>',error)
@@ -177,7 +183,6 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   },[]);
 
   const takePhotos = useCallback(async ()=>{
-      console.log('12345')
       try{
         const photo = await cameraRef?.current?.takePhoto({
           qualityPrioritization: 'speed',
@@ -185,29 +190,19 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           enableShutterSound: false,
           enableAutoRedEyeReduction: true,
         });
-        setComplete(true)
         console.log('photo======>>>',photo)
         if(!photo) return;
-        // imageViewer2Ref.current.open(()=>{
-        //   console.log('imageViewer2Ref====>>>');
-        // })
+        imageViewer2Ref.current.open({
+          imgUri: 'file://'+photo.path,
+        },(file:any)=>{
+          console.log('imageViewer2Ref====>>>file',file);
 
-        const overlayKey = <Overlay.View
-        onCloseRequest={()=>{
-          Overlay.hide(overlayKey)
-        }}
-        zIndex={123456}
-        style={{
-            alignItems: 'center', justifyContent: 'center',
-        }}>
-          <Text style={{color: '#fff',width: 200,height:500,backgroundColor:'red'}}>123456</Text>
-        </Overlay.View>
-
-        Overlay.show(overlayKey)
+          use_ref.current.callBack && use_ref.current.callBack(file)
 
 
-
-        // use_ref.current.callBack && use_ref.current.callBack(photo)
+          close();
+          
+        })
       }catch(e){
         console.log('e=====>>>',e)
         if (e instanceof CameraCaptureError) {
@@ -270,66 +265,55 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
 
 
         <Vw style={styles.bottomBtn}>
-          {
-            !complete ?  <Vw>
-                  <Text style={styles.captureTxt}>轻触拍照，长按摄像</Text>
-                  <Vw style={styles.bottomBtnWrapper}>
-                    <TouchableOpacity
-                    activeOpacity={0.6}
-                    style={styles.flashIconWrapper}
-                    >
-                      <Image 
-                        style={styles.flashIcon} 
-                        source={OPEN_FLASH}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      activeOpacity={0.6}
-                      style={styles.captureBtn}
-                      onLongPress={async ()=>{
-                        
-                        // await setCapture(true)
-                        use_ref.current.isCapture = true;
-                        console.log('0000----',use_ref.current.isCapture);
-
-                        const res = await onUseMicrophonePermission();
-                        console.log('res===000>>>',res);
-                        if(res!=200) return use_ref.current.isCapture = false;
-                        onCapture()
-                      }}
-                      onPressOut={async ()=>{
-                        console.log('0000',use_ref.current.isCapture,use_ref.current);
-                        if(use_ref.current.isCapture){
-                          await cameraRef?.current?.stopRecording()
-                          use_ref.current.isCapture = false;
-                        }
-                        // use_ref.current.callBack && use_ref.current.callBack()
-                      }}
-                      onPress={async ()=>{
-                        takePhotos();
-                      }}
-                    ></TouchableOpacity>
-                    <TouchableOpacity
-                    activeOpacity={0.6}
-                    style={styles.convertWrapper}
-                    >
-                      <Image 
-                        style={styles.convertIcon} 
-                        source={TURN_CAPTURE}
-                      />
-                    </TouchableOpacity>
-                  </Vw>
-            </Vw>:<TouchableOpacity
+          <Vw>
+            <Text style={styles.captureTxt}>轻触拍照，长按摄像</Text>
+            <Vw style={styles.bottomBtnWrapper}>
+              <TouchableOpacity
+              activeOpacity={0.6}
+              style={styles.flashIconWrapper}
+              >
+                <Image 
+                  style={styles.flashIcon} 
+                  source={OPEN_FLASH}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
                 activeOpacity={0.6}
-                style={styles.convertWrapper}
-                >
-                  <Text 
-                  onPress={()=>{
-                    setComplete(false)
-                  }}
-                  style={{color:'#fff'}}>完成</Text>
-            </TouchableOpacity>
-          }
+                style={styles.captureBtn}
+                onLongPress={async ()=>{
+                  
+                  // await setCapture(true)
+                  use_ref.current.isCapture = true;
+                  console.log('0000----',use_ref.current.isCapture);
+
+                  const res = await onUseMicrophonePermission();
+                  console.log('res===000>>>',res);
+                  if(res!=200) return use_ref.current.isCapture = false;
+                  onCapture()
+                }}
+                onPressOut={async ()=>{
+                  console.log('0000',use_ref.current.isCapture,use_ref.current);
+                  if(use_ref.current.isCapture){
+                    await cameraRef?.current?.stopRecording()
+                    use_ref.current.isCapture = false;
+                  }
+                  // use_ref.current.callBack && use_ref.current.callBack()
+                }}
+                onPress={async ()=>{
+                  takePhotos();
+                }}
+              ></TouchableOpacity>
+              <TouchableOpacity
+              activeOpacity={0.6}
+              style={styles.convertWrapper}
+              >
+                <Image 
+                  style={styles.convertIcon} 
+                  source={TURN_CAPTURE}
+                />
+              </TouchableOpacity>
+            </Vw>
+          </Vw>
         </Vw>
             
         <TouchableOpacity

@@ -156,9 +156,23 @@ const ImageViewerComponent = ({
     if(Platform.OS === "ios") {
       CameraRoll.save(url, { type: "auto" })
     }else{
-      saveToCameraRoll(url)
+      await saveToCameraRoll(url)
+    }
+    let saveResult = null;
+    if(Platform.OS === "ios") {
+      saveResult = await CameraRoll.save(url, { type: "auto" })
+    }else{
+      const  res:any = await saveToCameraRoll(url);
+      if(res.error===0) saveResult = res.data;
     }
 
+    if(saveResult) {
+      Toast.message('已成功保存到相册');
+    }else{
+      Toast.fail('保存失败');
+    }
+
+    close()
     // saveToCameraRoll(url)
   
   },[]);
@@ -228,6 +242,9 @@ const ImageViewerComponent = ({
       // renderFooter={()=>{
       //   return <Text style={{height: 15,width: '100%',borderWidth:1,borderColor:"red"}}>1234567</Text>
       // }}
+      renderImage={(props)=>{
+        return <Image {...props} resizeMode="contain"/>
+      }}
       menus={({cancel,saveToLocal})=>{
         return <TouchableOpacity style={{
           flex:1,

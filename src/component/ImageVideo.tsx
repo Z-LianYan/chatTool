@@ -49,7 +49,7 @@ import {
 } from './teaset/index';
 
 import ImageViewer from 'react-native-image-zoom-viewer';
-import { ALBUM_ICON, LOADING_ICON, PLAY_ICON } from '../assets/image';
+import { ALBUM_ICON, LOADING_ICON, PLAY_ICON, YU_JIA_ZAI } from '../assets/image';
 // import CameraRoll from "@react-native-community/cameraroll";
 type TypeProps = {
   // index?: number,
@@ -106,7 +106,7 @@ const ImageVideo = ({
         height: "100%",
         borderRadius: 8
       }} 
-      // defaultSource={ALBUM_ICON}
+      defaultSource={YU_JIA_ZAI}
       source={{uri: item.msg_content+(['video'].includes(item?.msg_type)?'?vframe/jpg/offset/0':'')}}
       // source={{uri: item.msg_content}}
       onProgress={({ nativeEvent: { loaded, total } })=>{//下载进度的回调事件。
@@ -131,7 +131,9 @@ const ImageVideo = ({
       style={styles.operatorWrapper}
       activeOpacity={0.6}
       onPress={()=>{
-        onClick && onClick()
+        // if(progress>=100){
+          onClick && onClick()
+        // }
       }}>
         {
           loading && <Image 
@@ -159,6 +161,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 120,
     position: 'relative',
+    borderRadius: 8,
     
   },
   operatorWrapper:{

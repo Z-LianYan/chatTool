@@ -171,7 +171,8 @@ const ChatPage = ({
           useCdnDomain: true, //表示是否使用 cdn 加速域名，为布尔值，true 表示使用，默认为 false。
           region: qiniu.region.z2, // 根据具体提示修改上传地区,当为 null 或 undefined 时，自动分析上传域名区域
         };
-        
+        // {"extension": null, "fileSize": null, "filename": null, "height": null, "orientation": null, "playableDuration": null, "uri": "file:///storage/emulated/0/Pictures/mrousavy6875371565517295052.jpg", "width": null}
+        // {"fileName": "wx_camera_1703045056368.jpg", "fileSize": 1222393, "height": 1919, "originalPath": "/storage/emulated/0/Pictures/WeiXin/wx_camera_1703045056368.jpg", "type": "image/jpeg", "uri": "file:///data/user/0/com.chattool/cache/rn_image_picker_lib_temp_a2930efe-3b53-4f8d-b598-3a2df507c7e1.jpg", "width": 1080}
         let putExtra = {
           // fname: file.fileName, //文件原文件名
           // params: {}, //用来放置自定义变量
@@ -305,10 +306,19 @@ const ChatPage = ({
           if(upload_res.error===0) {
             _item.msg_content = upload_res.uri
           }else{
-
+            runInAction(()=>{
+              for(const item of msg_contents){
+                if(_item?.msg_unique_id == item.msg_unique_id) {
+                  item.sendIng = false;
+                  item.sendStatus = 'serverNotCallBack';
+                  // if(['img'].includes(item?.msg_type)) delete item.file;
+                }
+              }
+            });
+            return;
           }
         }
-
+        console.log('_item====>>>',_item);
         sockitIo?.getSocketIo()?.timeout(5000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误 err
           msg_type: _item?.msg_type, 
           msg_content: _item.msg_content,
@@ -342,6 +352,8 @@ const ChatPage = ({
 
     });
   },[msgContent]);
+
+  
 
   return <Vw style={styles.container}>
     {
@@ -475,14 +487,13 @@ const ChatPage = ({
     </Vw>
     {
       showBottomOperationBtn && <BottomOperationBtn onSendMsg={async (result:any,type:string)=>{
-        console.log('type----->result',result,type,result.path)
+        console.log('type----->result',result,type,result.uri)
         const msgRows = [];
         if(['camera'].includes(type)){
-          result.uri = `file://${result.path}`;
+          // result.uri = `file://${result.path}`;
           
           const index = result.uri.lastIndexOf('.');
           const suffix = result.uri.slice(index);
-          delete result.path;
           msgRows.push({
             msg_type: ['.mov','.mp4'].includes(suffix)?'video':'img',
             msg_content: result.uri,

@@ -204,7 +204,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                 >{item.msg_content}</Text>
               }
 
-{
+              {
                 ['img','video'].includes(item?.msg_type) && <ImageVideo item={item} onClick={()=>{
                   console.log("it");
                   if(['img'].includes(item?.msg_type)){
@@ -224,55 +224,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   }
                 }}/>
               }
-              {/* {
-                ['img','video'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
-                onPress={()=>{
-                  // console.log('---------00000',imgs.findIndex((it:any)=>it.url==item.msg_content),item.msg_content,imgs);
-                  // return;
-                  refImageViewer.current.open({
-                    index: imgs.findIndex((it:any)=>it.url==item.msg_content),
-                    imgs: imgs,
-                  })
-                }}>
-                  <Image 
-                  resizeMode="cover"
-                  style={{
-                    width: 80,
-                    height: 120
-                  }} 
-                  source={{uri: item.msg_content}}/>
-                </TouchableOpacity>
-              } */}
-              {/* {
-                
-                ['video'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
-                onPress={()=>{
-                  console.log('12345')
-                  videoRef.current.presentFullscreenPlayer()
-                }}>
-                  <Video 
-                    // poster=""//视频加载时显示的图像
-                    paused={true}
-                    pictureInPicture={true}
-                    // Can be a URL or a local file.
-                    source={{uri: item.msg_content}}
-                    // Store reference  
-                    ref={videoRef}
-                    // Callback when remote video is buffering                                      
-                    onBuffer={(value)=>{
-                      console.log('onBuffer=====>>>',value)
-                    }}
-                    // Callback when video cannot be loaded              
-                    onError={(onError)=>{
-                      console.log('onError=====>>>',onError)
-                    }}               
-                    style={{
-                      width: 80,
-                      height: 120
-                    }}
-                  />
-                </TouchableOpacity>
-              } */}
+              
             </Vw>
             {
               ['text'].includes(item?.msg_type) && <Vw style={{
@@ -339,55 +291,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   }
                 }}/>
               }
-              {/* {
-                ['img','video'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
-                onPress={()=>{
-                  refImageViewer.current.open({
-                    index: imgs.findIndex((it:any)=>it.url==item.msg_content),
-                    imgs: imgs
-                  })
-                }}>
-                  <Image 
-                  resizeMode="cover"
-                  style={{
-                    width: 80,
-                    height: 120
-                  }} 
-                  source={{uri: item.msg_content+(['video'].includes(item?.msg_type)?'?vframe/jpg/offset/0':'')}}/>
-                </TouchableOpacity>
-              } */}
-
-              {/* {
-                
-                ['video'].includes(item?.msg_type) && <TouchableOpacity activeOpacity={0.6}
-                onPress={()=>{
-                  videoRef.current.presentFullscreenPlayer()
-                  console.log('videoRef====>>>',videoRef)
-                }}>
-                  <Video 
-                    // poster=""//视频加载时显示的图像
-                    paused={true}
-                    pictureInPicture={true}
-                    
-                    // Can be a URL or a local file.
-                    source={{uri: item.msg_content}}
-                    // Store reference  
-                    ref={videoRef}
-                    // Callback when remote video is buffering                                      
-                    onBuffer={(value)=>{
-                      console.log('onBuffer=====>>>',value)
-                    }}
-                    // Callback when video cannot be loaded              
-                    onError={(onError)=>{
-                      console.log('onError=====>>>',onError)
-                    }}               
-                    style={{
-                      width: 80,
-                      height: 120
-                    }}
-                  />
-                </TouchableOpacity>
-              } */}
+              
             </Vw>
             {
               ['text'].includes(item?.msg_type) && <Vw style={{
