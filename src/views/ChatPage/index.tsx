@@ -162,6 +162,7 @@ const ChatPage = ({
       try{
         console.log('=====>>>tokenConfig----',file);
 
+
         const tokenConfig:any = await get_upload_qiuniu_config();
 
         console.log('=====>>>tokenConfig',tokenConfig);
@@ -170,9 +171,14 @@ const ChatPage = ({
         let config = {
           useCdnDomain: true, //表示是否使用 cdn 加速域名，为布尔值，true 表示使用，默认为 false。
           region: qiniu.region.z2, // 根据具体提示修改上传地区,当为 null 或 undefined 时，自动分析上传域名区域
+
+          // retryCount: 6,
+          // concurrentRequestLimit: 6,
+          // checkByMD5: true,
+          // forceDirect: true,
+          // chunkSize: 1024
         };
-        // {"extension": null, "fileSize": null, "filename": null, "height": null, "orientation": null, "playableDuration": null, "uri": "file:///storage/emulated/0/Pictures/mrousavy6875371565517295052.jpg", "width": null}
-        // {"fileName": "wx_camera_1703045056368.jpg", "fileSize": 1222393, "height": 1919, "originalPath": "/storage/emulated/0/Pictures/WeiXin/wx_camera_1703045056368.jpg", "type": "image/jpeg", "uri": "file:///data/user/0/com.chattool/cache/rn_image_picker_lib_temp_a2930efe-3b53-4f8d-b598-3a2df507c7e1.jpg", "width": 1080}
+       
         let putExtra = {
           // fname: file.fileName, //文件原文件名
           // params: {}, //用来放置自定义变量

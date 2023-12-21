@@ -203,9 +203,11 @@ const ImageViewer2 = ({
           // "type": "video/mp4", 
           // "uri": "file:///data/user/0/com.chattool/cache/rn_image_picker_lib_temp_debbe12e-6df3-4561-ad07-390194c7ae12.mp4", 
           // "width": 1080}
+          const idx = item?.node?.image?.uri.lastIndexOf('/');
+
 
           ref2.current.callBack && ref2.current.callBack({
-            fileName: "1234999999",
+            fileName: item?.node?.image?.uri.slice(idx+1),
             type: item?.node?.type, 
             uri: item?.node?.image?.uri
           });

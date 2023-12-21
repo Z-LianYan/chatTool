@@ -154,13 +154,13 @@ const ImageViewerComponent = ({
       return;
     }
     if(Platform.OS === "ios") {
-      CameraRoll.save(url, { type: "auto" })
+      CameraRoll.save(url)
     }else{
       await saveToCameraRoll(url)
     }
     let saveResult = null;
     if(Platform.OS === "ios") {
-      saveResult = await CameraRoll.save(url, { type: "auto" })
+      saveResult = await CameraRoll.save(url)
     }else{
       const  res:any = await saveToCameraRoll(url);
       if(res.error===0) saveResult = res.data;

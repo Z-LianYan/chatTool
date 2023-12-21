@@ -58,11 +58,11 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
  
   const overlay_view_ref:{current:any} = useRef();
   const device = useCameraDevice('back',{
-    physicalDevices: [
-      'ultra-wide-angle-camera',
-      'wide-angle-camera',
-      'telephoto-camera'
-    ]
+    // physicalDevices: [
+    //   'ultra-wide-angle-camera',
+    //   'wide-angle-camera',
+    //   'telephoto-camera'
+    // ]
   });//受权后才会有
   const cameraRef = useRef<Camera>(null);
 
