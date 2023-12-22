@@ -208,6 +208,7 @@ const ImageViewer2 = ({
 
           ref2.current.callBack && ref2.current.callBack({
             fileName: item?.node?.image?.uri.slice(idx+1),
+            // fileSize: 137086484,
             type: item?.node?.type, 
             uri: item?.node?.image?.uri
           });

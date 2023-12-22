@@ -46,7 +46,7 @@ const _ = require('lodash');
 import * as qiniu from 'qiniu-js';
 import { element } from 'prop-types';
 import ShowMsg from './ShowMsg';
-
+import Qiniu,{Auth,ImgOps,Conf,Rs,Rpc} from 'react-native-qiniu';
 // import { 
 //   View,
 //   Text
@@ -160,7 +160,7 @@ const ChatPage = ({
       // console.log('压缩----》〉',data)
       // file = data.dist;
       try{
-        console.log('=====>>>tokenConfig----',file);
+        console.log('=====>>>tokenConfig----file',file);
 
 
         const tokenConfig:any = await get_upload_qiuniu_config();
@@ -176,7 +176,7 @@ const ChatPage = ({
           // concurrentRequestLimit: 6,
           // checkByMD5: true,
           // forceDirect: true,
-          // chunkSize: 1024
+          // chunkSize:100
         };
        
         let putExtra = {
@@ -185,35 +185,42 @@ const ChatPage = ({
           // mimeType: ["image/png", "image/jpeg", "image/gif"], //用来限制上传文件类型，为 null 时表示不对文件类型限制；限制类型放到数组里： ["image/png", "image/jpeg", "image/gif"]
         };
         console.log("key", key);
-        let observable = qiniu.upload(
-          file,
-          key,
-          tokenConfig.upload_token,
-          putExtra,
-          config
-        );
-        observable.subscribe({
-          next: (res) => {
-            // 主要用来展示进度
-            let total:any = res.total;
-            // setPercent(total.percent.toFixed(0))
-          },
-          error: (err:any) => {
-            // 失败报错信息
-            // Toast.fail(err.message);
-            console.log('上传七牛======err',err);
-            resolve({
-              error: 401,
-            })
-          },
-          complete: (res) => {
-            console.log('res======成功',res);
-            resolve({
-              error: 0,
-              uri: tokenConfig.static_host+res.key
-            })
-          },
-        });
+        // let observable = qiniu.upload(
+        //   file,
+        //   key,
+        //   tokenConfig.upload_token,
+        //   putExtra,
+        //   config
+        // );
+        // observable.subscribe({
+        //   next: (res) => {
+        //     console.log('res----next',res);
+        //     // 主要用来展示进度
+        //     let total:any = res.total;
+        //     // setPercent(total.percent.toFixed(0))
+        //   },
+        //   error: (err:any) => {
+        //     // 失败报错信息
+        //     // Toast.fail(err.message);
+        //     console.log('上传七牛======err',err);
+        //     resolve({
+        //       error: 401,
+        //     })
+        //   },
+        //   complete: (res) => {
+        //     console.log('res======成功',res);
+        //     resolve({
+        //       error: 0,
+        //       uri: tokenConfig.static_host+res.key
+        //     })
+        //   },
+        // });
+        console.log("file.uri==============>>>",file.uri);
+
+        Rpc.uploadFile(file.uri, tokenConfig.upload_token,{key:key},(e:any,xhr:any)=>{
+          console.log("e==============>>>",e)
+          console.log("xhr===========>>>",xhr)
+        })
 
       }catch(err:any){
         console.log('err=====>>>',err)

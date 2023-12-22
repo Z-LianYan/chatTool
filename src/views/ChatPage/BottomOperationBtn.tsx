@@ -84,7 +84,6 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions,onSendMsg}
       if(result && result.assets) {
         // await uploadImage(result.assets)
       }
-
       // callBack && callBack(result)
       onSendMsg && onSendMsg(result);
     }finally{
