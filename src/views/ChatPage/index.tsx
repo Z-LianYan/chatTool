@@ -46,7 +46,6 @@ const _ = require('lodash');
 import * as qiniu from 'qiniu-js';
 import { element } from 'prop-types';
 import ShowMsg from './ShowMsg';
-import Qiniu,{Auth,ImgOps,Conf,Rs,Rpc} from 'react-native-qiniu';
 // import { 
 //   View,
 //   Text
@@ -216,11 +215,28 @@ const ChatPage = ({
         //   },
         // });
         console.log("file.uri==============>>>",file.uri);
+        const formData = new FormData();
+        formData.append("key", key);
+        formData.append("token", tokenConfig.upload_token);
+        formData.append("file", {
+          uri: "file:///data/user/0/com.chattool/cache/rn_image_picker_lib_temp_5bd74380-b979-4d3e-be53-222c6285df54.mp4", 
+          type: "application/octet-stream", 
+          name: "rn_image_picker_lib_temp_5bd74380-b979-4d3e-be53-222c6285df54"
+        });
 
-        Rpc.uploadFile(file.uri, tokenConfig.upload_token,{key:key},(e:any,xhr:any)=>{
-          console.log("e==============>>>",e)
-          console.log("xhr===========>>>",xhr)
-        })
+        fetch('http://up-z2.qiniu.com/',{
+          method:'POST',
+          headers:{
+              'Content-Type':'multipart/form-data',
+          },
+          body:formData,
+        }).then((response) => response.json()).then((responseData)=>{
+          console.log('responseData=',responseData);
+        }).catch((error)=>{
+          console.error('error=',error)
+        });
+
+
 
       }catch(err:any){
         console.log('err=====>>>',err)
