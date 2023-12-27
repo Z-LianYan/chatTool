@@ -185,30 +185,7 @@ const ImageViewer2 = ({
       console.log('edges====>>>',id,edges)
       for(const item of edges){
         if(item.node.id==id) {
-          // {
-          //   "fileName": "wx_camera_1703045056368.jpg", 
-          //   "fileSize": 1222393, 
-          //   "height": 1919, 
-          //   "originalPath": "/storage/emulated/0/Pictures/WeiXin/wx_camera_1703045056368.jpg", 
-          // "type": "image/jpeg", 
-          // "uri": "file:///data/user/0/com.chattool/cache/rn_image_picker_lib_temp_a2930efe-3b53-4f8d-b598-3a2df507c7e1.jpg", 
-          // "width": 1080}
-
-
-          // {"bitrate": 17973149, 
-          // "duration": 10, 
-          // "fileName": "VID_20231220_172320.mp4", 
-          // "fileSize": 24053989, "height": 1920, 
-          // "originalPath": "/storage/emulated/0/DCIM/Camera/VID_20231220_172320.mp4", 
-          // "type": "video/mp4", 
-          // "uri": "file:///data/user/0/com.chattool/cache/rn_image_picker_lib_temp_debbe12e-6df3-4561-ad07-390194c7ae12.mp4", 
-          // "width": 1080}
-          const idx = item?.node?.image?.uri.lastIndexOf('/');
-
-
           ref2.current.callBack && ref2.current.callBack({
-            fileName: item?.node?.image?.uri.slice(idx+1),
-            // fileSize: 137086484,
             type: item?.node?.type, 
             uri: item?.node?.image?.uri
           });

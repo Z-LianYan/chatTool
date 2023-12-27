@@ -148,16 +148,6 @@ const ChatPage = ({
   }
   const uploadImage = useCallback(async (file:any)=>{
     return new Promise(async (resolve,reject)=>{
-      // console.log('压缩----》〉前',file)
-      // const data:any = await qiniu.compressImage(file, {
-      //   quality: 0.92,
-      //   noCompressIfLarger: true
-      // }).then(datas=>{
-      //   console.log('压缩----》〉datas',datas)
-      // }); 
-
-      // console.log('压缩----》〉',data)
-      // file = data.dist;
       try{
         console.log('=====>>>tokenConfig----file',file);
 
@@ -170,12 +160,6 @@ const ChatPage = ({
         let config = {
           useCdnDomain: true, //表示是否使用 cdn 加速域名，为布尔值，true 表示使用，默认为 false。
           region: qiniu.region.z2, // 根据具体提示修改上传地区,当为 null 或 undefined 时，自动分析上传域名区域
-
-          // retryCount: 6,
-          // concurrentRequestLimit: 6,
-          // checkByMD5: true,
-          // forceDirect: true,
-          // chunkSize:100
         };
        
         let putExtra = {
@@ -183,81 +167,50 @@ const ChatPage = ({
           // params: {}, //用来放置自定义变量
           // mimeType: ["image/png", "image/jpeg", "image/gif"], //用来限制上传文件类型，为 null 时表示不对文件类型限制；限制类型放到数组里： ["image/png", "image/jpeg", "image/gif"]
         };
-        console.log("key", key);
-        // let observable = qiniu.upload(
-        //   file,
-        //   key,
-        //   tokenConfig.upload_token,
-        //   putExtra,
-        //   config
-        // );
-        // observable.subscribe({
-        //   next: (res) => {
-        //     console.log('res----next',res);
-        //     // 主要用来展示进度
-        //     let total:any = res.total;
-        //     // setPercent(total.percent.toFixed(0))
-        //   },
-        //   error: (err:any) => {
-        //     // 失败报错信息
-        //     // Toast.fail(err.message);
-        //     console.log('上传七牛======err',err);
-        //     resolve({
-        //       error: 401,
-        //     })
-        //   },
-        //   complete: (res) => {
-        //     console.log('res======成功',res);
-        //     resolve({
-        //       error: 0,
-        //       uri: tokenConfig.static_host+res.key
-        //     })
-        //   },
-        // });
-        console.log("file.uri==============>>>",file.uri);
-        const formData = new FormData();
-        formData.append("key", key);
-        formData.append("token", tokenConfig.upload_token);
-        formData.append("file", {
-          uri: "file:///data/user/0/com.chattool/cache/rn_image_picker_lib_temp_5bd74380-b979-4d3e-be53-222c6285df54.mp4", 
-          type: "application/octet-stream", 
-          name: "rn_image_picker_lib_temp_5bd74380-b979-4d3e-be53-222c6285df54"
-        });
-
-        fetch('http://up-z2.qiniu.com/',{
-          method:'POST',
-          headers:{
-              'Content-Type':'multipart/form-data',
+        const idx1 = file.uri.lastIndexOf('/')
+        const str = file.uri.slice(idx1+1);
+        const idx2 = str.lastIndexOf('.');
+        const name = str.slice(0,idx2);
+        let observable = qiniu.upload(
+          {
+            uri: file.uri, 
+            type: file.type, 
+            name
+          },//文件格式需要这样子否则上传会失败
+          key,
+          tokenConfig.upload_token,
+          putExtra,
+          config
+        );
+        observable.subscribe({
+          next: (res) => {
+            console.log('res----next',res);
+            // 主要用来展示进度
+            let total:any = res.total;
+            // setPercent(total.percent.toFixed(0))
           },
-          body:formData,
-        }).then((response) => response.json()).then((responseData)=>{
-          console.log('responseData=',responseData);
-        }).catch((error)=>{
-          console.error('error=',error)
+          error: (err:any) => {
+            // 失败报错信息
+            // Toast.fail(err.message);
+            console.log('上传七牛======err',err);
+            resolve({
+              error: 401,
+            })
+          },
+          complete: (res) => {
+            console.log('res======成功',res);
+            resolve({
+              error: 0,
+              uri: tokenConfig.static_host+res.key
+            })
+          },
         });
-
-
-
       }catch(err:any){
         console.log('err=====>>>',err)
         resolve({
           error: 401,
           msg: err.messgae
         });
-        // Alert.alert(
-        //   "错误提示",
-        //   '上传失败！！！',
-        //   [
-        //     {
-        //       text: "",
-        //       onPress: () => {
-
-        //       },
-        //       style: "cancel"
-        //     },
-        //     { text: "关闭", onPress: async () => {}}
-        //   ]
-        // );
       }finally{
 
       }

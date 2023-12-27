@@ -54,19 +54,22 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   const use_ref = useRef<any>();
   const imageViewer2Ref = useRef<any>();
   const colorScheme = useColorScheme();
+  const [flash,setFlash] = useState<string>("off");//off,on
   
  
   const overlay_view_ref:{current:any} = useRef();
-  const device = useCameraDevice('back',{
+  const backDevice = useCameraDevice('back',{
     // physicalDevices: [
     //   'ultra-wide-angle-camera',
     //   'wide-angle-camera',
     //   'telephoto-camera'
     // ]
   });//受权后才会有
+  const frontDevice = useCameraDevice('front');
+  const [device,setDevice] = useState('back');
   const cameraRef = useRef<Camera>(null);
 
-  const [visibleModal,setVisibleModal] = useState(false)
+  const [visibleModal,setVisibleModal] = useState(false);
 
   useEffect(()=>{
     
@@ -158,7 +161,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
 
   const onCapture = useCallback(()=>{
       const _video = cameraRef?.current?.startRecording({
-        flash: "off",//off,on
+        flash: flash,//"off"| "auto"|"on"
         onRecordingFinished: (video) => {
           console.log("onRecordingFinished=========>>>",video);
           // use_ref.current.callBack && use_ref.current.callBack(video)
@@ -180,15 +183,16 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
 
      
       
-  },[]);
+  },[flash]);
 
   const takePhotos = useCallback(async ()=>{
       try{
         const photo = await cameraRef?.current?.takePhoto({
           qualityPrioritization: 'speed',
-          flash: 'on',// 'auto' | 'off'
+          flash: flash,// "off"| "auto"|"on"
           enableShutterSound: false,
           enableAutoRedEyeReduction: true,
+          enableAutoStabilization: true
         });
         console.log('photo======>>>',photo)
         if(!photo) return;
@@ -196,12 +200,8 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           imgUri: 'file://'+photo.path,
         },(file:any)=>{
           console.log('imageViewer2Ref====>>>file',file);
-
-          use_ref.current.callBack && use_ref.current.callBack(file)
-
-
+          use_ref.current.callBack && use_ref.current.callBack(file);
           close();
-          
         })
       }catch(e){
         console.log('e=====>>>',e)
@@ -217,7 +217,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         }
       }
       
-  },[])
+  },[flash])
 
   const onFocus = useCallback(async (tapEvent:any)=>{
     console.log('tapEvent==>>',tapEvent)
@@ -227,9 +227,9 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     })
   },[])
 
-
+  
   return <Modal
-  animationType={"fade"}// slide,fade,none
+  animationType={"none"}// slide,fade,none
   transparent={true}
   visible={visibleModal}
   statusBarTranslucent={true}//确定您的模态是否应位于系统状态栏下。
@@ -249,10 +249,13 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           device && <Camera
           ref={cameraRef}
           style={{
-            flex: 1,
+            // flex: 1,
+            width: '100%',
+            height: 300
           }}
-          resizeMode='cover'
-          device={device}
+          resizeMode='contain'
+          zoom={2.0}
+          device={device==='back'?backDevice:frontDevice}
           isActive={true}
           photo={true}
           video={true}
@@ -269,13 +272,22 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
             <Text style={styles.captureTxt}>轻触拍照，长按摄像</Text>
             <Vw style={styles.bottomBtnWrapper}>
               <TouchableOpacity
-              activeOpacity={0.6}
-              style={styles.flashIconWrapper}
-              >
-                <Image 
-                  style={styles.flashIcon} 
-                  source={OPEN_FLASH}
-                />
+              activeOpacity={1}
+              style={styles.flashIconWrapper}>
+                {
+                  device=='back' && <TouchableOpacity
+                    activeOpacity={0.6}
+                    onPress={()=>{
+                      console.log('123456',flash)
+                      setFlash(flash=='on'?'off':'on');
+                    }}
+                    >
+                      <Image 
+                        style={styles.flashIcon} 
+                        source={flash=='off'?CLOSE_FLASH:OPEN_FLASH}
+                      />
+                  </TouchableOpacity>
+                }
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.6}
@@ -306,6 +318,9 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
               <TouchableOpacity
               activeOpacity={0.6}
               style={styles.convertWrapper}
+              onPress={()=>{
+                setDevice(device=='back'?'front':'back');
+              }}
               >
                 <Image 
                   style={styles.convertIcon} 
@@ -340,7 +355,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#000',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    position: 'relative',
   },
   containerContent:{
     position: 'relative',
@@ -365,7 +381,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   flashIconWrapper:{
-
+    width: 30,
+    height: 30,
   },
   flashIcon:{
     width: 30,
