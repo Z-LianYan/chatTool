@@ -37,7 +37,6 @@ import {
 import PropTypes, { number, string } from 'prop-types';
 import NavigationBar from '../component/NavigationBar';
 import { login_out } from "../api/user";
-import { edit_user_info, get_user_info } from "../api/user";
 var ScreenObj = Dimensions.get('window');
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { INIT_PAGE } from '../assets/image';

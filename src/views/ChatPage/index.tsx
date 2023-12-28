@@ -176,7 +176,7 @@ const ChatPage = ({
             uri: file.uri, 
             type: file.type, 
             name
-          },//文件格式需要这样子否则上传会失败
+          } as any,//文件格式需要这样子否则上传会失败
           key,
           tokenConfig.upload_token,
           putExtra,

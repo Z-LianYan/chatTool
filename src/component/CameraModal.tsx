@@ -16,7 +16,8 @@ import {
   View as Vw,
   Text as Tx,
   Modal,
-  Linking
+  Linking,
+  Dimensions
 } from 'react-native';
 import { 
   NavigationContainer,
@@ -44,12 +45,13 @@ import { TextInput } from 'react-native-gesture-handler';
 import { runInAction } from 'mobx';
 
 
-import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera, CameraCaptureError} from 'react-native-vision-camera';
+import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera, CameraCaptureError, useCameraFormat} from 'react-native-vision-camera';
 import { CLOSE_CIRCLE_ICON, CLOSE_FLASH, OPEN_FLASH, TURN_CAPTURE } from '../assets/image';
 import ImageViewer2 from './ImageViewer2';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { result } from 'lodash';
 
+import StaticSafeAreaInsets from 'react-native-static-safe-area-insets'
 const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
   const use_ref = useRef<any>();
   const imageViewer2Ref = useRef<any>();
@@ -58,15 +60,44 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   
  
   const overlay_view_ref:{current:any} = useRef();
-  const backDevice = useCameraDevice('back',{
-    // physicalDevices: [
-    //   'ultra-wide-angle-camera',
-    //   'wide-angle-camera',
-    //   'telephoto-camera'
-    // ]
-  });//受权后才会有
-  const frontDevice = useCameraDevice('front');
-  const [device,setDevice] = useState('back');
+  // const backDevice = useCameraDevice('back',{
+  //   // physicalDevices: [
+  //   //   'ultra-wide-angle-camera',
+  //   //   'wide-angle-camera',
+  //   //   'telephoto-camera'
+  //   // ]
+  // });//受权后才会有
+  // const frontDevice = useCameraDevice('front');
+  // const [device,setDevice] = useState('back');
+
+  const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('back')
+  let device = useCameraDevice(cameraPosition)
+
+  const [targetFps, setTargetFps] = useState(60);
+
+  const SCREEN_WIDTH = Dimensions.get('window').width
+  const SCREEN_HEIGHT = Platform.select<number>({
+    android: Dimensions.get('screen').height - StaticSafeAreaInsets.safeAreaInsetsBottom,
+    ios: Dimensions.get('window').height,
+  }) as number
+
+
+  const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
+  // const format = useCameraFormat(device=='back'?backDevice:frontDevice, [
+  //   { fps: targetFps },
+  //   { videoAspectRatio: screenAspectRatio },
+  //   { videoResolution: 'max' },
+  //   { photoAspectRatio: screenAspectRatio },
+  //   { photoResolution: 'max' },
+  // ])
+
+  const format = useCameraFormat(device, [
+    { 
+      videoResolution: { width: 1280, height: 720 },
+      // PixelFormat: 'native' 
+    },
+    { fps: 30 }
+  ])
   const cameraRef = useRef<Camera>(null);
 
   const [visibleModal,setVisibleModal] = useState(false);
@@ -160,6 +191,9 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
 
 
   const onCapture = useCallback(()=>{
+    console.log('开始录制视频==========》〉》〉')
+    if(!cameraRef?.current) return; 
+    try{
       const _video = cameraRef?.current?.startRecording({
         flash: flash,//"off"| "auto"|"on"
         onRecordingFinished: (video) => {
@@ -178,21 +212,28 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           console.error('onRecordingError===========>>>>>>',error)
         }
       });
-
+  
       console.log('video======>>>',_video)
 
-     
-      
+    }catch(err){
+
+    }
   },[flash]);
 
   const takePhotos = useCallback(async ()=>{
       try{
+        if(!cameraRef?.current) return; 
         const photo = await cameraRef?.current?.takePhoto({
+          // qualityPrioritization: 'speed',
+          // flash: flash,// "off"| "auto"|"on"
+          // enableShutterSound: false,
+          // enableAutoRedEyeReduction: true,
+          // enableAutoStabilization: true
+
           qualityPrioritization: 'speed',
           flash: flash,// "off"| "auto"|"on"
+          quality: 90,
           enableShutterSound: false,
-          enableAutoRedEyeReduction: true,
-          enableAutoStabilization: true
         });
         console.log('photo======>>>',photo)
         if(!photo) return;
@@ -227,7 +268,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     })
   },[])
 
-  
+  // console.log('backDevice====>>',backDevice)
   return <Modal
   animationType={"none"}// slide,fade,none
   transparent={true}
@@ -248,18 +289,19 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         {
           device && <Camera
           ref={cameraRef}
+          format={format}
           style={{
-            // flex: 1,
-            width: '100%',
-            height: 300
+            flex: 1,
+            // width: '100%',
+            // height: 300
           }}
           resizeMode='contain'
-          zoom={2.0}
-          device={device==='back'?backDevice:frontDevice}
+          zoom={1.0}
+          device={device}
           isActive={true}
           photo={true}
           video={true}
-          audio={false}
+          audio={true}
           onInitialized={()=>{
             console.log('onInitialized====>>>')
           }}
@@ -275,7 +317,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
               activeOpacity={1}
               style={styles.flashIconWrapper}>
                 {
-                  device=='back' && <TouchableOpacity
+                  cameraPosition=='back' && <TouchableOpacity
                     activeOpacity={0.6}
                     onPress={()=>{
                       console.log('123456',flash)
@@ -304,9 +346,14 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
                   onCapture()
                 }}
                 onPressOut={async ()=>{
-                  console.log('0000',use_ref.current.isCapture,use_ref.current);
+                  console.log('0000',use_ref.current.isCapture,cameraRef?.current?.stopRecording);
                   if(use_ref.current.isCapture){
-                    await cameraRef?.current?.stopRecording()
+                    try{
+                      await cameraRef?.current?.stopRecording();
+                    }catch(err){
+                      console.log("stopRecording======>>>",err);
+                    }
+                    
                     use_ref.current.isCapture = false;
                   }
                   // use_ref.current.callBack && use_ref.current.callBack()
@@ -319,7 +366,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
               activeOpacity={0.6}
               style={styles.convertWrapper}
               onPress={()=>{
-                setDevice(device=='back'?'front':'back');
+                setCameraPosition(cameraPosition=='back'?'front':'back');
               }}
               >
                 <Image 
