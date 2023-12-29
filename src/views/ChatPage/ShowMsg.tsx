@@ -356,7 +356,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
           videoRef.current?.dismissFullscreenPlayer();
         }}         
         style={{
-          position: 'absolute'
+          // position: 'absolute'
           // width: '100%',
           // height: 700
         }}

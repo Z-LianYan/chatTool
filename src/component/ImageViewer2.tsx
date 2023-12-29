@@ -147,8 +147,8 @@ const ImageViewer2 = ({
   },[])
   const close = useCallback(()=>{
     setVisibleModal(false);
-    
-    
+    setImgUri('')
+    setVideoUri('')
     // if(Platform.OS == "android") StatusBar.setBackgroundColor(MyThemed[colorScheme||'light'].bg);
     // Overlay.show((this as any).overlayKey)
 

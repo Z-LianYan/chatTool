@@ -22,7 +22,8 @@ import {
 import { 
   NavigationContainer,
   DarkTheme,
-  DefaultTheme, 
+  DefaultTheme,
+  useIsFocused 
 } from '@react-navigation/native';
 import { 
   View,
@@ -39,9 +40,9 @@ import {
   Overlay,
   Label
 } from './teaset/index';
-import PropTypes, { number } from 'prop-types';
+import PropTypes, { any, number } from 'prop-types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TextInput } from 'react-native-gesture-handler';
+import { TextInput,PinchGestureHandler, PinchGestureHandlerGestureEvent, TapGestureHandler } from 'react-native-gesture-handler';
 import { runInAction } from 'mobx';
 
 
@@ -51,7 +52,7 @@ import ImageViewer2 from './ImageViewer2';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { result } from 'lodash';
 
-import StaticSafeAreaInsets from 'react-native-static-safe-area-insets'
+
 const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
   const use_ref = useRef<any>();
   const imageViewer2Ref = useRef<any>();
@@ -73,30 +74,15 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('back')
   let device = useCameraDevice(cameraPosition)
 
-  const [targetFps, setTargetFps] = useState(60);
-
-  const SCREEN_WIDTH = Dimensions.get('window').width
-  const SCREEN_HEIGHT = Platform.select<number>({
-    android: Dimensions.get('screen').height - StaticSafeAreaInsets.safeAreaInsetsBottom,
-    ios: Dimensions.get('window').height,
-  }) as number
-
-
-  const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
-  // const format = useCameraFormat(device=='back'?backDevice:frontDevice, [
-  //   { fps: targetFps },
-  //   { videoAspectRatio: screenAspectRatio },
-  //   { videoResolution: 'max' },
-  //   { photoAspectRatio: screenAspectRatio },
-  //   { photoResolution: 'max' },
-  // ])
+  const isActive = useIsFocused()
 
   const format = useCameraFormat(device, [
     { 
       videoResolution: { width: 1280, height: 720 },
-      // PixelFormat: 'native' 
+      photoResolution: { width: 1280, height: 720 },
+      pixelFormat: 'native' 
     },
-    { fps: 30 }
+    { fps: 60 }
   ])
   const cameraRef = useRef<Camera>(null);
 
@@ -190,13 +176,17 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   },[]);
 
 
-  const onCapture = useCallback(()=>{
+  const onCapture = useCallback(async ()=>{
     console.log('开始录制视频==========》〉》〉')
-    if(!cameraRef?.current) return; 
+    use_ref.current.isCapture = true;
+    console.log('0000----',use_ref.current.isCapture);
+    const res = await onUseMicrophonePermission();
+    if(res!=200) return use_ref.current.isCapture = false;
+    if(!cameraRef?.current) return;
     try{
-      const _video = cameraRef?.current?.startRecording({
+      const _video = await cameraRef?.current?.startRecording({
         flash: flash,//"off"| "auto"|"on"
-        onRecordingFinished: (video) => {
+        onRecordingFinished: (video:any) => {
           console.log("onRecordingFinished=========>>>",video);
           // use_ref.current.callBack && use_ref.current.callBack(video)
           imageViewer2Ref.current.open({
@@ -208,10 +198,10 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
             
           })
         },
-        onRecordingError: (error) => {
+        onRecordingError: (error:any) => {
           console.error('onRecordingError===========>>>>>>',error)
         }
-      });
+      } as any);
   
       console.log('video======>>>',_video)
 
@@ -234,7 +224,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           flash: flash,// "off"| "auto"|"on"
           quality: 90,
           enableShutterSound: false,
-        });
+        } as any);
         console.log('photo======>>>',photo)
         if(!photo) return;
         imageViewer2Ref.current.open({
@@ -287,25 +277,41 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         // })
       }}>
         {
-          device && <Camera
-          ref={cameraRef}
-          format={format}
-          style={{
-            flex: 1,
-            // width: '100%',
-            // height: 300
-          }}
-          resizeMode='contain'
-          zoom={1.0}
-          device={device}
-          isActive={true}
-          photo={true}
-          video={true}
-          audio={true}
-          onInitialized={()=>{
-            console.log('onInitialized====>>>')
-          }}
-          />
+          <PinchGestureHandler onGestureEvent={(data)=>({
+            onStart: (_:any, context:any) => {
+              console.log('onStart====>>>',context)
+              // context.startZoom = zoom.value
+            },
+            onActive: (event:any, context:any) => {
+              console.log('onActive====>>>',context)
+
+              // we're trying to map the scale gesture to a linear zoom here
+              // const startZoom = context.startZoom ?? 0
+              // const scale = interpolate(event.scale, [1 - 1 / SCALE_FULL_ZOOM, 1, SCALE_FULL_ZOOM], [-1, 0, 1], Extrapolate.CLAMP)
+              // zoom.value = interpolate(scale, [-1, 0, 1], [minZoom, startZoom, maxZoom], Extrapolate.CLAMP)
+            },
+          })}  enabled={isActive}>
+            <Camera
+            ref={cameraRef}
+            format={format} //不要项
+            style={{
+              flex: 1,
+              // width: '100%',
+              // height: 300
+            }}
+            resizeMode='contain'
+            zoom={1.0}
+            device={device}
+            torch={'off'}// 开启开启闪光 此项需要配置 否则 执行 cameraRef?.current?.stopRecording(); 会报错
+            isActive={isActive}
+            photo={true}
+            video={true}
+            audio={true}
+            onInitialized={()=>{
+              console.log('onInitialized====>>>')
+            }}
+            />
+          </PinchGestureHandler>
         }
 
 
@@ -335,14 +341,6 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
                 activeOpacity={0.6}
                 style={styles.captureBtn}
                 onLongPress={async ()=>{
-                  
-                  // await setCapture(true)
-                  use_ref.current.isCapture = true;
-                  console.log('0000----',use_ref.current.isCapture);
-
-                  const res = await onUseMicrophonePermission();
-                  console.log('res===000>>>',res);
-                  if(res!=200) return use_ref.current.isCapture = false;
                   onCapture()
                 }}
                 onPressOut={async ()=>{
@@ -409,6 +407,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     height: '80%',
+    backgroundColor: "red"
   },
   bottomBtn:{
     position: 'absolute',
