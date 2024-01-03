@@ -44,7 +44,7 @@ import {
 import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, LOADING_ICON, NEW_FIREND, SEND_FAIL, VIDEO_ICON } from '../../assets/image';
 
 import {launchCamera, launchImageLibrary,} from 'react-native-image-picker';
-import CameraModal from '../../component/CameraModal';
+import CameraModal from '../../component/CameraModal----';
 import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera} from 'react-native-vision-camera';
 import { formatTime } from '../../utils/tool';
 import { searchFriends } from '../../api/friends';

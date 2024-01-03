@@ -524,8 +524,6 @@ PODS:
   - RNScreens (3.29.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - RNStaticSafeAreaInsets (2.2.0):
-    - React-Core
   - SocketRocket (0.6.1)
   - SSZipArchive (2.4.3)
   - VisionCamera (3.6.17):
@@ -609,7 +607,6 @@ DEPENDENCIES:
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
-  - RNStaticSafeAreaInsets (from `../node_modules/react-native-static-safe-area-insets`)
   - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -731,8 +728,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNScreens:
     :path: "../node_modules/react-native-screens"
-  RNStaticSafeAreaInsets:
-    :path: "../node_modules/react-native-static-safe-area-insets"
   VisionCamera:
     :path: "../node_modules/react-native-vision-camera"
   Yoga:
@@ -801,7 +796,6 @@ SPEC CHECKSUMS:
   RNDeviceInfo: db5c64a060e66e5db3102d041ebe3ef307a85120
   RNGestureHandler: 32a01c29ecc9bb0b5bf7bc0a33547f61b4dc2741
   RNScreens: 3c5b9f4a9dcde752466854b6109b79c0e205dad3
-  RNStaticSafeAreaInsets: 055ddbf5e476321720457cdaeec0ff2ba40ec1b8
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   VisionCamera: 3cb14dbbf94962e123f56b3f6afe6c6fe5dac955

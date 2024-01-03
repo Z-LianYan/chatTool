@@ -72,9 +72,9 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   // const [device,setDevice] = useState('back');
 
   const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('back')
-  let device = useCameraDevice(cameraPosition)
+  const device = useCameraDevice(cameraPosition);
 
-  const isActive = useIsFocused()
+  
 
   const format = useCameraFormat(device, [
     { 
@@ -88,10 +88,13 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
 
   const [visibleModal,setVisibleModal] = useState(false);
 
-  useEffect(()=>{
-    
-  },[]);
+  // const isActive = useIsFocused();
+  const [isActive,setIsActive] = useState(false)
+  
 
+  useEffect(()=>{
+    // isActive = useIsFocused()
+  },[]);
 
   const open = useCallback(async (callBack:any)=>{
     use_ref.current = {
@@ -103,6 +106,11 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     // console.log('_ov====>>',_ov);
     // overlay_view_ref.current = _ov;
     setVisibleModal(true);
+    setTimeout(() => {
+      console.log('哈哈哈哈😄')
+      setIsActive(true)
+    }, 1000);
+    
 
   },[]);
   const close = useCallback(async()=>{
@@ -220,10 +228,12 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           // enableAutoRedEyeReduction: true,
           // enableAutoStabilization: true
 
-          qualityPrioritization: 'speed',
+          qualityPrioritization: 'quality',
           flash: flash,// "off"| "auto"|"on"
           quality: 90,
-          enableShutterSound: false,
+          enableShutterSound: true ,
+          enableAutoStabilization: true,
+          enableAutoRedEyeReduction: true,
         } as any);
         console.log('photo======>>>',photo)
         if(!photo) return;
@@ -258,6 +268,33 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     })
   },[])
 
+  const renderCamera = useCallback(()=>{
+    if(!device || !format) return;
+    return  <Camera
+      ref={cameraRef}
+      format={format} //不要项
+      style={{
+        flex: 1,
+        // width: '100%',
+        // height: 300
+      }}
+      resizeMode='contain'
+      zoom={1.0}
+      device={device}
+      torch={'off'}// 开启开启闪光 此项需要配置 否则 执行 cameraRef?.current?.stopRecording(); 会报错
+      isActive={isActive}
+      photo={true}
+      video={true}
+      audio={true}
+      onInitialized={()=>{
+        console.log('onInitialized====>>>')
+      }}
+      onError={(e)=>{
+        console.log('=======>>>>>onError',e)
+      }}
+      />
+  },[device,format])
+
   // console.log('backDevice====>>',backDevice)
   return <Modal
   animationType={"none"}// slide,fade,none
@@ -276,42 +313,9 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         //   y:e.nativeEvent.locationY
         // })
       }}>
+      
         {
-          <PinchGestureHandler onGestureEvent={(data)=>({
-            onStart: (_:any, context:any) => {
-              console.log('onStart====>>>',context)
-              // context.startZoom = zoom.value
-            },
-            onActive: (event:any, context:any) => {
-              console.log('onActive====>>>',context)
-
-              // we're trying to map the scale gesture to a linear zoom here
-              // const startZoom = context.startZoom ?? 0
-              // const scale = interpolate(event.scale, [1 - 1 / SCALE_FULL_ZOOM, 1, SCALE_FULL_ZOOM], [-1, 0, 1], Extrapolate.CLAMP)
-              // zoom.value = interpolate(scale, [-1, 0, 1], [minZoom, startZoom, maxZoom], Extrapolate.CLAMP)
-            },
-          })}  enabled={isActive}>
-            <Camera
-            ref={cameraRef}
-            format={format} //不要项
-            style={{
-              flex: 1,
-              // width: '100%',
-              // height: 300
-            }}
-            resizeMode='contain'
-            zoom={1.0}
-            device={device}
-            torch={'off'}// 开启开启闪光 此项需要配置 否则 执行 cameraRef?.current?.stopRecording(); 会报错
-            isActive={isActive}
-            photo={true}
-            video={true}
-            audio={true}
-            onInitialized={()=>{
-              console.log('onInitialized====>>>')
-            }}
-            />
-          </PinchGestureHandler>
+          renderCamera()
         }
 
 
@@ -407,7 +411,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     height: '80%',
-    backgroundColor: "red"
+    // backgroundColor: "red"
   },
   bottomBtn:{
     position: 'absolute',
