@@ -6118,6 +6118,11 @@ react-native-screens@^3.23.0:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
+react-native-static-safe-area-insets@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.npmmirror.com/react-native-static-safe-area-insets/-/react-native-static-safe-area-insets-2.2.0.tgz#dd86b6a38f43964fac8df8c0e6bc8e062527786c"
+  integrity sha512-TLTW2e2kRK3COSK8gMZzwp4wHguFCtcO18itDLn5av/xQblXt9ylu84o+qD9aKJCBfvtNzGOvqqTKqC5GJRZ/g==
+
 react-native-update@^8.1.0:
   version "8.4.0"
   resolved "https://registry.npmmirror.com/react-native-update/-/react-native-update-8.4.0.tgz#9dead9fa588ef2b05cfea63f99cc12a05c7a3179"
@@ -6130,10 +6135,10 @@ react-native-video@^6.0.0-alpha.11:
   resolved "https://registry.npmmirror.com/react-native-video/-/react-native-video-6.0.0-beta.3.tgz#acf7fca5feefb1ac93a6cac3dbfe0e0476714369"
   integrity sha512-WCGhl9drOr670En1taM7YF0r8obSjirnBabBaz+c0n2ZWd6EJUezI2+OtRH+/EQdtpI6hR52nTMIl42cQITEOw==
 
-react-native-vision-camera@^3.6.17:
-  version "3.6.17"
-  resolved "https://registry.npmmirror.com/react-native-vision-camera/-/react-native-vision-camera-3.6.17.tgz#5946589b0a1920dcfcc9bdffb6d2e98dad4ff4ce"
-  integrity sha512-dzkO6l6lqw48i2jQre4AXzuFZqEEzqEEVc8bfOqF4MZ/6PzdHtfjosWea0zuEdsiW13DhaFHf7XLh/+aKytx2w==
+react-native-vision-camera@3.6.16:
+  version "3.6.16"
+  resolved "https://registry.npmmirror.com/react-native-vision-camera/-/react-native-vision-camera-3.6.16.tgz#097d4428a2eb4d53f818f4ae60db7cc5e39a61cf"
+  integrity sha512-MyQ9uFNJhfQBBrZwV44ok2iviqjXpSDUYZfXkSadbsrCYjn6/7bQFaNT8GZfT8KBX+cruaO7Zu2EoZ8v2ZMCaA==
 
 react-native@0.72.3:
   version "0.72.3"

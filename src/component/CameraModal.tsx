@@ -52,6 +52,7 @@ import ImageViewer2 from './ImageViewer2';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { result } from 'lodash';
 
+import StaticSafeAreaInsets from 'react-native-static-safe-area-insets'
 
 const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
   const use_ref = useRef<any>();
@@ -71,29 +72,36 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   // const frontDevice = useCameraDevice('front');
   // const [device,setDevice] = useState('back');
 
-  const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('back')
+  const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('front')
   const device = useCameraDevice(cameraPosition);
 
-  
-
+  const SCREEN_WIDTH = Dimensions.get('window').width
+  const SCREEN_HEIGHT = Platform.select<number>({
+  android: Dimensions.get('screen').height - StaticSafeAreaInsets.safeAreaInsetsBottom,
+  ios: Dimensions.get('window').height,
+}) as number
+  const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
   const format = useCameraFormat(device, [
-    { 
-      videoResolution: { width: 1280, height: 720 },
-      photoResolution: { width: 1280, height: 720 },
-      pixelFormat: 'native' 
-    },
-    { fps: 60 }
+    // { 
+    //   videoResolution: { width: 1280, height: 720 },
+    //   photoResolution: { width: 1280, height: 720 },
+    //   pixelFormat: 'native' 
+    // },
+    { videoResolution: { width: 1280, height: 720 } },
+    { photoResolution: { width: 1280, height: 720 } },
+    { videoAspectRatio: screenAspectRatio },
+    { photoAspectRatio: screenAspectRatio },
+    { fps: 30 }
   ])
   const cameraRef = useRef<Camera>(null);
 
   const [visibleModal,setVisibleModal] = useState(false);
 
   // const isActive = useIsFocused();
-  const [isActive,setIsActive] = useState(false)
-  
+  const [isActive,setIsActive] = useState<boolean>(false);
+  const [convertCount,setConvertCount] = useState<number>(0);
 
   useEffect(()=>{
-    // isActive = useIsFocused()
   },[]);
 
   const open = useCallback(async (callBack:any)=>{
@@ -102,20 +110,15 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
       isCapture: false,
     };
     
-    // const _ov = Overlay.show(overlayView);
-    // console.log('_ov====>>',_ov);
-    // overlay_view_ref.current = _ov;
     setVisibleModal(true);
-    setTimeout(() => {
-      console.log('哈哈哈哈😄')
-      setIsActive(true)
-    }, 1000);
-    
 
   },[]);
   const close = useCallback(async()=>{
-    // Overlay.hide(overlay_view_ref.current);
     setVisibleModal(false);
+    // setIsActive(false);
+    if(use_ref.current?.timer) clearTimeout(use_ref.current?.timer);
+    setCameraPosition('front');
+    setConvertCount(0);
   },[]);
 
   // 把父组件需要调用的方法暴露出来
@@ -123,8 +126,6 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     open,
     close
   }));
-
-
 
 
   const onUseMicrophonePermission = useCallback(async ()=>{
@@ -268,32 +269,45 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     })
   },[])
 
-  const renderCamera = useCallback(()=>{
-    if(!device || !format) return;
+  const renderCamera = ()=>{
     return  <Camera
       ref={cameraRef}
-      format={format} //不要项
+      format={format} 
       style={{
         flex: 1,
-        // width: '100%',
-        // height: 300
       }}
       resizeMode='contain'
       zoom={1.0}
-      device={device}
+      device={device as any}
       torch={'off'}// 开启开启闪光 此项需要配置 否则 执行 cameraRef?.current?.stopRecording(); 会报错
       isActive={isActive}
       photo={true}
       video={true}
       audio={true}
       onInitialized={()=>{
-        console.log('onInitialized====>>>')
+        console.log('onInitialized====>>>',cameraPosition,convertCount)
+        // 3.6.17 版本必须初始化完成之后再激活，不然 android 打开会黑屏(经过测试打包后还是会黑屏)
+        // 3.6.16 打开相机画面有时会被拉伸的情况，（问题未解决）
+        setIsActive(true);
+        
+        const count = convertCount+1;
+        if(count<=1){
+          console.log('--------')
+          setCameraPosition('back');
+          setConvertCount(count);
+        }else{
+          if(use_ref.current?.timer) clearTimeout(use_ref.current?.timer);
+          use_ref.current.timer = setTimeout(() => {
+            setConvertCount(count);
+          }, 800);
+        }
+        
       }}
       onError={(e)=>{
         console.log('=======>>>>>onError',e)
       }}
-      />
-  },[device,format])
+    />
+  };
 
   // console.log('backDevice====>>',backDevice)
   return <Modal
@@ -305,6 +319,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     close()
   }}>
     <TouchableOpacity activeOpacity={1} style={styles.container}>
+      
       <TouchableOpacity activeOpacity={1} style={styles.containerContent} onPress={(e:any)=>{
         // console.log('e========>>>>',e.nativeEvent.locationX,e.nativeEvent.locationY);
         // console.log('e========>>>>pageY',e.nativeEvent.pageX,e.nativeEvent.pageY);
@@ -313,7 +328,9 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         //   y:e.nativeEvent.locationY
         // })
       }}>
-      
+        {convertCount<=1 && <Vw style={styles.containerMask}>
+          <Text style={{color:'#fff'}}>{convertCount}</Text>
+        </Vw> }
         {
           renderCamera()
         }
@@ -412,6 +429,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '80%',
     // backgroundColor: "red"
+  },
+  containerMask:{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#000',
+    zIndex: 1000
   },
   bottomBtn:{
     position: 'absolute',

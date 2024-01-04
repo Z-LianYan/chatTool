@@ -255,7 +255,7 @@ const ImageViewer2 = ({
           style={{
             // position: 'absolute'
             width: '100%',
-            minHeight: 500
+            minHeight: "80%"
           }}
         />
       }
