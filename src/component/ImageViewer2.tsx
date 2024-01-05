@@ -207,95 +207,98 @@ const ImageViewer2 = ({
   }}>
     
     
-    <Vw style={{flex:1,backgroundColor:'#000'}}>
-      {
-        imgUri && <Image 
-        resizeMode="contain"
-        style={{
-          width: '100%',
-          height: '100%'
-        }} 
-        source={{uri: imgUri}}/>
-      }
-      {
-        videoUri && <Video
-          resizeMode={ResizeMode.CONTAIN}
-          muted={false}//控制音频是否静音
-          posterResizeMode={PosterResizeModeType.CONTAIN}
-          // poster={videoUri+'?vframe/jpg/offset/0'}//视频加载时显示的图像
-          // repeat={true}
-          // paused={true}
-          // pictureInPicture={true}
-          // reportBandwidth={true}
-
-          // fullscreen={true}
-          // hideShutterView={true}
-          // Can be a URL or a local file.
-          source={{uri: videoUri}}
-          // Store reference  
-          ref={videoRef2}
-          controls={true}
-          // Callback when remote video is buffering                                      
-          onBuffer={(value)=>{
-            console.log('onBuffer=====>>>',value)
-          }}
-          // Callback when video cannot be loaded              
-          onError={(onError)=>{
-            console.log('onError=====>>>2',onError)
-          }}  
-          onEnd={()=>{
-            console.log('onEnd=====>>>')
-          }} 
-          onFullscreenPlayerDidDismiss={()=>{
-            console.log('onFullscreenPlayerDidDismiss=====>>>')
-            // setVideoSourceUri("")
-            // videoRef.current?.pause();
-            // videoRef.current?.dismissFullscreenPlayer();
-          }}         
+    <Vw style={{flex:1,backgroundColor:'#000',justifyContent:'center'}}>
+      <Vw style={{width: '100%',height: '80%',position:'relative'}}>
+        {
+          imgUri && <Image 
+          resizeMode="cover"
           style={{
-            // position: 'absolute'
-            width: '100%',
-            minHeight: "80%"
-          }}
-        />
-      }
+            flex:1,
+          }} 
+          source={{uri: imgUri}}/>
+        }
+        {
+          videoUri && <Video
+            resizeMode={ResizeMode.COVER}
+            muted={false}//控制音频是否静音
+            posterResizeMode={PosterResizeModeType.CONTAIN}
+            // poster={videoUri+'?vframe/jpg/offset/0'}//视频加载时显示的图像
+            // repeat={true}
+            // paused={true}
+            // pictureInPicture={true}
+            // reportBandwidth={true}
+
+            // fullscreen={true}
+            // hideShutterView={true}
+            // Can be a URL or a local file.
+            source={{uri: videoUri}}
+            rate={1.0}
+            repeat={true}
+            // Store reference  
+            ref={videoRef2}
+            controls={false}
+            // Callback when remote video is buffering                                      
+            onBuffer={(value)=>{
+              console.log('onBuffer=====>>>',value)
+            }}
+            // Callback when video cannot be loaded              
+            onError={(onError)=>{
+              console.log('onError=====>>>2',onError)
+            }}  
+            onEnd={()=>{
+              console.log('onEnd=====>>>',videoRef2.current)
+              // videoRef2.current?.resume()
+            }}
+            onFullscreenPlayerDidDismiss={()=>{
+              console.log('onFullscreenPlayerDidDismiss=====>>>')
+              // setVideoSourceUri("")
+              // videoRef.current?.pause();
+              // videoRef.current?.dismissFullscreenPlayer();
+            }}         
+            style={{
+              flex:1,
+            }}
+          />
+        }
+
+
+        <Vw style={{
+          position: "absolute",
+          bottom: 50,
+          left: 0,
+          right: 0,
+          justifyContent:'space-around',
+          flexDirection:'row',
+        }}>
+          <Button
+            style={{
+              width: 80,
+              height: 35,
+              borderColor: '#fff'
+            }}
+            title={'取消'}
+            type="default"
+            titleStyle={{
+              color: '#fff'
+            }}
+            onPress={() => {
+              close()
+            }}
+          />
+          <Button
+            style={{
+              width: 80,
+              height: 35,
+            }}
+            title={'完成'}
+            type="primary"
+            onPress={() => {
+              savePhoto(imgUri||videoUri);
+            }}
+          />
+        </Vw>
+      </Vw>
     </Vw>
-    <Vw style={{
-      position: "absolute",
-      bottom: 100,
-      left: 0,
-      right: 0,
-      justifyContent:'space-around',
-      flexDirection:'row',
-    }}>
-      <Button
-        style={{
-          width: 80,
-          height: 35,
-          borderColor: '#fff'
-        }}
-        title={'取消'}
-        type="default"
-        titleStyle={{
-          color: '#fff'
-        }}
-        onPress={() => {
-          close()
-        }}
-      />
-      <Button
-        style={{
-          width: 80,
-          height: 35,
-        }}
-        title={'完成'}
-        type="primary"
-        onPress={() => {
-          savePhoto(imgUri||videoUri);
-        }}
-      />
-    </Vw>
-    
   </Modal>;
 };
 

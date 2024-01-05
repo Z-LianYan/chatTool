@@ -52,26 +52,16 @@ import ImageViewer2 from './ImageViewer2';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { result } from 'lodash';
 
-import StaticSafeAreaInsets from 'react-native-static-safe-area-insets'
+import StaticSafeAreaInsets from 'react-native-static-safe-area-insets';
+import * as Progress from 'react-native-progress';
 
 const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
   const use_ref = useRef<any>();
   const imageViewer2Ref = useRef<any>();
   const colorScheme = useColorScheme();
+  const [startRecordingSecond,setStartRecordingSecond] = useState<number>(0);//off,on
   const [flash,setFlash] = useState<string>("off");//off,on
   
- 
-  const overlay_view_ref:{current:any} = useRef();
-  // const backDevice = useCameraDevice('back',{
-  //   // physicalDevices: [
-  //   //   'ultra-wide-angle-camera',
-  //   //   'wide-angle-camera',
-  //   //   'telephoto-camera'
-  //   // ]
-  // });//受权后才会有
-  // const frontDevice = useCameraDevice('front');
-  // const [device,setDevice] = useState('back');
-
   const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('front')
   const device = useCameraDevice(cameraPosition);
 
@@ -102,6 +92,10 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   const [convertCount,setConvertCount] = useState<number>(0);
 
   useEffect(()=>{
+
+    return ()=>{
+      if(use_ref.current?.timer) clearTimeout(use_ref.current?.timer);
+    }
   },[]);
 
   const open = useCallback(async (callBack:any)=>{
@@ -115,7 +109,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   },[]);
   const close = useCallback(async()=>{
     setVisibleModal(false);
-    // setIsActive(false);
+    setIsActive(false);
     if(use_ref.current?.timer) clearTimeout(use_ref.current?.timer);
     setCameraPosition('front');
     setConvertCount(0);
@@ -184,27 +178,43 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     })
   },[]);
 
+  const onStartRecord = ()=>{
+    if(use_ref.current.startRecordingTimer) clearInterval(use_ref.current.startRecordingTimer);
+    setStartRecordingSecond(0);
+    let time = 0;
+    use_ref.current.startRecordingTimer = setInterval(async ()=>{
+      if(time>=600) {
+        clearInterval(use_ref.current.startRecordingTimer);
+        use_ref.current.isCapture = false;
+        await cameraRef?.current?.stopRecording();
+      }else{
+        time += 1;
+        setStartRecordingSecond(time);
+      }
+    },100);
+  }
 
   const onCapture = useCallback(async ()=>{
-    console.log('开始录制视频==========》〉》〉')
     use_ref.current.isCapture = true;
     console.log('0000----',use_ref.current.isCapture);
     const res = await onUseMicrophonePermission();
     if(res!=200) return use_ref.current.isCapture = false;
     if(!cameraRef?.current) return;
     try{
+      console.log('开始录制视频==========》〉》〉111',startRecordingSecond)
+      
+      onStartRecord()
       const _video = await cameraRef?.current?.startRecording({
         flash: flash,//"off"| "auto"|"on"
         onRecordingFinished: (video:any) => {
-          console.log("onRecordingFinished=========>>>",video);
-          // use_ref.current.callBack && use_ref.current.callBack(video)
+          setStartRecordingSecond(0);
+          if(use_ref.current.startRecordingTimer) clearInterval(use_ref.current.startRecordingTimer);
           imageViewer2Ref.current.open({
             videoUri: 'file://'+video.path,
           },(file:any)=>{
             console.log('imageViewer2Ref====>>>file',file);
             use_ref.current.callBack && use_ref.current.callBack(file);
             close();
-            
           })
         },
         onRecordingError: (error:any) => {
@@ -223,12 +233,6 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
       try{
         if(!cameraRef?.current) return; 
         const photo = await cameraRef?.current?.takePhoto({
-          // qualityPrioritization: 'speed',
-          // flash: flash,// "off"| "auto"|"on"
-          // enableShutterSound: false,
-          // enableAutoRedEyeReduction: true,
-          // enableAutoStabilization: true
-
           qualityPrioritization: 'quality',
           flash: flash,// "off"| "auto"|"on"
           quality: 90,
@@ -236,7 +240,6 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
           enableAutoStabilization: true,
           enableAutoRedEyeReduction: true,
         } as any);
-        console.log('photo======>>>',photo)
         if(!photo) return;
         imageViewer2Ref.current.open({
           imgUri: 'file://'+photo.path,
@@ -279,23 +282,30 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
       resizeMode='contain'
       zoom={1.0}
       device={device as any}
-      torch={'off'}// 开启开启闪光 此项需要配置 否则 执行 cameraRef?.current?.stopRecording(); 会报错
+      torch={'off'}// 开启闪光 此项需要配置 否则 执行 cameraRef?.current?.stopRecording(); 会报错
       isActive={isActive}
       photo={true}
       video={true}
       audio={true}
+      onStarted={()=>{
+        console.log('=========>>>>onStarted');
+      }}
+      onStopped={()=>{
+        console.log('=========>>>>onStopped');
+      }}
       onInitialized={()=>{
         console.log('onInitialized====>>>',cameraPosition,convertCount)
         // 3.6.17 版本必须初始化完成之后再激活，不然 android 打开会黑屏(经过测试打包后还是会黑屏)
         // 3.6.16 打开相机画面有时会被拉伸的情况，（问题未解决）
         setIsActive(true);
         
+        //临时处理打开相机画面被拉伸的情况，（从前置调到后置可处理相机画面拉伸问题）
         const count = convertCount+1;
         if(count<=1){
           console.log('--------')
           setCameraPosition('back');
           setConvertCount(count);
-        }else{
+        }else if(count===2){
           if(use_ref.current?.timer) clearTimeout(use_ref.current?.timer);
           use_ref.current.timer = setTimeout(() => {
             setConvertCount(count);
@@ -308,8 +318,6 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
       }}
     />
   };
-
-  // console.log('backDevice====>>',backDevice)
   return <Modal
   animationType={"none"}// slide,fade,none
   transparent={true}
@@ -321,20 +329,13 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     <TouchableOpacity activeOpacity={1} style={styles.container}>
       
       <TouchableOpacity activeOpacity={1} style={styles.containerContent} onPress={(e:any)=>{
-        // console.log('e========>>>>',e.nativeEvent.locationX,e.nativeEvent.locationY);
-        // console.log('e========>>>>pageY',e.nativeEvent.pageX,e.nativeEvent.pageY);
-        // onFocus({
-        //   x: e.nativeEvent.locationX,
-        //   y:e.nativeEvent.locationY
-        // })
       }}>
         {convertCount<=1 && <Vw style={styles.containerMask}>
-          <Text style={{color:'#fff'}}>{convertCount}</Text>
+          <Text style={{color:'#fff'}}></Text>
         </Vw> }
         {
           renderCamera()
         }
-
 
         <Vw style={styles.bottomBtn}>
           <Vw>
@@ -365,22 +366,36 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
                   onCapture()
                 }}
                 onPressOut={async ()=>{
-                  console.log('0000',use_ref.current.isCapture,cameraRef?.current?.stopRecording);
                   if(use_ref.current.isCapture){
                     try{
                       await cameraRef?.current?.stopRecording();
                     }catch(err){
                       console.log("stopRecording======>>>",err);
                     }
-                    
                     use_ref.current.isCapture = false;
                   }
-                  // use_ref.current.callBack && use_ref.current.callBack()
                 }}
                 onPress={async ()=>{
                   takePhotos();
                 }}
-              ></TouchableOpacity>
+              >
+                <Progress.Circle 
+                  size={80} 
+                  // indeterminate={true} 
+                  // indeterminateAnimationDuration={60000}
+                  color={'green'}
+                  borderWidth={0}
+                  borderColor={'blue'}
+                  // fill={'yellow'}
+                  progress={(startRecordingSecond*1.666666)/1000}
+                  thickness={6} 
+                  showsText={false}
+                  textStyle={{
+                    color:'green',
+                    backgroundColor:'red'
+                }}/>
+              </TouchableOpacity>
+             
               <TouchableOpacity
               activeOpacity={0.6}
               style={styles.convertWrapper}
@@ -491,9 +506,6 @@ const styles = StyleSheet.create({
   closeBtn:{
     width: '100%',
     height: '100%',
-    // position: 'absolute',
-    // top: 50,
-    // left: 20,
     tintColor: '#fff'
   }
 });
