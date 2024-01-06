@@ -18,6 +18,7 @@ import {
 import ImageZoom from 'react-native-image-pan-zoom';
 import styles from './image-viewer.style';
 import { IImageInfo, IImageSize, Props, State } from './image-viewer.type';
+import Video, { PosterResizeModeType, ResizeMode } from 'react-native-video';
 
 export default class ImageViewer extends React.Component<Props, State> {
   public static defaultProps = new Props();
@@ -429,6 +430,51 @@ export default class ImageViewer extends React.Component<Props, State> {
     }
   };
 
+  renderVideo({uri: uri='',index:index=0}){
+    return <Video
+      key={"Video"+index}
+      resizeMode={ResizeMode.CONTAIN}
+      muted={false}//控制音频是否静音
+      posterResizeMode={PosterResizeModeType.CONTAIN}
+      // poster={videoUri+'?vframe/jpg/offset/0'}//视频加载时显示的图像
+      // repeat={true}
+      // paused={true}
+      // pictureInPicture={true}
+      // reportBandwidth={true}
+
+      // fullscreen={true}
+      // hideShutterView={true}
+      // Can be a URL or a local file.
+      source={{uri:uri}}
+      rate={1.0}
+      repeat={true}
+      // Store reference  
+      // ref={videoRef2}
+      controls={false}
+      // Callback when remote video is buffering                                      
+      onBuffer={(value)=>{
+        console.log('onBuffer=====>>>',value)
+      }}
+      // Callback when video cannot be loaded              
+      onError={(onError)=>{
+        console.log('onError=====>>>2',onError)
+      }}  
+      onEnd={()=>{
+        // console.log('onEnd=====>>>',videoRef2.current)
+        // videoRef2.current?.resume()
+      }}
+      onFullscreenPlayerDidDismiss={()=>{
+        console.log('onFullscreenPlayerDidDismiss=====>>>')
+        // setVideoSourceUri("")
+        // videoRef.current?.pause();
+        // videoRef.current?.dismissFullscreenPlayer();
+      }}         
+      style={{
+        flex:1,
+      }}
+    />
+  }
+
   /**
    * 获得整体内容
    */
@@ -437,7 +483,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     const screenWidth = this.width;
     const screenHeight = this.height;
 
-    const ImageElements = this.props.imageUrls.map((image, index) => {
+    const ImageElements = this.props.imageUrls.map((image, index:number) => {
       if ((this.state.currentShowIndex || 0) > index + 1 || (this.state.currentShowIndex || 0) < index - 1) {
         return <View key={index} style={{ width: screenWidth, height: screenHeight }} />;
       }
@@ -535,9 +581,13 @@ export default class ImageViewer extends React.Component<Props, State> {
           if (this.props.enablePreload) {
             this.preloadImage(this.state.currentShowIndex || 0);
           }
+
+          const index = image.props?.source?.uri.lastIndexOf('.');
+          const suffix = image.props?.source?.uri.slice(index);
+          console.log('image.props----->>>',image.props);
           return (
             <ImageZoom
-              key={index}
+              key={index+Math.random()}
               ref={el => (this.imageRefs[index] = el)}
               cropWidth={this.width}
               cropHeight={this.height}
@@ -560,7 +610,9 @@ export default class ImageViewer extends React.Component<Props, State> {
               minScale={this.props.minScale}
               maxScale={this.props.maxScale}
             >
-              {this!.props!.renderImage!(image.props)}
+              {
+                ['.mov','.mp4'].includes(suffix)? this.renderVideo({uri:image.props?.source?.uri,index}):this!.props!.renderImage!(image.props)
+              }
             </ImageZoom>
           );
         case 'fail':

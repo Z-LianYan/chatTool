@@ -63,7 +63,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
   const refImageViewer:{current:any} = useRef();
 
   const videoRef:{current:any} = useRef<VideoRef>(null);
-  const [videoSourceUri,setVideoSourceUri] = useState<string>('')
+  // const [videoSourceUri,setVideoSourceUri] = useState<string>('')
   useEffect(()=>{
     
   },[]);
@@ -144,7 +144,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
   const renderMsg = useCallback(()=>{
     const imgs:any = [];
     msg_contents.map((item:any)=>{
-      if(['img'].includes(item?.msg_type)) imgs.push({url: item.msg_content});
+      if(['img','video'].includes(item?.msg_type)) imgs.push({url: item.msg_content});
     });
     return msg_contents?.map((item:any,index:number)=>{
       if(['des'].includes(item.type)) return renderDes(item,index);
@@ -206,21 +206,21 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
               {
                 ['img','video'].includes(item?.msg_type) && <ImageVideo item={item} onClick={()=>{
                   console.log("it");
-                  if(['img'].includes(item?.msg_type)){
+                  if(['img','video'].includes(item?.msg_type)){
                     refImageViewer.current.open({
                       index: imgs.findIndex((it:any)=>it.url==item.msg_content),
                       imgs: imgs
                     })
                   }
-                  if(['video'].includes(item?.msg_type)){
-                    setVideoSourceUri(item?.msg_content)
-                    console.log('videoRef.current====>>>play',videoRef.current)
-                    setTimeout(() => {
-                      // videoRef.current?.resume()
-                      videoRef.current?.presentFullscreenPlayer()
-                      // videoRef.current?.play()
-                    }, 100);
-                  }
+                  // if(['video'].includes(item?.msg_type)){
+                  //   setVideoSourceUri(item?.msg_content)
+                  //   console.log('videoRef.current====>>>play',videoRef.current)
+                  //   setTimeout(() => {
+                  //     // videoRef.current?.resume()
+                  //     videoRef.current?.presentFullscreenPlayer()
+                  //     // videoRef.current?.play()
+                  //   }, 100);
+                  // }
                 }}/>
               }
               
@@ -275,19 +275,19 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
               {
                 ['img','video'].includes(item?.msg_type) && <ImageVideo item={item} onClick={()=>{
                   console.log("it");
-                  if(['img'].includes(item?.msg_type)){
+                  if(['img','video'].includes(item?.msg_type)){
                     refImageViewer.current.open({
                       index: imgs.findIndex((it:any)=>it.url==item.msg_content),
                       imgs: imgs
                     })
                   }
-                  if(['video'].includes(item?.msg_type)){
-                    setVideoSourceUri(item?.msg_content)
-                    // videoRef.current?.play()
-                    setTimeout(() => {
-                      videoRef.current?.presentFullscreenPlayer()
-                    }, 100);
-                  }
+                  // if(['video'].includes(item?.msg_type)){
+                  //   setVideoSourceUri(item?.msg_content)
+                  //   // videoRef.current?.play()
+                  //   setTimeout(() => {
+                  //     videoRef.current?.presentFullscreenPlayer()
+                  //   }, 100);
+                  // }
                 }}/>
               }
               
@@ -319,7 +319,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
     }
     <ImageViewer ref={refImageViewer}/>
 
-    {
+    {/* {
       videoSourceUri && <Video 
         resizeMode={ResizeMode.CONTAIN}
         muted={false}//控制音频是否静音
@@ -360,7 +360,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
           // height: 700
         }}
       />
-    }
+    } */}
   </Vw>;
 };
 
