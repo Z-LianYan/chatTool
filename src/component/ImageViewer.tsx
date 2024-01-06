@@ -53,10 +53,12 @@ import {
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 
+
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
 import RNFetchBlob from "rn-fetch-blob";
 import { saveToCameraRoll } from '../utils/tool';
+import ImageZoomViewer from './ImageZoomViewer';
 
 type TypeProps = {
   // index?: number,
@@ -234,7 +236,7 @@ const ImageViewerComponent = ({
   onRequestClose={()=>{
     close()
   }}>
-      <ImageViewer 
+      <ImageZoomViewer 
       ref={imageViewerRef}
       renderIndicator={(a,b)=>{
           return <Text style={{color:'#fff'}}></Text>

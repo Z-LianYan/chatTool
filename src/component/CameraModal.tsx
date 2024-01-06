@@ -235,7 +235,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         const photo = await cameraRef?.current?.takePhoto({
           qualityPrioritization: 'quality',
           flash: flash,// "off"| "auto"|"on"
-          quality: 90,
+          // quality: 90,
           enableShutterSound: true ,
           enableAutoStabilization: true,
           enableAutoRedEyeReduction: true,
