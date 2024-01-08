@@ -142,10 +142,10 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
     }}>{item.des}</Text>
   },[]);
   const renderMsg = useCallback(()=>{
-    const imgs:any = [];
-    msg_contents.map((item:any)=>{
-      if(['img','video'].includes(item?.msg_type)) imgs.push({url: item.msg_content});
-    });
+    // const imgs:any = [];
+    // msg_contents.map((item:any)=>{
+    //   if(['img','video'].includes(item?.msg_type)) imgs.push({url: item.msg_content});
+    // });
     return msg_contents?.map((item:any,index:number)=>{
       if(['des'].includes(item.type)) return renderDes(item,index);
       if(['time'].includes(item.type)) return renderTime(item,index);
@@ -208,8 +208,8 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   console.log("it");
                   if(['img','video'].includes(item?.msg_type)){
                     refImageViewer.current.open({
-                      index: imgs.findIndex((it:any)=>it.url==item.msg_content),
-                      imgs: imgs
+                      index: 0,
+                      imgs:   [{url: item.msg_content}]
                     })
                   }
                   // if(['video'].includes(item?.msg_type)){
@@ -277,8 +277,8 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   console.log("it");
                   if(['img','video'].includes(item?.msg_type)){
                     refImageViewer.current.open({
-                      index: imgs.findIndex((it:any)=>it.url==item.msg_content),
-                      imgs: imgs
+                      index: 0,
+                      imgs: [{url: item.msg_content}]
                     })
                   }
                   // if(['video'].includes(item?.msg_type)){

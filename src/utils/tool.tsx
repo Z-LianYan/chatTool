@@ -188,7 +188,7 @@ export function isLocalFile (path:any) {
     }
     // 如果不是本地⽂件前缀开头，则可能是⽹络⽂件
     return false;
-  };
+};
 export async function saveToCameraRoll(imageUrl:any) {
     return new Promise( async (resolve,reject)=>{
         console.log('0000--->>',imageUrl)
@@ -218,12 +218,13 @@ export async function saveToCameraRoll(imageUrl:any) {
               fileCache: true,
               // appendExt: suffix, // 可以根据需要更改⽂件扩展名 
             }).fetch('GET', imageUrl);
-            console.log('0000--->>2',imageUrl)
+            console.log('下载⽹络图⽚到本地--->>',imageUrl,response)
             
             const imagePath = response.path();
             console.log("imagePath========>>>",imagePath);
             // 将本地图⽚保存到相册
-            const result:any = await CameraRoll.save(imagePath);
+            const result:any = await CameraRoll.save(imagePath,{type: 'photo'});
+            console.log('result====>>111222',result)
             if (result) {
                 resolve({error: 0,data: result});
                 // Toast.message('已成功保存到相册');

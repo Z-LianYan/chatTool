@@ -198,12 +198,14 @@ export default class ImageViewer extends React.Component<Props, State> {
     Image.getSize(
       image.url,
       (width: number, height: number) => {
+        console.log('成功=========》〉》',width,height,image.url)
         imageStatus.width = width;
         imageStatus.height = height;
         imageStatus.status = 'success';
         saveImageSize();
       },
       () => {
+        console.log('失败=========》〉》')
         try {
           const data = (Image as any).resolveAssetSource(image.props.source);
           imageStatus.width = data.width;
@@ -482,6 +484,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     // 获得屏幕宽高
     const screenWidth = this.width;
     const screenHeight = this.height;
+    console.log('screenWidth===>>>',screenWidth,screenHeight)
 
     const ImageElements = this.props.imageUrls.map((image, index:number) => {
       if ((this.state.currentShowIndex || 0) > index + 1 || (this.state.currentShowIndex || 0) < index - 1) {
@@ -522,7 +525,10 @@ export default class ImageViewer extends React.Component<Props, State> {
           horizontalOuterRangeOffset={this.handleHorizontalOuterRangeOffset}
           responderRelease={this.handleResponderRelease}
           onMove={this.props.onMove}
-          onLongPress={this.handleLongPressWithIndex.get(index)}
+          onLongPress={()=>{
+            // this.handleLongPressWithIndex.get(index)
+            this.handleLongPress(image)
+          }}
           onClick={this.handleClick}
           onDoubleClick={this.handleDoubleClick}
           enableSwipeDown={this.props.enableSwipeDown}
@@ -541,7 +547,7 @@ export default class ImageViewer extends React.Component<Props, State> {
         case 'loading':
           return (
             <Wrapper
-              key={index}
+              key={Math.random()}
               style={{
                 ...this.styles.modalContainer,
                 ...this.styles.loadingContainer
@@ -584,10 +590,11 @@ export default class ImageViewer extends React.Component<Props, State> {
 
           const index = image.props?.source?.uri.lastIndexOf('.');
           const suffix = image.props?.source?.uri.slice(index);
-          console.log('image.props----->>>',image.props);
+          console.log('image.props----->>>this.width',this.width,this.height,image.props);
+          console.log('width,height----->>>',width,height);
           return (
             <ImageZoom
-              key={index+Math.random()}
+              key={index+"zoom"+Math.random()}
               ref={el => (this.imageRefs[index] = el)}
               cropWidth={this.width}
               cropHeight={this.height}
@@ -595,11 +602,14 @@ export default class ImageViewer extends React.Component<Props, State> {
               horizontalOuterRangeOffset={this.handleHorizontalOuterRangeOffset}
               responderRelease={this.handleResponderRelease}
               onMove={this.props.onMove}
-              onLongPress={this.handleLongPressWithIndex.get(index)}
+              onLongPress={()=>{
+                // this.handleLongPressWithIndex.get(index)
+                this.handleLongPress(image)
+              }}
               onClick={this.handleClick}
               onDoubleClick={this.handleDoubleClick}
-              imageWidth={width}
-              imageHeight={height}
+              imageWidth={['.mov','.mp4'].includes(suffix)?this.width:width}
+              imageHeight={['.mov','.mp4'].includes(suffix)?this.height:height}
               enableSwipeDown={this.props.enableSwipeDown}
               swipeDownThreshold={this.props.swipeDownThreshold}
               onSwipeDown={this.handleSwipeDown}
@@ -618,7 +628,7 @@ export default class ImageViewer extends React.Component<Props, State> {
         case 'fail':
           return (
             <Wrapper
-              key={index}
+              key={Math.random()}
               style={this.styles.modalContainer}
               imageWidth={this.props.failImageSource ? this.props.failImageSource.width : screenWidth}
               imageHeight={this.props.failImageSource ? this.props.failImageSource.height : screenHeight}

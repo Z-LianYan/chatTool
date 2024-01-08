@@ -51,7 +51,7 @@ import {
   Toast
 } from '../component/teaset/index';
 
-import ImageViewer from 'react-native-image-zoom-viewer';
+// import ImageZoomViewer from 'react-native-image-zoom-viewer';
 
 
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
@@ -155,11 +155,11 @@ const ImageViewerComponent = ({
     if (Platform.OS === "android" && !(await hasAndroidPermission())) {
       return;
     }
-    if(Platform.OS === "ios") {
-      CameraRoll.save(url)
-    }else{
-      await saveToCameraRoll(url)
-    }
+    // if(Platform.OS === "ios") {
+    //   CameraRoll.save(url)
+    // }else{
+    //   await saveToCameraRoll(url)
+    // }
     let saveResult = null;
     if(Platform.OS === "ios") {
       saveResult = await CameraRoll.save(url)
