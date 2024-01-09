@@ -166,14 +166,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                 onPress={()=>{
                   runInAction(()=>{
                     const im = msg_contents[index];
-                    // im.created_at = dayjs().format('YYYY-MM-DD HH:mm:ss');
-                    // im.sendIng = true;
-                    // im.msg_unique_id = uniqueMsgId(AppStore.userInfo?.user_id);
                     msg_contents.splice(index,1);
-                    // sendMsg({
-                    //   msg_type:'text',
-                    //   msgRow:im,
-                    // });
                     const obj = {
                       msg_type: im?.msg_type,
                       msg_content: im.msg_content,
@@ -205,7 +198,6 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
 
               {
                 ['img','video'].includes(item?.msg_type) && <ImageVideo item={item} onClick={()=>{
-                  console.log("it");
                   if(['img','video'].includes(item?.msg_type)){
                     refImageViewer.current.open({
                       index: 0,

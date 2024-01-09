@@ -2,8 +2,9 @@ import dayjs from 'dayjs';
 import store from '../store/index';
 import _ from 'lodash';
 import { runInAction } from 'mobx';
+import { Platform } from 'react-native';
 import { Toast } from '../component/teaset';
-
+import RNFS from 'react-native-fs';
 import RNFetchBlob from "rn-fetch-blob";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 const getFinalRowMsg =  function(msg_contents:any[]){
@@ -208,35 +209,71 @@ export async function saveToCameraRoll(imageUrl:any) {
                 // Toast.fail('保存失败');
             }
             return;
-          }
+        }
+        const index = imageUrl.lastIndexOf('.');
+        const suffix = imageUrl.slice(index+1);
+        let timestamp = (new Date()).getTime();//获取当前时间错
+        let random = String(((Math.random() * 1000000) | 0))//六位随机数
+        let dirs = Platform.OS === 'ios' ? RNFS.LibraryDirectoryPath : RNFS.ExternalDirectoryPath; //外部⽂件，共享⽬录的绝对路径
+        const downloadDest = `${dirs}/${timestamp + random}.${suffix}`;
+        const formUrl = imageUrl;
+        const options = {
+            fromUrl: formUrl,
+            toFile: downloadDest,
+            background: true,
+            begin: (res:any) => {
+                // console.log('begin', res);
+                // console.log('contentLength:', res.contentLength / 1024 / 1024, 'M');
+            },
+        };
 
-          try {
-            // const index = imageUrl.lastIndexOf('.');
-            // const suffix = imageUrl.slice(index+1);
-            // 下载⽹络图⽚到本地
-            const response = await RNFetchBlob.config({
-              fileCache: true,
-              // appendExt: suffix, // 可以根据需要更改⽂件扩展名 
-            }).fetch('GET', imageUrl);
-            console.log('下载⽹络图⽚到本地--->>',imageUrl,response)
+        try {
             
-            const imagePath = response.path();
-            console.log("imagePath========>>>",imagePath);
-            // 将本地图⽚保存到相册
-            const result:any = await CameraRoll.save(imagePath,{type: 'photo'});
-            console.log('result====>>111222',result)
-            if (result) {
-                resolve({error: 0,data: result});
-                // Toast.message('已成功保存到相册');
-            } else {
+
+            // // 下载⽹络图⽚到本地
+            // const response = await RNFetchBlob.config({
+            //   fileCache: true,
+            //   // appendExt: suffix, // 可以根据需要更改⽂件扩展名 
+            // }).fetch('GET', imageUrl);
+            // console.log('下载⽹络图⽚到本地--->>',imageUrl,response)
+            
+            // const imagePath = response.path();
+            // console.log("imagePath========>>>",imagePath);
+            // // 将本地图⽚保存到相册
+            // const result:any = await CameraRoll.save(imagePath,{type: 'photo'});
+            // console.log('result====>>111222',result)
+            // if (result) {
+            //     resolve({error: 0,data: result});
+            //     // Toast.message('已成功保存到相册');
+            // } else {
+            //     resolve({error: 401});
+            //     // Toast.fail('保存失败');
+            // }
+
+            console.log('downloadDest========>>>1',downloadDest)
+            console.log('imageUrl========>>>2',imageUrl)
+            const res = RNFS.downloadFile(options);
+            res.promise.then(res => { 
+                var promise = CameraRoll.save(downloadDest);
+                promise.then(function (result) {
+                    // console.log('保存成功！地址如下：',result)
+                    // Toast.message('保存成功！地址如下：'+result);
+                    resolve({error: 0,data: result});
+                }).catch(function (error) {
+                    console.log('error----保存', error);
+                    // Toast.message('保存失败！'+error);
+                    resolve({error: 401});
+                });
+                // resolve(res);
+            }).catch(err => {
+                // reject(new Error(err))
                 resolve({error: 401});
-                // Toast.fail('保存失败');
-            }
-          } catch (error) {
+            });
+        } catch (error) {
             console.log('error====>>>',error)
             resolve({error: 401});
             // Toast.fail('保存失败');
-          }
+        }
     })
     
   }

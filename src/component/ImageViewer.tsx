@@ -80,7 +80,7 @@ const ImageViewerComponent = ({
 
   const [visibleModal,setVisibleModal] = useState(false)
   const [currentIndex,setCurrentIndex] = useState(0);
-  const [images,setImages] = useState([])
+  const [images,setImages] = useState<any[]>([])
   const imageViewerRef:{current:any} = useRef();
 
   const navigation:any = useNavigation();
@@ -161,12 +161,12 @@ const ImageViewerComponent = ({
     //   await saveToCameraRoll(url)
     // }
     let saveResult = null;
-    if(Platform.OS === "ios") {
-      saveResult = await CameraRoll.save(url)
-    }else{
+    // if(Platform.OS === "ios") {
+    //   saveResult = await CameraRoll.save(url)
+    // }else{
       const  res:any = await saveToCameraRoll(url);
       if(res.error===0) saveResult = res.data;
-    }
+    // }
 
     if(saveResult) {
       Toast.message('已成功保存到相册');
@@ -326,8 +326,14 @@ const ImageViewerComponent = ({
       enableSwipeDown={false}
       // menuContext={{ "saveToLocal": "保存图片", "cancel": "取消" }}
       // onChange={(index:number) => { }} // 图片切换时触发
-      onClick={() => { // 图片单击事件
-        close()
+      onClick={(fns,idx:any) => { // 图片单击事件
+        console.log('data===>>idx',idx);
+        const url = images[idx].url;
+        const index = url.lastIndexOf('.');
+        const suffix = url.slice(index);
+        if(!['.mov','.mp4'].includes(suffix)){
+          close()
+        }
       }}
       onSave={(url:string) => { 
         savePhoto(url)

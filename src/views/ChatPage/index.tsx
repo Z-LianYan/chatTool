@@ -270,7 +270,6 @@ const ChatPage = ({
           scrollRef.current?.scrollToEnd()
         });
         
-        
       }
       
       setTimeout(() => {
@@ -301,7 +300,7 @@ const ChatPage = ({
           }
         }
         console.log('_item====>>>',_item);
-        sockitIo?.getSocketIo()?.timeout(5000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误 err
+        sockitIo?.getSocketIo()?.timeout(15000).emit('sendServerMsg',{ // 15 秒后 服务端没有回应 会返回错误 err
           msg_type: _item?.msg_type, 
           msg_content: _item.msg_content,
           to_user_id: _item.to_user_id,
@@ -439,7 +438,7 @@ const ChatPage = ({
                 inputRef.current.blur();
                 setTimeout(()=>{
                   setShowBottomOperationBtn(true);
-                });
+                },200);
               }else{
                 
                 if(showBottomOperationBtn){

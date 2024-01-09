@@ -198,7 +198,7 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions,onSendMsg}
       source={CAPTURE_ICON}/>
       <Text>拍摄</Text>
     </TouchableOpacity>
-    <TouchableOpacity 
+    {/* <TouchableOpacity 
     activeOpacity={0.6}
     style={{
       ...styles.operationItem,
@@ -211,7 +211,7 @@ const BottomOperationBtn = ({AppStore,MyThemed,navigation,AppVersions,onSendMsg}
       }} 
       source={VIDEO_ICON}/>
       <Text>视频聊天</Text>
-    </TouchableOpacity>
+    </TouchableOpacity> */}
 
     <CameraModal ref={camera_modal}/>
     

@@ -194,18 +194,23 @@ export default class ImageViewer extends React.Component<Props, State> {
       saveImageSize();
       return;
     }
-
+    const idx = image.url.lastIndexOf('.');
+    const suffix = image.url.slice(idx);
+    if(['.mov','.mp4'].includes(suffix)) {
+      imageStatus.status = 'success';
+      saveImageSize();
+      return;
+    };
     Image.getSize(
       image.url,
       (width: number, height: number) => {
-        console.log('成功=========》〉》',width,height,image.url)
         imageStatus.width = width;
         imageStatus.height = height;
         imageStatus.status = 'success';
         saveImageSize();
       },
-      () => {
-        console.log('失败=========》〉》')
+      (err) => {
+        console.log('失败=========》〉》err',err)
         try {
           const data = (Image as any).resolveAssetSource(image.props.source);
           imageStatus.width = data.width;
@@ -698,8 +703,8 @@ export default class ImageViewer extends React.Component<Props, State> {
    */
   public saveToLocal = () => {
     if (!this.props.onSave) {
-      CameraRoll.saveToCameraRoll(this.props.imageUrls[this.state.currentShowIndex || 0].url);
-      this!.props!.onSaveToCamera!(this.state.currentShowIndex);
+      // CameraRoll.saveToCameraRoll(this.props.imageUrls[this.state.currentShowIndex || 0].url);
+      // this!.props!.onSaveToCamera!(this.state.currentShowIndex);
     } else {
       this.props.onSave(this.props.imageUrls[this.state.currentShowIndex || 0].url);
     }
