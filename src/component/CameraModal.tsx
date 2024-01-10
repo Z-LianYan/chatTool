@@ -273,6 +273,7 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
   },[])
 
   const renderCamera = ()=>{
+    if(!device) return;
     return  <Camera
       ref={cameraRef}
       format={format} 

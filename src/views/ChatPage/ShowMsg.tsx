@@ -41,7 +41,7 @@ import {
   AlbumView
 } from '../../component/teaset/index';
 
-import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, LOADING_ICON, NEW_FIREND, SEND_FAIL, VIDEO_ICON } from '../../assets/image';
+import { ADD_CIR, ADD_USER, ALBUM_ICON, AUDIO_ICON, AUDIO_ICON_NOT_CIRCLE, CAPTURE_ICON, LOADING_ICON, NEW_FIREND, SEND_FAIL, VIDEO_ICON } from '../../assets/image';
 
 import {launchCamera, launchImageLibrary,} from 'react-native-image-picker';
 import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera} from 'react-native-vision-camera';
@@ -186,14 +186,32 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
             }
             <Vw style={styles.msgTextWrapper}>
               {
-                ['text'].includes(item?.msg_type) && <Text
-                  selectable={true}
+                ['text','audio'].includes(item?.msg_type) && <TouchableOpacity
+                  activeOpacity={1}
                   style={{
-                    ...styles.msgText,
+                    padding: 8,
+                    minHeight: 20,
                     backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
-                    color: MyThemed['light'].ftCr
+                    justifyContent: "center"
                   }}
-                >{item.msg_content}</Text>
+                >
+                  {
+                    ['audio'].includes(item?.msg_type)?<Image 
+                      style={{
+                        width: 20,
+                        height: 20,
+                        tintColor: MyThemed[colorScheme||'light'].ftCr,
+                        marginVertical: 0
+                      }} 
+                    source={AUDIO_ICON_NOT_CIRCLE}/>:<Text
+                    selectable={true}
+                     style={{
+                      ...styles.msgText,
+                      color: MyThemed['light'].ftCr,
+                     }}
+                    >{item.msg_content}</Text>
+                  } 
+                </TouchableOpacity>
               }
 
               {
@@ -215,10 +233,11 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   // }
                 }}/>
               }
-              
+
+             
             </Vw>
             {
-              ['text'].includes(item?.msg_type) && <Vw style={{
+              ['text','audio'].includes(item?.msg_type) && <Vw style={{//箭头
                 borderWidth: 8,
                 // borderColor: 'transparent',
                 borderLeftColor: MyThemed[colorScheme||'light'].fromMsgBg,
@@ -254,14 +273,35 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
           item.from_user_id !== AppStore.userInfo?.user_id && <Vw style={styles.msgTextContainer}>
             <Vw style={styles.msgTextWrapper}>
               {
-                ['text'].includes(item?.msg_type) && <Text
-                  selectable={true}
+                ['text','audio'].includes(item?.msg_type) && <TouchableOpacity
+                  activeOpacity={1}
+                  
                   style={{
-                    ...styles.msgText,
-                    // textAlign: 'center',
+                    padding: 8,
+                    minHeight: 20,
+                    // backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
+                    justifyContent: "center",
+
+                    // ...styles.msgText,
                     backgroundColor:  MyThemed[colorScheme||'light'].ctBg
                   }}
-                >{item.msg_content}</Text>
+                >
+                  
+                  {
+                    ['audio'].includes(item?.msg_type)?<Image 
+                      style={{
+                        width: 20,
+                        height: 20,
+                        tintColor: MyThemed[colorScheme||'light'].ftCr,
+                      }} 
+                    source={AUDIO_ICON_NOT_CIRCLE}/>:<Text 
+                    selectable={true}
+                    style={{
+                      ...styles.msgText,
+                      color: MyThemed['light'].ftCr,
+                    }}>{item.msg_content}</Text>
+                  }
+                </TouchableOpacity>
               }
 
               {
@@ -282,10 +322,9 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                   // }
                 }}/>
               }
-              
             </Vw>
             {
-              ['text'].includes(item?.msg_type) && <Vw style={{
+              ['text','audio'].includes(item?.msg_type) && <Vw style={{
                 borderWidth: 8,
                 // borderColor: 'transparent',
                 borderLeftColor: 'transparent',
@@ -371,7 +410,7 @@ const styles = StyleSheet.create({
     marginVertical:10,
   },
   msgText:{
-    padding: 8,
+    // padding: 8,
     lineHeight: 20,
   },
   leftLoadingIcon:{

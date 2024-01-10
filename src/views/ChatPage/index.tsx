@@ -19,6 +19,8 @@ import {
   Alert,
   Dimensions,
   Keyboard,
+  TouchableWithoutFeedback,
+  PermissionsAndroid,
 } from 'react-native';
 
 import { 
@@ -31,7 +33,7 @@ import { View,Text } from '../../component/customThemed';
 import NavigationBar from '../../component/NavigationBar';
 import CustomListRow from '../../component/CustomListRow';
 import MyCell from '../../component/MyCell';
-import { ADD_CIR, ADD_USER, ALBUM_ICON, CAPTURE_ICON, MORE_ICON, NEW_FIREND, SEND_FAIL, VIDEO_ICON } from '../../assets/image';
+import { ADD_CIR, ADD_USER, ALBUM_ICON, AUDIO_ICON, CAPTURE_ICON, MORE_ICON, NEW_FIREND, SEND_FAIL, VIDEO_ICON } from '../../assets/image';
 import SocketIoClient from '../../socketIo';
 import { Label, Menu, Overlay, Toast } from '../../component/teaset';
 import { TextInput } from 'react-native-gesture-handler';
@@ -46,6 +48,8 @@ const _ = require('lodash');
 import * as qiniu from 'qiniu-js';
 import { element } from 'prop-types';
 import ShowMsg from './ShowMsg';
+import AudioModal from '../../component/AudioModal';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 // import { 
 //   View,
 //   Text
@@ -59,6 +63,7 @@ const ChatPage = ({
 }:any) => {
   const scrollRef:{current:any} = useRef();
   const inputRef:{current:any} = useRef();
+  const audioModalRef:{current:any} = useRef();
   
   const sockitIo = SocketIoClient.getInstance({
     callBack: ()=>{},
@@ -72,12 +77,15 @@ const ChatPage = ({
   const [textInputHeight,setTextInputHeight] = useState<number>(40);
   // const [keyboardHeight,setkeyboardHeight] = useState<number>(0);
   const [showBottomOperationBtn,setShowBottomOperationBtn] = useState<boolean>(false);
+  const [showAudioBtn,setShowAudioBtn] = useState<boolean>(false);
   
   const login_user_id = AppStore?.userInfo?.user_id;
 
   const chatLogs = FriendsStore.chatLogs[login_user_id]||{};
   const user = chatLogs[params?.user_id]||{}
   const msg_contents = user.msg_contents||[];
+
+  const audioRecorderPlayer = new AudioRecorderPlayer();
 
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
@@ -171,6 +179,11 @@ const ChatPage = ({
         const str = file.uri.slice(idx1+1);
         const idx2 = str.lastIndexOf('.');
         const name = str.slice(0,idx2);
+        console.log('-------->>>>upload format', {
+          uri: file.uri, 
+          type: file.type, 
+          name
+        })
         let observable = qiniu.upload(
           {
             uri: file.uri, 
@@ -253,7 +266,7 @@ const ChatPage = ({
           msg_type: (item as any)?.msg_type||'text',
           sendIng: true,
           msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id),
-          file: item.file
+          file: item?.file
         }
         msg_rows.push(msg_row);
         await handlerChatLog({
@@ -281,7 +294,7 @@ const ChatPage = ({
       const msg_contents = chatLogs[params?.user_id].msg_contents||[];
       console.log('1234567890--==666',msg_rows)
       for(const _item of msg_rows){
-        if(['img','video'].includes(_item?.msg_type)){
+        if(['img','video','audio'].includes(_item?.msg_type)){
           const upload_res:any = await uploadImage(_item.file);
           console.log('upload_res===>>>',upload_res)
           if(upload_res.error===0) {
@@ -334,7 +347,59 @@ const ChatPage = ({
     });
   },[msgContent]);
 
-  
+  const onUseMicrophonePermission = useCallback(async ()=>{
+    return new Promise(async (resolve, reject) => {
+      if (Platform.OS === 'android') {
+        try {
+          const grants = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          ]);
+      
+          console.log('write external stroage', grants);
+      
+          if (
+            grants['android.permission.WRITE_EXTERNAL_STORAGE'] ===
+              PermissionsAndroid.RESULTS.GRANTED &&
+            grants['android.permission.READ_EXTERNAL_STORAGE'] ===
+              PermissionsAndroid.RESULTS.GRANTED &&
+            grants['android.permission.RECORD_AUDIO'] ===
+              PermissionsAndroid.RESULTS.GRANTED
+          ) {
+            console.log('Permissions granted');
+            resolve({error:0})
+          } else {
+            console.log('All required permissions not granted');
+            return;
+          }
+        } catch (err) {
+          console.warn(err);
+          return;
+        }
+      }
+    })
+  },[]);
+
+  const onStopRecord = async () => {
+    const audio_rul = await audioRecorderPlayer.stopRecorder();
+    audioRecorderPlayer.removeRecordBackListener();
+    
+    if(audio_rul.indexOf('file:///')==-1) return;
+    const msgRow = {
+      msg_type: "audio",
+      msg_content: audio_rul,
+
+      file:{
+        type: "video/mp4",
+        uri: audio_rul
+      }
+    }
+    
+    await sendMsg({
+      msgRows: [msgRow]
+    });
+  };
 
   return <Vw style={styles.container}>
     {
@@ -382,37 +447,89 @@ const ChatPage = ({
           borderTopColor: ['light'].includes(colorScheme)?'#d3d3d3':'#292929',
           backgroundColor: MyThemed[colorScheme||'light'].bg
         }}>
-          <TextInput 
-          ref={inputRef}
-          multiline={true}
-          clearButtonMode={'always'}
-          style={{
-            ...styles.msgContentInput,
-            flex:1,
-            backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
-            height: textInputHeight,
-          }}
-          placeholder='' 
-          value={msgContent} 
-          // animated={true}
-          autoFocus={false}//只聚焦，没有自动弹出键盘
-          keyboardType="default"
-          onChangeText={(val:string)=>{
-            setMsgContent(val)
-          }}
-          onContentSizeChange={(event:any)=>{
-            const { contentSize } = event.nativeEvent;
-            if(contentSize.height>300) return;
-            setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
-          }}
-          onFocus={async (val)=>{
-            // console.log('-------->>>val',val)
+          <TouchableOpacity 
+          activeOpacity={0.6}
+          onPress={()=>{
+            inputRef.current?.blur();
             setShowBottomOperationBtn(false);
-            setTimeout(() => {
-              scrollRef.current?.scrollToEnd()
-            },200);
-          }}
-          onSubmitEditing={async ()=>{}}/>
+            setShowAudioBtn(!showAudioBtn)
+          }}>
+            <Image 
+            style={{
+              width: 35,height:35,
+              tintColor: MyThemed[colorScheme||'light'].ftCr,
+              marginRight: 10
+            }} 
+            source={AUDIO_ICON}/>
+          </TouchableOpacity>
+          {
+            showAudioBtn ?<TouchableWithoutFeedback>
+              <TouchableOpacity style={{
+                ...styles.msgContentInput,
+                  flex:1,
+                  backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
+                  height: textInputHeight,
+              }}
+              onLongPress={async ()=>{
+                // console.log('onLongPress===========>>>');
+                // audioModalRef.current?.open();
+                const res:any = await onUseMicrophonePermission();
+                if(res?.error===0) {
+                  const result = await audioRecorderPlayer.startRecorder();
+                  audioRecorderPlayer.addRecordBackListener((e) => {
+                    // this.setState({
+                    //   recordSecs: e.currentPosition,
+                    //   recordTime: this.audioRecorderPlayer.mmssss(
+                    //     Math.floor(e.currentPosition),
+                    //   ),
+                    // });
+                    console.log('e------------>>>>>',e)
+                    return;
+                  });
+                };
+              }}
+              onPressOut={()=>{
+                console.log('onPressOut===========>>>');
+                // audioModalRef.current?.close();
+                onStopRecord()
+              }}>
+                <Text style={{
+                  textAlign: "center"
+                }}>按住 说话</Text>
+              </TouchableOpacity>
+            </TouchableWithoutFeedback>:<TextInput 
+            ref={inputRef}
+            multiline={true}
+            clearButtonMode={'always'}
+            style={{
+              ...styles.msgContentInput,
+              flex:1,
+              backgroundColor: ['light'].includes(colorScheme)?'#ffffff':'#292929',
+              height: textInputHeight,
+            }}
+            placeholder='' 
+            value={msgContent} 
+            // animated={true}
+            autoFocus={false}//只聚焦，没有自动弹出键盘
+            keyboardType="default"
+            onChangeText={(val:string)=>{
+              setMsgContent(val)
+            }}
+            onContentSizeChange={(event:any)=>{
+              const { contentSize } = event.nativeEvent;
+              if(contentSize.height>300) return;
+              setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
+            }}
+            onFocus={async (val)=>{
+              // console.log('-------->>>val',val)
+              setShowBottomOperationBtn(false);
+              setTimeout(() => {
+                scrollRef.current?.scrollToEnd()
+              },200);
+            }}
+            onSubmitEditing={async ()=>{}}/>
+          }
+          
           {
             msgContent ? <TouchableOpacity 
             style={{
@@ -434,8 +551,8 @@ const ChatPage = ({
             </TouchableOpacity>:<TouchableOpacity 
             style={styles.add_cir_icon}
             onPress={()=>{
-              if(inputRef.current.isFocused()){
-                inputRef.current.blur();
+              if(inputRef.current?.isFocused()){
+                inputRef.current?.blur();
                 setTimeout(()=>{
                   setShowBottomOperationBtn(true);
                 },200);
@@ -443,7 +560,7 @@ const ChatPage = ({
                 
                 if(showBottomOperationBtn){
                   setTimeout(()=>{
-                    inputRef.current.focus();
+                    inputRef.current?.focus();
                   });
                 }else{
                   setTimeout(()=>{
@@ -451,17 +568,17 @@ const ChatPage = ({
                   })
                 }
               }
+              setShowAudioBtn(false)
             }}>
               <Image 
               style={{
-                width: 25,height:25,
+                width: 35,height: 35,
                 tintColor: MyThemed[colorScheme||'light'].ftCr
               }} 
               source={ADD_CIR}/>
             </TouchableOpacity>
           }
         </Vw>
-
       </Vw>
       
 
@@ -511,6 +628,8 @@ const ChatPage = ({
         
       }}/>
     }
+
+    <AudioModal ref={audioModalRef}/>
   </Vw>;
 };
 

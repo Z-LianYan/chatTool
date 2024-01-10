@@ -39,3 +39,5 @@ export const MORE_ICON = require('./more.png');
 export const SEND_FAIL = require('./send-fail.png');
 export const PLAY_ICON = require('./playIcon.png');
 export const YU_JIA_ZAI = require('./yujiazai.png');
+export const AUDIO_ICON = require('./audio.png');
+export const AUDIO_ICON_NOT_CIRCLE = require('./audio_not_cicle.png');
