@@ -50,6 +50,8 @@ import { element } from 'prop-types';
 import ShowMsg from './ShowMsg';
 import AudioModal from '../../component/AudioModal';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import RNFS from 'react-native-fs';
+
 // import { 
 //   View,
 //   Text
@@ -78,6 +80,7 @@ const ChatPage = ({
   // const [keyboardHeight,setkeyboardHeight] = useState<number>(0);
   const [showBottomOperationBtn,setShowBottomOperationBtn] = useState<boolean>(false);
   const [showAudioBtn,setShowAudioBtn] = useState<boolean>(false);
+  const [audioRecording,setAudioRecording] = useState<boolean>(false);
   
   const login_user_id = AppStore?.userInfo?.user_id;
 
@@ -85,7 +88,8 @@ const ChatPage = ({
   const user = chatLogs[params?.user_id]||{}
   const msg_contents = user.msg_contents||[];
 
-  const audioRecorderPlayer = new AudioRecorderPlayer();
+  // const audioRecorderPlayer = new AudioRecorderPlayer();
+  const audioRecorderPlayer = useRef(new AudioRecorderPlayer()).current;
 
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
@@ -188,7 +192,7 @@ const ChatPage = ({
           {
             uri: file.uri, 
             type: file.type, 
-            name
+            name: name + Math.random()
           } as any,//文件格式需要这样子否则上传会失败
           key,
           tokenConfig.upload_token,
@@ -377,15 +381,21 @@ const ChatPage = ({
           console.warn(err);
           return;
         }
+      }else{
+        resolve({error:0})
       }
     })
   },[]);
 
   const onStopRecord = async () => {
     const audio_rul = await audioRecorderPlayer.stopRecorder();
+    console.log('audio_rul====>>>',audio_rul,audioRecording)
     audioRecorderPlayer.removeRecordBackListener();
-    
-    if(audio_rul.indexOf('file:///')==-1) return;
+
+    if(audio_rul.indexOf('file://')==-1 || !audioRecording) return;
+    // if(audio_rul.indexOf('file://')==-1) return;
+    console.log("哈哈哈哈哈哈😂")
+    setAudioRecording(false);
     const msgRow = {
       msg_type: "audio",
       msg_content: audio_rul,
@@ -475,22 +485,19 @@ const ChatPage = ({
                 // audioModalRef.current?.open();
                 const res:any = await onUseMicrophonePermission();
                 if(res?.error===0) {
-                  const result = await audioRecorderPlayer.startRecorder();
+                  const fileName = dayjs().format("YYYYMMDDHHmmssSSS")+String(Math.random()*100000000000).slice(0,6)
+                  const path = Platform.select({
+                    ios: `${RNFS.CachesDirectoryPath}/${fileName}.m4a`,
+                    android: `${RNFS.CachesDirectoryPath}/${fileName}.mp3`,
+                  });
+                  const result = await audioRecorderPlayer.startRecorder(path);// android 正常  ios 模拟器上不行，真机为测试过
                   audioRecorderPlayer.addRecordBackListener((e) => {
-                    // this.setState({
-                    //   recordSecs: e.currentPosition,
-                    //   recordTime: this.audioRecorderPlayer.mmssss(
-                    //     Math.floor(e.currentPosition),
-                    //   ),
-                    // });
+                    setAudioRecording(true)
                     console.log('e------------>>>>>',e)
-                    return;
                   });
                 };
               }}
               onPressOut={()=>{
-                console.log('onPressOut===========>>>');
-                // audioModalRef.current?.close();
                 onStopRecord()
               }}>
                 <Text style={{

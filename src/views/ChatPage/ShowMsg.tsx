@@ -52,6 +52,7 @@ import { conformsTo } from 'lodash';
 import ImageViewer from '../../component/ImageViewer';
 import Video, {VideoRef,ResizeMode,PosterResizeModeType} from 'react-native-video';
 import ImageVideo from '../../component/ImageVideo';
+import Sound from 'react-native-sound';
 
 const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMsg,params}:any,ref:any) => {
   const use_ref = useRef<any>();
@@ -141,6 +142,30 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
       color: MyThemed[colorScheme||'light'].ftCr2,
     }}>{item.des}</Text>
   },[]);
+  const playAudio = useCallback((url:string)=>{
+    // 解决ios 问题 对于IOS，您可以将url => decodeURI(url) 和 Sound.MAIN_BUNDLE 设置为“”（空字符串）
+    const whoosh = new Sound(decodeURI(url), '', (error:any) => {
+      if (error) {
+        console.log('failed to load the sound', error);
+        return;
+      }
+      // loaded successfully
+      console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+      // whoosh.stop(() => {
+      //   console.log('sto')
+      //   // Note: If you want to play a sound after stopping and rewinding it,
+      //   // it is important to call play() in a callback.
+      // });
+      // Play the sound with an onEnd callback
+      whoosh.play((success:any) => {
+        if (success) {
+          console.log('successfully finished playing');
+        } else {
+          console.log('playback failed due to audio decoding errors');
+        }
+      });
+    });
+  },[])
   const renderMsg = useCallback(()=>{
     // const imgs:any = [];
     // msg_contents.map((item:any)=>{
@@ -194,6 +219,9 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                     backgroundColor:  MyThemed[colorScheme||'light'].fromMsgBg,
                     justifyContent: "center"
                   }}
+                  onPress={()=>{
+                    if(['audio'].includes(item?.msg_type)) playAudio(item.msg_content)
+                  }}
                 >
                   {
                     ['audio'].includes(item?.msg_type)?<Image 
@@ -203,7 +231,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                         tintColor: MyThemed[colorScheme||'light'].ftCr,
                         marginVertical: 0
                       }} 
-                    source={AUDIO_ICON_NOT_CIRCLE}/>:<Text
+                      source={AUDIO_ICON_NOT_CIRCLE}/>:<Text
                     selectable={true}
                      style={{
                       ...styles.msgText,
@@ -274,7 +302,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
             <Vw style={styles.msgTextWrapper}>
               {
                 ['text','audio'].includes(item?.msg_type) && <TouchableOpacity
-                  activeOpacity={1}
+                  activeOpacity={0.6}
                   
                   style={{
                     padding: 8,
@@ -285,15 +313,18 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                     // ...styles.msgText,
                     backgroundColor:  MyThemed[colorScheme||'light'].ctBg
                   }}
+                  onPress={()=>{
+                    if(['audio'].includes(item?.msg_type)) playAudio(item.msg_content)
+                  }}
                 >
                   
                   {
                     ['audio'].includes(item?.msg_type)?<Image 
-                      style={{
-                        width: 20,
-                        height: 20,
-                        tintColor: MyThemed[colorScheme||'light'].ftCr,
-                      }} 
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: MyThemed[colorScheme||'light'].ftCr,
+                    }} 
                     source={AUDIO_ICON_NOT_CIRCLE}/>:<Text 
                     selectable={true}
                     style={{
@@ -349,49 +380,6 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
       renderMsg()
     }
     <ImageViewer ref={refImageViewer}/>
-
-    {/* {
-      videoSourceUri && <Video 
-        resizeMode={ResizeMode.CONTAIN}
-        muted={false}//控制音频是否静音
-        posterResizeMode={PosterResizeModeType.CONTAIN}
-        poster={videoSourceUri+'?vframe/jpg/offset/0'}//视频加载时显示的图像
-        // repeat={true}
-        // paused={true}
-        // pictureInPicture={true}
-        // reportBandwidth={true}
-
-        // fullscreen={true}
-        // hideShutterView={true}
-        // Can be a URL or a local file.
-        source={{uri: videoSourceUri}}
-        // Store reference  
-        ref={videoRef}
-        controls={true}
-        // Callback when remote video is buffering                                      
-        onBuffer={(value)=>{
-          console.log('onBuffer=====>>>',value)
-        }}
-        // Callback when video cannot be loaded              
-        onError={(onError)=>{
-          console.log('onError=====>>>',onError)
-        }}  
-        onEnd={()=>{
-          console.log('onEnd=====>>>')
-        }} 
-        onFullscreenPlayerDidDismiss={()=>{
-          console.log('onFullscreenPlayerDidDismiss=====>>>')
-          // setVideoSourceUri("")
-          videoRef.current?.pause();
-          videoRef.current?.dismissFullscreenPlayer();
-        }}         
-        style={{
-          // position: 'absolute'
-          // width: '100%',
-          // height: 700
-        }}
-      />
-    } */}
   </Vw>;
 };
 
