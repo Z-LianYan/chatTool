@@ -12,7 +12,5 @@ import {
 
 export default {
   // HOST: 'http://film.imgresource.com.cn',
-  HOST: 'http://82.156.127.235:7002'
-
-  
+  HOST: 'http://106.53.161.135:7002'
 }

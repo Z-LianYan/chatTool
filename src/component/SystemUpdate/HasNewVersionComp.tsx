@@ -45,7 +45,7 @@ export class HasNewVersionComp extends Component<IProps, IState> {
                 })
             }
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: sv(60) }}>
-                <TouchableOpacity style={{ width: sv(168), height: sv(58), backgroundColor: '#F5F9FD', alignItems: 'center', justifyContent: 'center', borderRadius: sv(8) }}
+                <TouchableOpacity style={{ width: sv(168), height: sv(70), backgroundColor: '#CCC', alignItems: 'center', justifyContent: 'center', borderRadius: sv(8) }}
                     onPress={() => {
                         this.props.hide();
                     }}
@@ -53,7 +53,7 @@ export class HasNewVersionComp extends Component<IProps, IState> {
                     <Text style={{ fontSize: st(26), fontFamily: 'PingFang SC', color: '#334466' }}>取消</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={{ width: sv(168), height: sv(58), backgroundColor: '#E63141', alignItems: 'center', justifyContent: 'center', borderRadius: sv(8), marginLeft: sv(24) }}
+                <TouchableOpacity style={{ width: sv(168), height: sv(70), backgroundColor: '#05c160', alignItems: 'center', justifyContent: 'center', borderRadius: sv(8), marginLeft: sv(24) }}
                     onPress={() => {
                         this.props.updateHandler()
                     }}

@@ -10,8 +10,11 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <!-- 如果需要考虑Android 7.0以下的客户，则还需要添加外部存储权限 WRITE_EXTERNAL_STORAGE -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!--android:usesCleartextTraffic="true" 为true时 http协议能请求-->
     <application

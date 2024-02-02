@@ -401,7 +401,7 @@ const ChatPage = ({
       msg_content: audio_rul,
 
       file:{
-        type: "video/mp4",
+        type: "video/mp4",//audio/mpeg
         uri: audio_rul
       }
     }
