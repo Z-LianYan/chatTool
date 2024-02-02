@@ -191,6 +191,7 @@ export default class SocketIoClient {
             await AsyncStorage.removeItem('userInfo');
             callBack && callBack();
             // socket?.disconnect(); //服务端执行断开
+            this.removeInstance();
         })
 
 
@@ -198,6 +199,10 @@ export default class SocketIoClient {
 
     getSocketIo(){
         return SocketIoClient.socketIo;
+    }
+
+    removeInstance(){
+        delete SocketIoClient.socketIo;
     }
 }
 

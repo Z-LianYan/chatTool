@@ -78,6 +78,7 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
           await AsyncStorage.removeItem('token');
           await AsyncStorage.removeItem('userInfo');
           sockitIo.getSocketIo()?.disconnect();
+          sockitIo.removeInstance()
         } }
       ]
     );

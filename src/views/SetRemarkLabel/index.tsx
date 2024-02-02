@@ -215,6 +215,14 @@ const SetRemarkLabel = ({
       ]
     );
   },[]);
+
+  const getAddressBookList = useCallback(async()=>{
+    try{
+      await FriendsStore.getFriendList();
+    }catch(err:any){
+      console.log('err------>>',err.message)
+    }
+  },[])
   
 
   return <ScrollView style={{
@@ -252,6 +260,7 @@ const SetRemarkLabel = ({
             ...formData
           };
         });
+        getAddressBookList();
         // navigation.navigate({
         //   name: 'UserDetail',
         //   params:{

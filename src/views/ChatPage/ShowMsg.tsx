@@ -235,7 +235,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                     selectable={true}
                      style={{
                       ...styles.msgText,
-                      color: MyThemed['light'].ftCr,
+                      // color: MyThemed[colorScheme||'light'].ftCr,
                      }}
                     >{item.msg_content}</Text>
                   } 
@@ -329,7 +329,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                     selectable={true}
                     style={{
                       ...styles.msgText,
-                      color: MyThemed['light'].ftCr,
+                      // color: MyThemed[colorScheme||'light'].ftCr,
                     }}>{item.msg_content}</Text>
                   }
                 </TouchableOpacity>
