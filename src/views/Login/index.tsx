@@ -71,7 +71,11 @@ const Login = (props:any) => {
       if (!reg_tel.test(mobile_phone)) {
         return Toast.message("请输入正确的手机号");
       }
+      console.log('======>>>12345')
       const result:any = await userLogin(form_data);
+      console.log('reuslt=======>>>login',result);
+
+
       AppStore.setUserInfo(result);
       await AsyncStorage.setItem('userInfo',JSON.stringify(result));
       if(result && result.token){
