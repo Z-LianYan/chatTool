@@ -51,6 +51,7 @@ import ShowMsg from './ShowMsg';
 import AudioModal from '../../component/AudioModal';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import RNFS from 'react-native-fs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import { 
 //   View,
@@ -324,7 +325,7 @@ const ChatPage = ({
           msg_unique_id: _item.msg_unique_id
         },function(err:any,response:any) {
           console.log('err====>>',err);
-          runInAction(()=>{
+          runInAction(async ()=>{
             for(const item of msg_contents){
               if(_item?.msg_unique_id == item.msg_unique_id) {
                 item.sendIng = false;
@@ -342,6 +343,8 @@ const ChatPage = ({
                 })
               }
             };
+
+            await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
           });
         });
       }

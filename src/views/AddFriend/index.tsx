@@ -78,7 +78,7 @@ const AddFriend = ({AppStore,MyThemed,navigation,AppVersions}:any) => {
         </View>
       </TouchableOpacity>
       <Text style={styles.inputBom}>
-        我的聊天号：{AppStore?.userInfo?.chat_no}
+        我的畅聊号：{AppStore?.userInfo?.chat_no}
         <View style={{width: 20}}></View>
         <Image 
         style={{

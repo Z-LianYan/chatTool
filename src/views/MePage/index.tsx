@@ -55,7 +55,7 @@ const MePage = ({
         <View style={{flex:1,paddingHorizontal:10}}>
           <Text style={{paddingBottom: 10,color: MyThemed[colorScheme||'light'].ftCr,fontWeight:'bold'}}>{AppStore?.userInfo?.user_name}</Text>
           <View style={{flexDirection:'row'}}>
-            <Text style={{flex:1}}>聊天号：{AppStore?.userInfo?.chat_no}</Text>
+            <Text style={{flex:1}}>畅聊号：{AppStore?.userInfo?.chat_no}</Text>
             <View style={{flexDirection:'row'}}>
               <Image 
               style={{

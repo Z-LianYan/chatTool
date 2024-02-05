@@ -35,6 +35,7 @@ import SocketIoClient from '../../socketIo';
 import { Menu } from '../../component/teaset';
 import dayjs from 'dayjs';
 import { isArray } from 'lodash';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { 
 //   View,
 //   Text
@@ -158,6 +159,8 @@ const ChatListPage = ({
                 avatar: FriendsStore.chatLogs[login_user_id][key]?.avatar
               });
             });
+
+            await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
           });
           
         }}

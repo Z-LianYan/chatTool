@@ -26,6 +26,7 @@ import { NEW_FIREND } from '../../assets/image';
 import { View } from '../../component/customThemed';
 import { getFriendList, searchFriends } from '../../api/friends';
 import { runInAction } from 'mobx';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { 
 //   View,
 //   Text
@@ -83,11 +84,12 @@ const AddressBookPage = ({
     </View>:null }
     onPress={()=>{
       navigation.navigate('NewFriendsList')
-      runInAction(()=>{
+      runInAction(async ()=>{
         for(let key in addFriendChatLogs){
           if(['userIdSort'].includes(key)) continue;
           addFriendChatLogs[key].newAddFriendReadMsg = true;
         }
+        await AsyncStorage.setItem('addFriendChatLogs',JSON.stringify(FriendsStore.addFriendChatLogs));
       });
     }}/>
     {/* <MyCell

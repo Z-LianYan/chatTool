@@ -39,6 +39,7 @@ import NavigationContainerCom from './navigators/NavigationContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SocketIoClient from './socketIo';
 import { get_user_info } from './api/user';
+import { runInAction } from 'mobx';
 
 function App(): JSX.Element {
   const colorScheme = useColorScheme();
@@ -49,17 +50,28 @@ function App(): JSX.Element {
   const [tokenComplete,setTokenComplete] = useState<boolean>(false);
   useEffect(()=>{
       (async ()=>{
-          const _token:any = await AsyncStorage.getItem('token');
-          if(_token){
-            setToken(_token);
-            try{
-              await getUserInfo();
-            }catch(err){
 
-            }
-            
+
+        runInAction(async ()=>{
+          const chatLogs = await AsyncStorage.getItem('chatLogs');
+          store.FriendsStore.chatLogs = chatLogs?JSON.parse(chatLogs):{};
+
+          const addFriendChatLogs = await AsyncStorage.getItem('addFriendChatLogs');
+          store.FriendsStore.addFriendChatLogs = addFriendChatLogs?JSON.parse(addFriendChatLogs):{};
+        });
+
+        
+        const _token:any = await AsyncStorage.getItem('token');
+        if(_token){
+          setToken(_token);
+          try{
+            await getUserInfo();
+          }catch(err){
+
           }
-          setTokenComplete(true);
+          
+        }
+        setTokenComplete(true);
       })();
   },[]);
 

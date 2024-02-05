@@ -263,10 +263,12 @@ const UserDetail = ({
           <View style={{flexDirection:'column'}}>
             {search_user_info?.f_user_name_remark && search_user_info?.user_name!=search_user_info?.f_user_name_remark && <Text style={{flex:1,marginTop:5}}>昵称：{search_user_info?.user_name}</Text>}
             {
-              ([1].includes(search_user_info?.f_status) || search_user_info?.user_id===userInfo?.user_id) &&  <Text style={{flex:1,marginTop:5}}>聊天号：{search_user_info?.chat_no}</Text>
+              ([1].includes(search_user_info?.f_status) || search_user_info?.user_id===userInfo?.user_id) &&  search_user_info?.chat_no && <Text style={{flex:1,marginTop:5}}>畅聊号：{search_user_info?.chat_no}</Text>
             }
             
-            <Text style={{flex:1,marginTop:5}}>地区：{search_user_info?.area}</Text>
+            {
+              search_user_info?.area && <Text style={{flex:1,marginTop:5}}>地区：{search_user_info?.area}</Text>
+            }
             
             
           </View>

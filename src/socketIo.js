@@ -141,6 +141,8 @@ export default class SocketIoClient {
                             type: data?.type
                         });
                     });
+                    await store.FriendsStore.getFriendList();
+                    await store.FriendsStore.get_new_friends_list();
                 }else{
                     const target_obj = {
                         chatLogs: isAddFriend ? store.FriendsStore.addFriendChatLogs : store.FriendsStore.chatLogs,
@@ -166,7 +168,8 @@ export default class SocketIoClient {
                     msg_unique_id: data.msg_content?.msg_unique_id
                 });
 
-                
+                await AsyncStorage.setItem('chatLogs',JSON.stringify(store.FriendsStore.chatLogs));
+                await AsyncStorage.setItem('addFriendChatLogs',JSON.stringify(FriendsStore.addFriendChatLogs));
             });
         });
 

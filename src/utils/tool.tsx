@@ -7,6 +7,7 @@ import { Toast } from '../component/teaset';
 import RNFS from 'react-native-fs';
 import RNFetchBlob from "rn-fetch-blob";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const getFinalRowMsg =  function(msg_contents:any[]){
     let len = msg_contents.length-1;
     if(len<0) return null;
@@ -31,7 +32,7 @@ export async function handlerChatLog({
     type = ''
 }:handlerChatLogType){
     return new Promise((resolve,reject)=>{
-        runInAction(()=>{
+        runInAction(async ()=>{
             const from_user_id = data.user_id;
     
             if(!data.msg_content) return;
@@ -39,12 +40,16 @@ export async function handlerChatLog({
             const time = {
                 type: 'time',
                 created_at: data?.msg_content?.created_at,
+            }, des = {
+                type: 'des',
+                des: '以上是打招呼的内容'
             }
             if(!chatLogs[login_user_id]){
                 chatLogs[login_user_id] = {
                     userIdSort: [from_user_id]
                 };
                 const msg_contents = [data.msg_content];
+                if(['acceptAddFriends'].includes(type)) msg_contents.unshift(des)
                 if(!addTypes.includes(type))  msg_contents.unshift(time);
                 chatLogs[login_user_id][from_user_id] = {
                     user_id:  data?.user_id,
@@ -53,7 +58,6 @@ export async function handlerChatLog({
                     avatar:  data?.avatar, 
                     msg_contents: msg_contents,
                 }
-                
             }else{
                 if(!Array.isArray(chatLogs[login_user_id].userIdSort)){
                     chatLogs[login_user_id].userIdSort = [];
@@ -76,13 +80,10 @@ export async function handlerChatLog({
                     const msg_contents = [...chatLogs[login_user_id][from_user_id].msg_contents];
                     if(!addTypes.includes(type)){
                         const finalRowMsg = getFinalRowMsg(msg_contents);
-                        const minute = dayjs(data?.msg_content?.created_at).diff(finalRowMsg.created_at,'minute');
+                        const minute = dayjs(data?.msg_content?.created_at).diff(finalRowMsg?.created_at,'minute');
                         if(['acceptAddFriends'].includes(type)){
                             msg_contents.unshift(time); 
-                            msg_contents.push({
-                                type: 'des',
-                                des: '以上是打招呼的内容'
-                            })
+                            msg_contents.push(des)
                         }else if(minute>3) {
                             msg_contents.push(time); 
                         }
@@ -145,6 +146,7 @@ function week(day:any){
 }
 
 export function formatTime(time:string){
+    if(!time) return;
     const year = dayjs(time).year(),
         month = dayjs(time).month(),
         date = dayjs(time).date(),

@@ -434,7 +434,7 @@ const SetRemarkLabel = ({
                 f_user_id: search_user_info.user_id,
                 msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id)
               });
-              console.log('接受返回=============》〉》',res);
+              console.log('res完成===========》〉》',res?.data?.f_user_name_remark,res);
               if(!res || !res.data) return;
               //清除缓存
               let infoObj:any = await AsyncStorage.getItem('remarkLabel');
@@ -449,7 +449,6 @@ const SetRemarkLabel = ({
               runInAction(async()=>{
                 AppStore.search_user_info = friends;
                 const has_val = FriendsStore.addFriendChatLogs[login_user_id] && FriendsStore.addFriendChatLogs[login_user_id][search_user_id];
-                console.log('msg_contents.push(data.msg_content);====>>>1111',JSON.stringify(has_val));
                 if(!FriendsStore.chatLogs[login_user_id]) {
                   FriendsStore.chatLogs[login_user_id] = {
                     userIdSort: [search_user_id]
@@ -463,7 +462,6 @@ const SetRemarkLabel = ({
                     FriendsStore.chatLogs[login_user_id].userIdSort = [search_user_id];
                   }
                 }
-
                 if(has_val){
                   const user = FriendsStore.addFriendChatLogs[login_user_id][search_user_id]||[];
                   const msg_contents = user.msg_contents;
@@ -483,22 +481,31 @@ const SetRemarkLabel = ({
                   });
                   FriendsStore.chatLogs[login_user_id][search_user_id] = _.cloneDeep(user);
                 }else{
+                  console.log('FriendsStore.chatLogs[login_user_id][search_user_id]======>>>',res?.data?.f_user_name_remark,FriendsStore.chatLogs[login_user_id][search_user_id]);
                   FriendsStore.chatLogs[login_user_id][search_user_id] = {
                     user_id: res?.data?.user_id,
                     user_name: res?.data?.user_name,
                     avatar: res?.data?.avatar,
                     f_user_name_remark: res?.data?.f_user_name_remark,
                     msg_contents: [{
+                        type: 'time',
+                        created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                      },{
+                        type:'des',
+                        des: '以上是打招呼的内容'
+                      },{
                       type:'des',
                       des: `你已添加了${res?.data?.user_name},现在可以开始聊天了`
                     }]
                   };
-                }
-                console.log('------->>login_user_id',FriendsStore.chatLogs[login_user_id]);
+                  console.log('FriendsStore.chatLogs[login_user_id][search_user_id]======>>>123', JSON.stringify(FriendsStore.chatLogs[login_user_id][search_user_id]));
 
-                console.log('FriendsStore.chatLogs[login_user_id][search_user_id]===========>>>',FriendsStore.chatLogs[login_user_id][search_user_id]);
+                }
                 await FriendsStore.getFriendList();
                 await FriendsStore.get_new_friends_list();
+
+                await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
+                await AsyncStorage.setItem('addFriendChatLogs',JSON.stringify(FriendsStore.addFriendChatLogs));
               });
               navigation.navigate({
                 name: 'UserDetail',

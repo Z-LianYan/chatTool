@@ -51,12 +51,13 @@ import {
   MINE_ACTIVATE_ICON,
 } from '../assets/image/index';
 import { runInAction } from 'mobx';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // type TypeProps = {
 //   index?: number
 // }
 const TabBar = ({
-   state, descriptors, navigation,AppStore,MyThemed
+   state, descriptors, navigation,AppStore,MyThemed,FriendsStore
 }:any) => {
   const colorScheme = useColorScheme();
   useEffect(()=>{
@@ -102,8 +103,9 @@ const TabBar = ({
         navigation.navigate({ name: route.name, merge: true });
         AppStore.curRouteName = route.name;
         if(route.name=='AddressBookPage'){
-          runInAction(()=>{
+          runInAction(async ()=>{
             AppStore.tabBar.AddressBookPage.msgCnt = 0;
+            await AsyncStorage.setItem('addFriendChatLogs',JSON.stringify(FriendsStore.addFriendChatLogs));
           });
         }
       }
@@ -192,4 +194,4 @@ const styles = StyleSheet.create({
   // }
 });
 
-export default inject("AppStore","MyThemed")(observer(TabBar));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(TabBar));
