@@ -107,8 +107,7 @@ export default class SocketIoClient {
          * 
         */
         socket.on('sendClientMsg',(data,callBack)=>{//服务端发送过来的消息
-            // data.type 
-            console.log('===========>>>>有消息---',store.AppStore.userInfo?.user_name,data?.msg_content?.msg_unique_id);
+            // console.log('===========>>>>有消息---',store.AppStore.userInfo?.user_name,data?.msg_content?.msg_unique_id);
             console.log('===========>>>>有消息---data', data);
 
             const login_user_id = store.AppStore.userInfo?.user_id;
@@ -169,7 +168,7 @@ export default class SocketIoClient {
                 });
 
                 await AsyncStorage.setItem('chatLogs',JSON.stringify(store.FriendsStore.chatLogs));
-                await AsyncStorage.setItem('addFriendChatLogs',JSON.stringify(FriendsStore.addFriendChatLogs));
+                await AsyncStorage.setItem('addFriendChatLogs',JSON.stringify(store.FriendsStore.addFriendChatLogs));
             });
         });
 

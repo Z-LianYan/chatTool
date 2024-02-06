@@ -55,6 +55,7 @@ const MyCell = ({
   showRightArrow=false,//是否显示右边箭头
   rightValue,
   onPress,
+  onLongPress,
   MyThemed,
   isAvatarTintColor=true,
   style,
@@ -102,8 +103,14 @@ const MyCell = ({
   // }
   
   return <View style={style}>
-    <TouchableOpacity style={styles.container} activeOpacity={0.6} onPress={()=>{
+    <TouchableOpacity 
+    style={styles.container} 
+    activeOpacity={0.6} 
+    onPress={()=>{
       onPress && onPress();
+    }}
+    onLongPress={(e)=>{
+      onLongPress && onLongPress(e)
     }}>
       {
         avatar && <View

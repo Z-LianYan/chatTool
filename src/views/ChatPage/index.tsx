@@ -141,10 +141,11 @@ const ChatPage = ({
       },300);
     });
 
-    runInAction(()=>{
+    runInAction(async ()=>{
       for(const item of msg_contents){
         item.readMsg = true;
       }
+      await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
     })
     
     return ()=>{

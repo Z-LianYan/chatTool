@@ -165,6 +165,27 @@ const ChatListPage = ({
           
         }}
         curRouteName="ChatListPage"
+        onLongPress={(e:any)=>{
+          console.log('e====>>>',e.nativeEvent);
+          const width = Dimensions.get('window').width;
+            let items = [
+              { title: '删除该聊天', 
+                // icon: ADD_USER, 
+                onPress: async () => {
+                  console.log('delete chat');
+
+                  
+                  runInAction(async ()=>{
+                    delete FriendsStore.chatLogs[login_user_id][key];
+                    const idx = userIdSort.indexOf(key);
+                    userIdSort.splice(idx,1);
+                    await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
+                  });
+                }
+              },
+            ];
+            Menu.show({x: e.nativeEvent.locationX, y: e.nativeEvent.locationY, width:100, height:100}, items);
+        }}
       />)
     }
     return redArr;
