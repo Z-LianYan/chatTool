@@ -98,7 +98,7 @@ export class SystemUpdataContent extends Component<IProps,IState> {
             </>
         }
         return <>
-             <Text style={{fontFamily:'PingFang SC',color:'#334466',fontSize:st(25),fontWeight:"700"}}>检查更新</Text>                
+             <Text style={{fontFamily:'PingFang SC',color:'#334466',fontSize:st(25),fontWeight:"700"}}>{lastVersion && step==2?'下载中...':'检查更新'}</Text>                
                 <View style={{height:sv(30)}}></View>
                 {step==3?(<>
                     <Text>此v{store.AppVersions.versionName}版本为最新版本</Text>

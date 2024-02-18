@@ -135,7 +135,7 @@ const SetRemarkLabel = ({
         msg_unique_id: msg_unique_id,
         msg_type: msg_type
       });
-      console.log('res=======>>>',res);
+      console.log('res=======>>>申请',res);
       if(['alreadyFriend'].includes(res?.status)){
         navigation.navigate({
           name: 'ChatListPage',
@@ -145,6 +145,53 @@ const SetRemarkLabel = ({
           }
         });
         await FriendsStore.getFriendList();
+        await FriendsStore.get_new_friends_list();
+        
+        
+        if(!FriendsStore.chatLogs[login_user_id]) {
+          FriendsStore.chatLogs[login_user_id]['userIdSort'] = [search_user_id];
+          FriendsStore.chatLogs[login_user_id][search_user_id] = {
+
+          }
+        }
+        const has_val = FriendsStore.chatLogs[login_user_id][search_user_id];
+        console.log('------>>>哈哈哈哈----999---',has_val);
+        if(has_val){
+          const msg_contents = has_val.msg_contents||[];
+          for(const item of msg_contents) item.readMsg = true;
+          const time = {
+            type: 'time',
+            created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+          }
+          msg_contents.unshift(time);
+          msg_contents.push({
+            type:'des',
+            des: '以上是打招呼的内容'
+          });
+          msg_contents.push({
+            type:'des',
+            des: `你已添加了${search_user_info?.user_name},现在可以开始聊天了`
+          });
+        }else{
+          console.log('------>>>哈哈哈哈----999')
+          FriendsStore.chatLogs[login_user_id][search_user_id] = {
+            user_id: search_user_info?.user_id,
+            user_name: search_user_info?.user_name,
+            avatar: search_user_info?.avatar,
+            f_user_name_remark: search_user_info?.f_user_name_remark,
+            msg_contents: [{
+                type: 'time',
+                created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+              },{
+                type:'des',
+                des: '以上是打招呼的内容'
+              },{
+              type:'des',
+              des: `你已添加了${search_user_info?.user_name},现在可以开始聊天了`
+            }]
+          };
+        }
+
         return;
       }
 

@@ -64,7 +64,7 @@ export class VersionUpdatingComp extends Component<IProps,IState> {
         super(props);
         this.state={
             download_url:props.lastVersion?.download_url||"",
-            totalsize:props.lastVersion.package_size||0,
+            totalsize:props.lastVersion.size||0,
             receivedsize:0,
             progress:0,
             diffsize:0,
@@ -145,7 +145,10 @@ export class VersionUpdatingComp extends Component<IProps,IState> {
            }}>
                 <View style={{width:this.state.progress+'%',height:'100%',backgroundColor:"#05c160"}}></View>
            </View>
-           <Text style={{fontSize:st(23),color:"#334466",fontWeight:"600",fontFamily:"PingFang SC"}}>{this.calcPackageSize(this.state.receivedsize)}/{this.calcPackageSize(this.state.totalsize)}，下载速度:{this.calcPackageSize(this.state.diffsize)}/s</Text>
+            <Text style={{fontSize:st(23),color:"#334466",fontWeight:"600",fontFamily:"PingFang SC"}}>
+                {this.calcPackageSize(this.state.receivedsize)}/{this.calcPackageSize(this.state.totalsize)}
+                {/* ，下载速度:{this.calcPackageSize(this.state.diffsize)}/s */}
+            </Text>
             <View style={{flexDirection:'row',justifyContent:'flex-end',marginTop:sv(80)}}>
                 
                 

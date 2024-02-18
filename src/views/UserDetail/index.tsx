@@ -138,71 +138,74 @@ const UserDetail = ({
             });
           }}
         />
-        <Button
-          title={'删除'}
-          type="danger"
-          disabled={false}
-          titleStyle={{
-            // color: MyThemed[colorScheme||'light'].ftCr3
-          }}
-          style={{
-            marginTop:10,
-            height: 55,
-            borderWidth:0,
-            backgroundColor: MyThemed[colorScheme||'light'].ctBg,
-          }}
-          onPress={() => {
-            Alert.alert(
-              "删除联系人",
-              `将联系人 ”${search_user_info?.f_user_name_remark||search_user_info?.user_name}“ 删除，将同时删除与该联系人的聊天记录`,
-              [
-                { 
-                  text: "取消", 
-                  onPress: async () => {},
-                  style: "cancel"
-                },
-                { 
-                  text: "删除", 
-                  onPress: async () => {
-                    runInAction(async ()=>{
-                      try{
-                        const res = await FriendsStore.del_friends({
-                          f_user_id: search_user_info.user_id,
-                        });
-
-                        delete addFriendChatLogs[search_user_info.user_id];
-                        const addUserIdSort = addFriendChatLogs?.userIdSort||[];
-                        const addIdx = addUserIdSort.indexOf(search_user_info.user_id);
-                        runInAction(()=>{
-                          addUserIdSort.splice(addIdx,1);
-                        })
-                        
-
-                        const chatLogs = FriendsStore.chatLogs[login_user_id] || {}
-                        delete chatLogs[search_user_info.user_id];
-                        const userIdSort = chatLogs?.userIdSort||[];
-                        const idx = userIdSort.indexOf(search_user_info.user_id);
-                        runInAction(()=>{
-                          userIdSort.splice(idx,1);
-                        })
-                        
-
-                        await FriendsStore.getFriendList();
-                        await FriendsStore.get_new_friends_list();
-                        
-                        navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
-                        navigation.navigate('ChatListPage');
-                      }catch(err:any){
-                        console.log('err----->>>',err.message)
-                      }
-                    })
+        {
+          search_user_info.user_id!=userInfo?.user_id && <Button
+            title={'删除'}
+            type="danger"
+            disabled={false}
+            titleStyle={{
+              // color: MyThemed[colorScheme||'light'].ftCr3
+            }}
+            style={{
+              marginTop:10,
+              height: 55,
+              borderWidth:0,
+              backgroundColor: MyThemed[colorScheme||'light'].ctBg,
+            }}
+            onPress={() => {
+              Alert.alert(
+                "删除联系人",
+                `将联系人 ”${search_user_info?.f_user_name_remark||search_user_info?.user_name}“ 删除，将同时删除与该联系人的聊天记录`,
+                [
+                  { 
+                    text: "取消", 
+                    onPress: async () => {},
+                    style: "cancel"
                   },
-                  style: "destructive"
-                }
-              ]
-            );
-          }}
-        />
+                  { 
+                    text: "删除", 
+                    onPress: async () => {
+                      runInAction(async ()=>{
+                        try{
+                          const res = await FriendsStore.del_friends({
+                            f_user_id: search_user_info.user_id,
+                          });
+
+                          delete addFriendChatLogs[search_user_info.user_id];
+                          const addUserIdSort = addFriendChatLogs?.userIdSort||[];
+                          const addIdx = addUserIdSort.indexOf(search_user_info.user_id);
+                          runInAction(()=>{
+                            addUserIdSort.splice(addIdx,1);
+                          })
+                          
+
+                          
+                          runInAction(()=>{
+                            const chatLogs = FriendsStore.chatLogs[login_user_id] || {}
+                            delete chatLogs[search_user_info.user_id];
+                            const userIdSort = chatLogs?.userIdSort||[];
+                            const idx = userIdSort.indexOf(search_user_info.user_id);
+                            userIdSort.splice(idx,1);
+                          })
+                          
+
+                          await FriendsStore.getFriendList();
+                          await FriendsStore.get_new_friends_list();
+                          
+                          navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
+                          navigation.navigate('ChatListPage');
+                        }catch(err:any){
+                          console.log('err----->>>',err.message)
+                        }
+                      })
+                    },
+                    style: "destructive"
+                  }
+                ]
+              );
+            }}
+          />
+        }
       </Vw>
     }else{
       return <Button
