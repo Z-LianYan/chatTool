@@ -46,7 +46,12 @@ const MePage = ({
       paddingTop: Platform.OS == 'ios'?30:80,
       paddingBottom: 30
     }}>
-      <View style={{flexDirection:'row',alignItems:'center'}}>
+      <TouchableOpacity 
+      activeOpacity={0.9}
+      style={{flexDirection:'row',alignItems:'center'}}
+      onPress={()=>{
+        navigation.navigate({name:'EditUserInfo'})
+      }}>
         {
           AppStore?.userInfo?.avatar && <Image style={{
             ...styles.avatarImg,
@@ -57,13 +62,13 @@ const MePage = ({
           <View style={{flexDirection:'row'}}>
             <Text style={{flex:1}}>{AppStore?.userInfo?.chat_no && <Text>畅聊号：{AppStore?.userInfo?.chat_no}</Text>}</Text>
             <View style={{flexDirection:'row'}}>
-              <Image 
+              {/* <Image 
               style={{
                 ...styles.rightArrow,
                 marginHorizontal: 10,
                 tintColor: MyThemed[colorScheme||'light'].ftCr2,
               }} 
-              source={QRCODE}/>
+              source={QRCODE}/> */}
               <Image 
               style={{
                 ...styles.rightArrow,
@@ -74,7 +79,7 @@ const MePage = ({
             
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
 
     {/* <MyCell

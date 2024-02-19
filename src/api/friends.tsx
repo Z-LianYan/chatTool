@@ -27,7 +27,6 @@ export function getFriendList(params?:any,text='加载中...') {
 export function searchFriends(params?:any,text='加载中...') {
   return new Promise((resolve, reject) => {
     HttpUtils.post(Api.SEARCH_FRIENDS, params, text).then((res:any)=> {
-      console.log('res-->>',res)
       switch (res.error) {
         case 0:
           resolve(res.data);

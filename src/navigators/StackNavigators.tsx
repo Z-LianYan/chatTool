@@ -39,6 +39,7 @@ import NewFriendsList from '../views/NewFriendsList';
 import ChatPage from '../views/ChatPage';
 import SetChatMsg from '../views/SetChatMsg';
 import SocketIoClient from '../socketIo';
+import EditUserInfo from '../views/EditUserInfo';
 
 const routes=[
     { 
@@ -162,6 +163,16 @@ const routes=[
         options: {
             headerShown: true,
             title: '聊天信息',
+            headerStyle:{
+            }
+        } 
+    },
+    { 
+        component: EditUserInfo, 
+        name: "EditUserInfo",
+        options: {
+            headerShown: true,
+            title: '个人信息',
             headerStyle:{
             }
         } 

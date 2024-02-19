@@ -101,27 +101,27 @@ const ChatPage = ({
       headerStyle: { 
         backgroundColor: MyThemed[colorScheme||'light'].bg,
       },
-      headerRight: ()=>{
-        return <Vw style={{paddingRight: 10}}>
-          <TouchableOpacity 
-          activeOpacity={0.6}
-          onPress={()=>{
-            navigation.navigate({
-              name: 'SetChatMsg',
-              params: {
-              }
-            });
-          }}>
-            <Image 
-            style={{
-              width: 25,height:25,
-              tintColor: MyThemed[colorScheme||'light'].ftCr
-            }} 
-            source={MORE_ICON}/>
-          </TouchableOpacity>
+      // headerRight: ()=>{
+      //   return <Vw style={{paddingRight: 10}}>
+      //     <TouchableOpacity 
+      //     activeOpacity={0.6}
+      //     onPress={()=>{
+      //       navigation.navigate({
+      //         name: 'SetChatMsg',
+      //         params: {
+      //         }
+      //       });
+      //     }}>
+      //       <Image 
+      //       style={{
+      //         width: 25,height:25,
+      //         tintColor: MyThemed[colorScheme||'light'].ftCr
+      //       }} 
+      //       source={MORE_ICON}/>
+      //     </TouchableOpacity>
           
-        </Vw>
-      }
+      //   </Vw>
+      // }
     });
     
   });
@@ -163,14 +163,8 @@ const ChatPage = ({
   const uploadImage = useCallback(async (file:any)=>{
     return new Promise(async (resolve,reject)=>{
       try{
-        console.log('=====>>>tokenConfig----file',file);
-
-
         const tokenConfig:any = await get_upload_qiuniu_config();
-
-        console.log('=====>>>tokenConfig',tokenConfig);
-        
-        const key = `public/chatLogs/${dayjs().format('YYYYMMDD')}/${dayjs().format('HHmmssSSS')+String(Math.floor(Math.random() * 10000)) + getExtName(file.uri)}`; // 上传后文件资源名以设置的 key 为主，如果 key 为 null 或者 undefined，则文件资源名会以 hash 值作为资源名。
+        const key = `public/chatTool/chatLogs/${dayjs().format('YYYYMMDD')}/${dayjs().format('HHmmssSSS')+String(Math.floor(Math.random() * 10000)) + getExtName(file.uri)}`; // 上传后文件资源名以设置的 key 为主，如果 key 为 null 或者 undefined，则文件资源名会以 hash 值作为资源名。
         let config = {
           useCdnDomain: true, //表示是否使用 cdn 加速域名，为布尔值，true 表示使用，默认为 false。
           region: qiniu.region.z2, // 根据具体提示修改上传地区,当为 null 或 undefined 时，自动分析上传域名区域
@@ -185,11 +179,6 @@ const ChatPage = ({
         const str = file.uri.slice(idx1+1);
         const idx2 = str.lastIndexOf('.');
         const name = str.slice(0,idx2);
-        console.log('-------->>>>upload format', {
-          uri: file.uri, 
-          type: file.type, 
-          name
-        })
         let observable = qiniu.upload(
           {
             uri: file.uri, 
@@ -444,9 +433,6 @@ const ChatPage = ({
             setShowBottomOperationBtn(false);
           }}>
             <Vw style={{height: 30}}></Vw>
-            {/* {
-              renderMsg()
-            } */}
             <ShowMsg params={params} navigation={navigation} onSendMsg={(msgRows:any)=>{
               sendMsg({
                 msgRows: msgRows
@@ -485,8 +471,6 @@ const ChatPage = ({
                   height: textInputHeight,
               }}
               onLongPress={async ()=>{
-                // console.log('onLongPress===========>>>');
-                // audioModalRef.current?.open();
                 const res:any = await onUseMicrophonePermission();
                 if(res?.error===0) {
                   const fileName = dayjs().format("YYYYMMDDHHmmssSSS")+String(Math.random()*100000000000).slice(0,6)
@@ -494,10 +478,9 @@ const ChatPage = ({
                     ios: `${RNFS.CachesDirectoryPath}/${fileName}.m4a`,
                     android: `${RNFS.CachesDirectoryPath}/${fileName}.mp3`,
                   });
-                  const result = await audioRecorderPlayer.startRecorder(path);// android 正常  ios 模拟器上不行，真机为测试过
+                  const result = await audioRecorderPlayer.startRecorder(path);// android 正常  ios 模拟器上不行，真机未测试过
                   audioRecorderPlayer.addRecordBackListener((e) => {
                     setAudioRecording(true)
-                    console.log('e------------>>>>>',e)
                   });
                 };
               }}
@@ -532,7 +515,6 @@ const ChatPage = ({
               setTextInputHeight(['android'].includes(Platform.OS)?contentSize.height:contentSize.height+20)
             }}
             onFocus={async (val)=>{
-              // console.log('-------->>>val',val)
               setShowBottomOperationBtn(false);
               setTimeout(() => {
                 scrollRef.current?.scrollToEnd()

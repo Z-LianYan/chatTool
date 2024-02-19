@@ -89,7 +89,7 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
     stickyHeaderIndices={[]}
     onMomentumScrollEnd={(event:any)=>{}}>
       
-      {
+      {/* {
         Platform.OS == 'android' && <MyCell
         style={{marginTop:0}}
         title='关于' 
@@ -99,12 +99,28 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
         onPress={()=>{
           navigation.navigate('VersionPage');
         }}/>
-      }
-
-      
+      } */}
 
 
-                
+      {/* <MyCell
+      style={{marginTop:0}}
+      title='个人信息' 
+      showBottomBorder={false}
+      showRightArrow={true}
+      rightValue={''}
+      onPress={()=>{
+        navigation.navigate('EditUserInfo');
+      }}/> */}
+
+      <MyCell
+      style={{marginTop:10}}
+      title='关于' 
+      showBottomBorder={false}
+      showRightArrow={true}
+      rightValue={'版本号'+AppVersions.versionName}
+      onPress={()=>{
+        navigation.navigate('VersionPage');
+      }}/>   
 
       <Button
         style={{marginHorizontal:10,marginTop:50,height: 44}}

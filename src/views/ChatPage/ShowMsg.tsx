@@ -53,6 +53,7 @@ import ImageViewer from '../../component/ImageViewer';
 import Video, {VideoRef,ResizeMode,PosterResizeModeType} from 'react-native-video';
 import ImageVideo from '../../component/ImageVideo';
 import Sound from 'react-native-sound';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMsg,params}:any,ref:any) => {
   const use_ref = useRef<any>();
@@ -83,11 +84,26 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
   //   open,
   //   close
   // }));
+
   const goUserDetail = useCallback(async (user_id:number)=>{
     const friends:any = await searchFriends({user_id: user_id});
-    runInAction(()=>{
+    runInAction(async ()=>{
       AppStore.search_user_info = friends;
+
+      if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]){
+        FriendsStore.chatLogs[login_user_id][params?.user_id] = {
+          ...FriendsStore.chatLogs[login_user_id][params?.user_id],
+          user_id:  friends?.user_id,
+          user_name:  friends?.user_name,
+          f_user_name_remark: friends?.f_user_name_remark,
+          avatar:  friends?.avatar,
+        }
+
+        await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
+      }
+      
     });
+    
     navigation.navigate({
       name: 'UserDetail',
       params: {
@@ -292,7 +308,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
             marginLeft: item.from_user_id === AppStore.userInfo?.user_id? 10:0,
             marginRight: item.from_user_id !== AppStore.userInfo?.user_id? 10:0,
           }} 
-          source={{uri: item.from_avatar}}/>
+          source={{uri: item.from_user_id === AppStore.userInfo?.user_id?AppStore.userInfo?.avatar:user.avatar}}/>
         </TouchableOpacity>
 
 
@@ -303,7 +319,6 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
               {
                 ['text','audio'].includes(item?.msg_type) && <TouchableOpacity
                   activeOpacity={0.6}
-                  
                   style={{
                     padding: 8,
                     minHeight: 20,

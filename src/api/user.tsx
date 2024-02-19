@@ -112,32 +112,23 @@ export function get_user_info(params?:any,text="") {
 
 
 
-
-
-
-
-
-
-
-
-// export function edit_user_info(params:any) {
-//   return new Promise((resolve, reject) => {
-//     HttpUtils.post(Api.EDIT_USER_INFO, params, '修改中...').then((res:any) => {
-//       switch (res.error) {
-//         case 0:
-//           resolve(res.data);
-//           Toast.show({
-//             icon: 'success',
-//             duration: 2000,
-//             text: res.message,
-//           });
-//           break;
-//         default:
-//           // Toast.message(res.message);
-//           Toast.fail(res.message||'修改成功');
-//           reject(res);
-//           break;
-//       }
-//     });
-//   });
-// }
+export function edit_user_info(params:any) {
+  return new Promise((resolve, reject) => {
+    HttpUtils.post(Api.EDIT_USER_INFO, params, '修改中...').then((res:any) => {
+      switch (res.error) {
+        case 0:
+          resolve(res.data);
+          Toast.show({
+            icon: 'success',
+            duration: 2000,
+            text: res.message,
+          });
+          break;
+        default:
+          Toast.fail(res.message||'修改成功');
+          reject(res);
+          break;
+      }
+    });
+  });
+}

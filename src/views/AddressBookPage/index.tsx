@@ -108,8 +108,21 @@ const AddressBookPage = ({
           showBottomBorder={index!=FriendsStore?.friendsData.rows.length-1}
           onPress={async ()=>{
             const friends:any = await searchFriends({user_id: item.user_id});
-            runInAction(()=>{
+            runInAction(async()=>{
               AppStore.search_user_info = friends;
+
+              if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][item.user_id]){
+                FriendsStore.chatLogs[login_user_id][item.user_id] = {
+                  ...FriendsStore.chatLogs[login_user_id][item.user_id],
+                  user_id:  friends?.user_id,
+                  user_name:  friends?.user_name,
+                  f_user_name_remark: friends?.f_user_name_remark,
+                  avatar:  friends?.avatar,
+                }
+                await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
+              }
+
+
             });
             navigation.navigate({
               name: 'UserDetail',

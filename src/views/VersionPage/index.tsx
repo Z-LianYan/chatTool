@@ -57,27 +57,6 @@ const VersionPage = ({app,navigation,AppVersions}:any) => {
     });
   },[])
 
-  async function onLoginOut() {
-
-    Alert.alert(
-      "您确定退出登录吗？",
-      "",
-      [
-        {
-          text: "取消",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel"
-        },
-        { text: "确定", onPress: async () => {
-          await login_out();
-          navigation.navigate("HomePage");
-          app.setUserInfo(null);
-          // navigation.replace('LoginPage')
-        } }
-      ]
-    );
-  }
-
   return <View style={styles.container}>
     {/* <NavigationBar 
     onBack={()=>{
@@ -98,10 +77,10 @@ const VersionPage = ({app,navigation,AppVersions}:any) => {
       <CustomListRow 
       bottomSeparator="indent" 
       title={'检测更新'} 
-      accessory= {(versionCode==AppVersions.versionCode||!versionName)?'none':'indicator'}
+      accessory= {Platform.OS != 'android' && (versionCode==AppVersions.versionCode||!versionName)?'none':'indicator'}
       detail={(versionCode==AppVersions.versionCode||!versionName)?'已是最新版本':`有版本更新v${versionName}`} 
       onPress={()=>{{
-        if(versionCode && versionCode!=AppVersions.versionCode) new SystemUpdataOverlay().show(false);
+        if(versionCode && versionCode!=AppVersions.versionCode && Platform.OS == 'android') new SystemUpdataOverlay().show(false);
       }}}/>
 
     </ScrollView>
