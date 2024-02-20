@@ -170,13 +170,13 @@ const ImageViewer2 = ({
     if(Platform.OS === "ios") {
       saveResult = await CameraRoll.save(url, { type: "auto" })
     }else{
-      const  res:any = await saveToCameraRoll(url);
+      const  res:any = await saveToCameraRoll(url);//保存到相册
       if(res.error===0) saveResult = res.data;
     }
     console.log('点击完成=====》〉》〉111',saveResult);
     if(saveResult){
       const id = saveResult.slice(saveResult.lastIndexOf('/')+1);
-      const data = await CameraRoll.getPhotos({
+      const data = await CameraRoll.getPhotos({//获取相册
         first: 5,
       });
       console.log('reslut====>>>first111',JSON.stringify(data));
@@ -211,7 +211,7 @@ const ImageViewer2 = ({
       <Vw style={{width: '100%',height: '80%',position:'relative'}}>
         {
           imgUri && <Image 
-          resizeMode="cover"
+          resizeMode="contain"
           style={{
             flex:1,
           }} 
@@ -219,7 +219,7 @@ const ImageViewer2 = ({
         }
         {
           videoUri && <Video
-            resizeMode={ResizeMode.COVER}
+            resizeMode={ResizeMode.CONTAIN}
             muted={false}//控制音频是否静音
             posterResizeMode={PosterResizeModeType.CONTAIN}
             // poster={videoUri+'?vframe/jpg/offset/0'}//视频加载时显示的图像

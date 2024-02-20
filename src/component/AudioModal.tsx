@@ -47,7 +47,7 @@ import { runInAction } from 'mobx';
 
 
 import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera, CameraCaptureError, useCameraFormat} from 'react-native-vision-camera';
-import { AUDIO_ICON_NOT_CIRCLE, CLOSE_CIRCLE_ICON, CLOSE_FLASH, OPEN_FLASH, TURN_CAPTURE } from '../assets/image';
+import { AUDIO_ICON_NOT_CIRCLE_LEFT, CLOSE_CIRCLE_ICON, CLOSE_FLASH, OPEN_FLASH, TURN_CAPTURE } from '../assets/image';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { result } from 'lodash';
 
@@ -163,7 +163,7 @@ const AudioModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
             marginRight: 10,
             marginTop: 50
           }} 
-          source={AUDIO_ICON_NOT_CIRCLE}/>
+          source={AUDIO_ICON_NOT_CIRCLE_LEFT}/>
         </TouchableWithoutFeedback>
 
       </TouchableOpacity>

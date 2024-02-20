@@ -41,7 +41,7 @@ import {
   AlbumView
 } from '../../component/teaset/index';
 
-import { ADD_CIR, ADD_USER, ALBUM_ICON, AUDIO_ICON, AUDIO_ICON_NOT_CIRCLE, CAPTURE_ICON, LOADING_ICON, NEW_FIREND, SEND_FAIL, VIDEO_ICON } from '../../assets/image';
+import { ADD_CIR, ADD_USER, ALBUM_ICON, AUDIO_ICON, AUDIO_ICON_NOT_CIRCLE_LEFT, AUDIO_ICON_NOT_CIRCLE_RIGHT, CAPTURE_ICON, LOADING_ICON, NEW_FIREND, SEND_FAIL, VIDEO_ICON } from '../../assets/image';
 
 import {launchCamera, launchImageLibrary,} from 'react-native-image-picker';
 import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera} from 'react-native-vision-camera';
@@ -56,7 +56,7 @@ import Sound from 'react-native-sound';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMsg,params}:any,ref:any) => {
-  const use_ref = useRef<any>();
+  const use_audio_ref = useRef<any>();
   const colorScheme:any = useColorScheme();
   const login_user_id = AppStore?.userInfo?.user_id;
   const chatLogs = FriendsStore.chatLogs[login_user_id]||{};
@@ -90,6 +90,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
     runInAction(async ()=>{
       AppStore.search_user_info = friends;
 
+      // 更新聊天记录的会员信息
       if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]){
         FriendsStore.chatLogs[login_user_id][params?.user_id] = {
           ...FriendsStore.chatLogs[login_user_id][params?.user_id],
@@ -98,9 +99,19 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
           f_user_name_remark: friends?.f_user_name_remark,
           avatar:  friends?.avatar,
         }
-
         await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
       }
+
+      //更新通讯录的个人信息
+      FriendsStore?.friendsData?.rows.map((item:any)=>{
+        runInAction(()=>{
+          if(item.user_id===friends?.user_id) {
+            item.user_name = friends?.user_name;
+            item.f_user_name_remark = friends?.f_user_name_remark;
+            item.avatar = friends?.avatar;
+          }
+        })
+      })
       
     });
     
@@ -159,28 +170,41 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
     }}>{item.des}</Text>
   },[]);
   const playAudio = useCallback((url:string)=>{
-    // 解决ios 问题 对于IOS，您可以将url => decodeURI(url) 和 Sound.MAIN_BUNDLE 设置为“”（空字符串）
-    const whoosh = new Sound(decodeURI(url), '', (error:any) => {
-      if (error) {
-        console.log('failed to load the sound', error);
-        return;
-      }
-      // loaded successfully
-      console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
-      // whoosh.stop(() => {
-      //   console.log('sto')
-      //   // Note: If you want to play a sound after stopping and rewinding it,
-      //   // it is important to call play() in a callback.
-      // });
-      // Play the sound with an onEnd callback
-      whoosh.play((success:any) => {
-        if (success) {
-          console.log('successfully finished playing');
-        } else {
-          console.log('playback failed due to audio decoding errors');
+    if(use_audio_ref.current){
+      if(use_audio_ref.current.timer){
+        clearTimeout(use_audio_ref.current.timer)
+      }else{
+        use_audio_ref.current.whoosh && use_audio_ref.current.whoosh.stop();
+      };
+    }else{
+      use_audio_ref.current = {}
+    }
+
+    const timer = setTimeout(() => {
+      // 解决ios 问题 对于IOS，您可以将url => decodeURI(url) 和 Sound.MAIN_BUNDLE(第二个参数) 设置为“”（空字符串）
+      const whoosh = new Sound(decodeURI(url), '', (error:any) => {
+        if (error) {
+          console.log('failed to load the sound', error);
+          return;
         }
+        // loaded successfully
+        console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+       
+        // Play the sound with an onEnd callback
+        whoosh.play((success:any) => {
+          if (success) {
+            use_audio_ref.current.timer = null;
+            use_audio_ref.current.whoosh = null;
+            console.log('successfully finished playing');
+          } else {
+            console.log('playback failed due to audio decoding errors');
+          }
+        });
       });
-    });
+      use_audio_ref.current.whoosh = whoosh;
+      
+    }, 800);
+    use_audio_ref.current.timer = timer;
   },[])
   const renderMsg = useCallback(()=>{
     // const imgs:any = [];
@@ -247,7 +271,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                         tintColor: MyThemed[colorScheme||'light'].ftCr,
                         marginVertical: 0
                       }} 
-                      source={AUDIO_ICON_NOT_CIRCLE}/>:<Text
+                      source={AUDIO_ICON_NOT_CIRCLE_RIGHT}/>:<Text
                     selectable={true}
                      style={{
                       ...styles.msgText,
@@ -308,7 +332,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
             marginLeft: item.from_user_id === AppStore.userInfo?.user_id? 10:0,
             marginRight: item.from_user_id !== AppStore.userInfo?.user_id? 10:0,
           }} 
-          source={{uri: item.from_user_id === AppStore.userInfo?.user_id?AppStore.userInfo?.avatar:user.avatar}}/>
+          source={{uri: item.from_user_id === AppStore.userInfo?.user_id?AppStore.userInfo?.avatar:FriendsStore.chatLogs[login_user_id][params?.user_id]?.avatar}}/>
         </TouchableOpacity>
 
 
@@ -340,7 +364,7 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                       height: 20,
                       tintColor: MyThemed[colorScheme||'light'].ftCr,
                     }} 
-                    source={AUDIO_ICON_NOT_CIRCLE}/>:<Text 
+                    source={AUDIO_ICON_NOT_CIRCLE_LEFT}/>:<Text 
                     selectable={true}
                     style={{
                       ...styles.msgText,

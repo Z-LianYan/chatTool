@@ -185,9 +185,9 @@ export function isLocalFile (path:any) {
     const localFilePrefixes = ['file://', '/'];
     // 检查⽂件路径是否以本地⽂件前缀开始
     for (const prefix of localFilePrefixes) {
-    if (path.startsWith(prefix)) {
-    return true; // 是本地⽂件
-    }
+        if (path.startsWith(prefix)) {
+            return true; // 是本地⽂件
+        }
     }
     // 如果不是本地⽂件前缀开头，则可能是⽹络⽂件
     return false;
@@ -214,7 +214,7 @@ export async function saveToCameraRoll(imageUrl:any) {
         }
         const index = imageUrl.lastIndexOf('.');
         const suffix = imageUrl.slice(index+1);
-        let timestamp = (new Date()).getTime();//获取当前时间错
+        let timestamp = (new Date()).getTime();//获取当前时间戳
         let random = String(((Math.random() * 1000000) | 0))//六位随机数
         let dirs = Platform.OS === 'ios' ? RNFS.LibraryDirectoryPath : RNFS.ExternalDirectoryPath; //外部⽂件，共享⽬录的绝对路径
         const downloadDest = `${dirs}/${timestamp + random}.${suffix}`;

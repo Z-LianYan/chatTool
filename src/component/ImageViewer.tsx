@@ -59,29 +59,33 @@ import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import RNFetchBlob from "rn-fetch-blob";
 import { saveToCameraRoll } from '../utils/tool';
 import ImageZoomViewer from './ImageZoomViewer';
+import { Props } from 'react-native-image-zoom-viewer/built/image-viewer.type';
 
 type TypeProps = {
   // index?: number,
   // images: any[],
-  style?: object,
+  // style?: object,
   MyThemed?: any,
+  footerOperatorBtn?: boolean,
+  saveToLocalByLongPress?: boolean,
 }
 
 
 const ImageViewerComponent = ({
-  // index = 0,
-  // images = [],
-  style,
-  MyThemed
+  MyThemed,
+  footerOperatorBtn,
+  saveToLocalByLongPress=true,
 }:TypeProps,ref:any) => {
   const colorScheme = useColorScheme();
   const { StatusBarManager } = NativeModules;
   
 
-  const [visibleModal,setVisibleModal] = useState(false)
+  const [visibleModal,setVisibleModal] = useState(false);
+  // const [renderFooter,setRenderFooter] = useState<any>();
   const [currentIndex,setCurrentIndex] = useState(0);
   const [images,setImages] = useState<any[]>([])
   const imageViewerRef:{current:any} = useRef();
+  const ref2:{current:any} = useRef();
 
   const navigation:any = useNavigation();
   useEffect(()=>{
@@ -129,12 +133,17 @@ const ImageViewerComponent = ({
     return await getRequestPermissionPromise();
   }
 
-  const open = useCallback(({imgs,index}:any)=>{
+  const open = useCallback(({imgs,index,callBack}:any,)=>{
+    // console.log('renderFooter====>>>',renderFooter)
     // StatusBar.setHidden(true);
-    if(!imgs || !imgs.length) return
+    if(!imgs || !imgs.length) return;
+    // setRenderFooter(renderFooter);
     setCurrentIndex(index);
     setImages(imgs);//imgs [{url:''}]
     setVisibleModal(true)
+    ref2.current = {
+      callBack: callBack,
+    };
 
     if(Platform.OS == "android") StatusBar.setBackgroundColor('#000000');
   },[])
@@ -164,19 +173,40 @@ const ImageViewerComponent = ({
     // if(Platform.OS === "ios") {
     //   saveResult = await CameraRoll.save(url)
     // }else{
-      const  res:any = await saveToCameraRoll(url);
+      const  res:any = await saveToCameraRoll(url);//保存相册
       if(res.error===0) saveResult = res.data;
     // }
 
-    if(saveResult) {
-      Toast.message('已成功保存到相册');
-    }else{
-      Toast.fail('保存失败');
-    }
+    console.log('res====>>>111222',res);
 
+    
+
+
+
+    if(ref2.current?.callBack) {
+      const id = saveResult.slice(saveResult.lastIndexOf('/')+1);
+      const data = await CameraRoll.getPhotos({//获取相册
+        first: 5,
+      });
+      const image = null;
+      const edges = data?.edges||[];
+      for(const item of edges){
+        if(item.node.id==id) {
+          ref2.current.callBack && ref2.current.callBack({
+            type: item?.node?.type, 
+            uri: item?.node?.image?.uri
+          });
+          break;
+        }
+      }
+    }else{
+      if(saveResult){
+        Toast.message('已成功保存到相册');
+      }else{
+        Toast.fail('保存失败');
+      }
+    }
     close()
-    // saveToCameraRoll(url)
-  
   },[]);
 
   // const isLocalFile = (path:any) => {
@@ -228,6 +258,46 @@ const ImageViewerComponent = ({
   //   }
   // }
 
+  const renderFooterOperatorBtn = (currentIndex:number)=>{
+    return  <Vw style={{
+      // position: "absolute",
+      // bottom: 50,
+      // left: 0,
+      // right: 0,
+      width: Dimensions.get('window').width,
+      height: 100,
+      justifyContent:'space-around',
+      flexDirection:'row',
+    }}>
+      <Button
+        style={{
+          width: 80,
+          height: 35,
+          borderColor: '#fff'
+        }}
+        title={'取消'}
+        type="default"
+        titleStyle={{
+          color: '#fff'
+        }}
+        onPress={() => {
+          close()
+        }}
+      />
+      <Button
+        style={{
+          width: 80,
+          height: 35,
+        }}
+        title={'完成'}
+        type="primary"
+        onPress={() => {
+          savePhoto(images[currentIndex].url);
+        }}
+      />
+    </Vw>
+  }
+
   return <Modal
   animationType={"fade"}// slide,fade,none
   transparent={false}
@@ -241,8 +311,16 @@ const ImageViewerComponent = ({
       renderIndicator={(a,b)=>{
           return <Text style={{color:'#fff'}}></Text>
       }}
-      // renderFooter={()=>{
-      //   return <Text style={{height: 15,width: '100%',borderWidth:1,borderColor:"red"}}>1234567</Text>
+      renderFooter={(currentIndex: number)=>{
+        return <Vw>
+            {
+              footerOperatorBtn &&  renderFooterOperatorBtn(currentIndex)
+            }
+          </Vw>
+      }}
+      // renderFooter={(currentIndex)=>{
+      //   console.log('----->>>renderFooter',currentIndex)
+      //   return renderFooter && renderFooter()
       // }}
       renderImage={(props)=>{
         return <Image {...props} resizeMode="contain"/>
@@ -317,7 +395,7 @@ const ImageViewerComponent = ({
       enablePreload={true}//启用预加载
       imageUrls={images}
       enableImageZoom={true} // 是否开启手势缩放
-      saveToLocalByLongPress={true} //是否开启长按保存
+      saveToLocalByLongPress={saveToLocalByLongPress} //是否开启长按保存
       index={currentIndex} // 初始显示第几张
       // failImageSource={} // 加载失败图片
       loadingRender={()=>{

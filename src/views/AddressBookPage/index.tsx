@@ -111,6 +111,7 @@ const AddressBookPage = ({
             runInAction(async()=>{
               AppStore.search_user_info = friends;
 
+              // 更新聊天记录的会员信息
               if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][item.user_id]){
                 FriendsStore.chatLogs[login_user_id][item.user_id] = {
                   ...FriendsStore.chatLogs[login_user_id][item.user_id],
@@ -121,6 +122,17 @@ const AddressBookPage = ({
                 }
                 await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
               }
+
+              //更新通讯录的个人信息
+              FriendsStore?.friendsData?.rows.map((item:any)=>{
+                runInAction(()=>{
+                  if(item.user_id===friends?.user_id) {
+                    item.user_name = friends?.user_name;
+                    item.f_user_name_remark = friends?.f_user_name_remark;
+                    item.avatar = friends?.avatar;
+                  }
+                })
+              })
 
 
             });

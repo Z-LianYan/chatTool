@@ -49,6 +49,7 @@ import { runInAction } from 'mobx';
 import {useCameraDevice,useCameraPermission,useMicrophonePermission,Camera, CameraCaptureError, useCameraFormat} from 'react-native-vision-camera';
 import { CLOSE_CIRCLE_ICON, CLOSE_FLASH, OPEN_FLASH, TURN_CAPTURE } from '../assets/image';
 import ImageViewer2 from './ImageViewer2';
+import ImageViewer from './ImageViewer';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { result } from 'lodash';
 
@@ -58,6 +59,7 @@ import * as Progress from 'react-native-progress';
 const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => {
   const use_ref = useRef<any>();
   const imageViewer2Ref = useRef<any>();
+  const imageViewerRef = useRef<any>();
   const colorScheme = useColorScheme();
   const [startRecordingSecond,setStartRecordingSecond] = useState<number>(0);//off,on
   const [flash,setFlash] = useState<string>("off");//off,on
@@ -67,9 +69,9 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
 
   const SCREEN_WIDTH = Dimensions.get('window').width
   const SCREEN_HEIGHT = Platform.select<number>({
-  android: Dimensions.get('screen').height - StaticSafeAreaInsets.safeAreaInsetsBottom,
-  ios: Dimensions.get('window').height,
-}) as number
+    android: Dimensions.get('screen').height - StaticSafeAreaInsets.safeAreaInsetsBottom,
+    ios: Dimensions.get('window').height,
+  }) as number
   const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
   const format = useCameraFormat(device, [
     // { 
@@ -209,13 +211,29 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         onRecordingFinished: (video:any) => {
           setStartRecordingSecond(0);
           if(use_ref.current.startRecordingTimer) clearInterval(use_ref.current.startRecordingTimer);
-          imageViewer2Ref.current.open({
-            videoUri: 'file://'+video.path,
-          },(file:any)=>{
-            console.log('imageViewer2Ref====>>>file',file);
-            use_ref.current.callBack && use_ref.current.callBack(file);
-            close();
+          // imageViewer2Ref.current.open({
+          //   videoUri: 'file://'+video.path,
+          // },(file:any)=>{
+          //   console.log('imageViewer2Ref====>>>file',file);
+          //   use_ref.current.callBack && use_ref.current.callBack(file);
+          //   close();
+          // })
+
+          // imageViewerRef.current.open({
+          //   index: 0,
+          //   imgs:   [{url: 'file://'+video.path}]
+          // })
+
+          imageViewerRef.current.open({
+            index: 0,
+            imgs:   [{ url: 'file://'+video.path }],
+            callBack: (file:any)=>{
+              use_ref.current.callBack && use_ref.current.callBack(file);
+              close();
+            }
           })
+
+
         },
         onRecordingError: (error:any) => {
           console.error('onRecordingError===========>>>>>>',error)
@@ -234,19 +252,29 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
         if(!cameraRef?.current) return; 
         const photo = await cameraRef?.current?.takePhoto({
           qualityPrioritization: 'quality',
-          flash: flash,// "off"| "auto"|"on"
+          flash: flash,// 闪光灯 "off"| "auto"|"on"
           // quality: 90,
           enableShutterSound: true ,
           enableAutoStabilization: true,
           enableAutoRedEyeReduction: true,
         } as any);
         if(!photo) return;
-        imageViewer2Ref.current.open({
-          imgUri: 'file://'+photo.path,
-        },(file:any)=>{
-          console.log('imageViewer2Ref====>>>file',file);
-          use_ref.current.callBack && use_ref.current.callBack(file);
-          close();
+        // imageViewer2Ref.current.open({
+        //   imgUri: 'file://'+photo.path,
+        // },(file:any)=>{
+        //   console.log('imageViewer2Ref====>>>file',file);
+        //   use_ref.current.callBack && use_ref.current.callBack(file);
+        //   close();
+        // })
+
+        imageViewerRef.current.open({
+          index: 0,
+          imgs:   [{ url: 'file://'+photo.path }],
+          callBack: (file:any)=>{
+            console.log('file====>>>哈哈哈哈😄',file);
+            use_ref.current.callBack && use_ref.current.callBack(file);
+            close();
+          }
         })
       }catch(e){
         console.log('e=====>>>',e)
@@ -428,7 +456,12 @@ const CameraModal = ({AppStore,MyThemed,navigation,AppVersions}:any,ref:any) => 
     </TouchableOpacity>
 
 
-    <ImageViewer2 ref={imageViewer2Ref}/>
+    {/* <ImageViewer2 ref={imageViewer2Ref}/> */}
+
+    <ImageViewer 
+    ref={imageViewerRef}
+    footerOperatorBtn={true}
+    saveToLocalByLongPress={false}/>
   </Modal>;
 };
 
