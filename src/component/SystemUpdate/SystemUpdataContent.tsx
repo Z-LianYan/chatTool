@@ -3,7 +3,6 @@
 import React, {Component,PureComponent} from 'react';
 import {
     ScrollView,
-    AsyncStorage,
     NativeModules,
     Text,
     View,
