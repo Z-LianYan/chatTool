@@ -33,6 +33,8 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+!debug2.keystore
+!lend2.keystore
 
 # node.js
 #

@@ -204,7 +204,7 @@ const NewFriendsList = ({
           // showDisNotice={true}
           showRightArrow={false}
           // rightValue="12345"
-          msg={item.status+'-'+item.is_apply}
+          msg={addFriendChatLogs[item.f_user_id] && addFriendChatLogs[item.f_user_id].msg_contents?addFriendChatLogs[item.f_user_id].msg_contents.slice(-1)[0]?.msg_content:''}
           hasNewMsg={false}
           showBottomBorder={FriendsStore?.new_friends_list?.threeDaysBefore.length==(index+1)?false:true}
           avatar={item.f_avatar}

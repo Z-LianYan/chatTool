@@ -155,7 +155,6 @@ const SetRemarkLabel = ({
           }
         }
         const has_val = FriendsStore.chatLogs[login_user_id][search_user_id];
-        console.log('------>>>哈哈哈哈----999---',has_val);
         if(has_val){
           const msg_contents = has_val.msg_contents||[];
           for(const item of msg_contents) item.readMsg = true;

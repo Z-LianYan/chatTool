@@ -174,19 +174,21 @@ const UserDetail = ({
                           delete addFriendChatLogs[search_user_info.user_id];
                           const addUserIdSort = addFriendChatLogs?.userIdSort||[];
                           const addIdx = addUserIdSort.indexOf(search_user_info.user_id);
-                          runInAction(()=>{
+                          runInAction(async()=>{
                             addUserIdSort.splice(addIdx,1);
-                          })
+                            await AsyncStorage.setItem('addFriendChatLogs',JSON.stringify(addFriendChatLogs));
+                          });
                           
 
                           
-                          runInAction(()=>{
+                          runInAction(async ()=>{
                             const chatLogs = FriendsStore.chatLogs[login_user_id] || {}
                             delete chatLogs[search_user_info.user_id];
                             const userIdSort = chatLogs?.userIdSort||[];
                             const idx = userIdSort.indexOf(search_user_info.user_id);
                             userIdSort.splice(idx,1);
-                          })
+                            await AsyncStorage.setItem('chatLogs',JSON.stringify(chatLogs));
+                          });
                           
 
                           await FriendsStore.getFriendList();
@@ -230,6 +232,7 @@ const UserDetail = ({
     for(const item of add_msg_contents) {
       if(item.from_user_id==search_user_info.user_id) hasReply =  true;
     }
+    console.log('showReplyBtn=====>>>',hasReply)
     if(hasReply && [1].includes(search_user_info.f_is_apply)) return true;
     if([0].includes(search_user_info.f_is_apply) && add_msg_contents.length) return true;
     return false
@@ -280,7 +283,7 @@ const UserDetail = ({
     </View>
 
     {
-      ([0].includes(search_user_info?.f_status) && add_msg_contents.length) ? <View style={{
+      (([0].includes(search_user_info?.f_status) || [0].includes(search_user_info?.to_f_status)) && add_msg_contents.length) ? <View style={{
         ...styles.applyMsgWrapper,
       }}>
 
@@ -398,7 +401,10 @@ const UserDetail = ({
     }
 
     
-    <ReplyMsg ref={replyMsgRef} AppStorez={AppStore} to_user_id={search_user_info.user_id}/>
+    <ReplyMsg 
+    ref={replyMsgRef} 
+    to_user_id={search_user_info.user_id}
+    navigation={navigation}/>
 
   </ScrollView>
   

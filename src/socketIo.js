@@ -107,7 +107,6 @@ export default class SocketIoClient {
          * 
         */
         socket.on('sendClientMsg',(data,callBack)=>{//服务端发送过来的消息
-            // console.log('===========>>>>有消息---',store.AppStore.userInfo?.user_name,data?.msg_content?.msg_unique_id);
             console.log('===========>>>>有消息---data', data);
 
             const login_user_id = store.AppStore.userInfo?.user_id;
@@ -115,7 +114,6 @@ export default class SocketIoClient {
             runInAction(async ()=>{// acceptAddFriends
                 const isAddFriend = ['addFriendsApply','addFriendApplyReply'].includes(data?.type);
                 if(['acceptAddFriends'].includes(data?.type)){
-                    console.log('执行了=======》〉》〉',from_user_id,store.FriendsStore.addFriendChatLogs[login_user_id])
                     runInAction(async ()=>{
                         const addFriendChatLogs = store.FriendsStore.addFriendChatLogs[login_user_id]||{};
                         const addUser = addFriendChatLogs[from_user_id];
@@ -152,10 +150,12 @@ export default class SocketIoClient {
                     await handlerChatLog(target_obj);
                 }
 
+
                 if(!['AddressBookPage'].includes(store.AppStore.curRouteName) && isAddFriend) {
                     runInAction(()=>{
                         let addressBookPageNotreadMsgCount = 0;
-                        const addFriendChatLogs = store.FriendsStore.addFriendChatLogs[login_user_id]||{}
+                        const addFriendChatLogs = store.FriendsStore.addFriendChatLogs[login_user_id]||{};
+                        addFriendChatLogs[data.user_id].newAddFriendReadMsg = false;
                         for(const key in addFriendChatLogs) {
                             if(['userIdSort'].includes(key)) continue;
                             if(!addFriendChatLogs[key].newAddFriendReadMsg) addressBookPageNotreadMsgCount += 1;
@@ -174,8 +174,6 @@ export default class SocketIoClient {
 
 
         socket.on('outLogin',async (data,callBack)=>{
-            console.log('outLogin====>>',data, SocketIoClient?.navigation);
-            
             // await login_out();
             store.AppStore.setUserInfo(null);
             SocketIoClient?.navigation?.dispatch(StackActions.popToTop());//清除内部导航堆栈

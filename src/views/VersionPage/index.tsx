@@ -77,10 +77,10 @@ const VersionPage = ({app,navigation,AppVersions}:any) => {
       <CustomListRow 
       bottomSeparator="indent" 
       title={'检测更新'} 
-      accessory= {Platform.OS != 'android' && (versionCode==AppVersions.versionCode||!versionName)?'none':'indicator'}
+      accessory= {Platform.OS != 'android' || (versionCode<=AppVersions.versionCode||!versionName)?'none':'indicator'}
       detail={(versionCode==AppVersions.versionCode||!versionName)?'已是最新版本':`有版本更新v${versionName}`} 
       onPress={()=>{{
-        if(versionCode && versionCode!=AppVersions.versionCode && Platform.OS == 'android') new SystemUpdataOverlay().show(false);
+        if(versionCode && versionCode>AppVersions.versionCode && Platform.OS == 'android') new SystemUpdataOverlay().show(false);
       }}}/>
 
     </ScrollView>

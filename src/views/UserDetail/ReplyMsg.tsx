@@ -28,7 +28,7 @@ import {
   View,
   Text
 } from '../../component/customThemed';
-import { Button, Input } from '../../component/teaset';
+import { Button, Input, Toast } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
@@ -38,7 +38,8 @@ const ReplyMsg = ({
   MyThemed,
   AppStore,
   to_user_id,
-  navigation
+  navigation,
+  FriendsStore,
 }:any,ref:any) => {
   const sockitIo = SocketIoClient.getInstance({
     callBack: ()=>{},
@@ -76,6 +77,7 @@ const ReplyMsg = ({
     if(isSending) return;
     if(isSending) setIsSending(true);
     if(!AppStore?.userInfo?.user_id || !to_user_id) return;
+    console.log('reply_content===>>',reply_content,to_user_id)
     sockitIo?.getSocketIo()?.emit('addFriendApplyReply',{ 
       msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id),
       to_user_id: to_user_id,
@@ -87,7 +89,16 @@ const ReplyMsg = ({
           // close();
           // set_reply_content('');
       } else {
-          console.log('Failed to send message!');
+        console.log('Failed to send message!',response);
+        Toast.fail(response?.msg);
+        // if(['alreadyDelFriend'].includes(response.status)) {
+        //   Toast.fail(response?.msg);
+          // setTimeout(async() => {
+          //   navigation.navigate('ChatListPage');
+          //   await FriendsStore.getFriendList();
+          //   await FriendsStore.get_new_friends_list();
+          // }, 800);
+        // }
       }
       close();
       set_reply_content('');
@@ -208,4 +219,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","MyThemed")(observer(forwardRef(ReplyMsg)));
+export default inject("AppStore","MyThemed","FriendsStore")(observer(forwardRef(ReplyMsg)));
