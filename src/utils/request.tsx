@@ -11,8 +11,8 @@ import { useState } from 'react';
 
 import config from '../config/index';
 import { TopView, Toast,ModalIndicator, Theme } from '../component/teaset/index';
-import AppStore from '../store/AppStore';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import store from "../store";
 
 let tip:any = null;
 function isLoading(text?:string){
@@ -74,8 +74,7 @@ export function post(url:string, data?:any, text?:string,headers={}) {
     if (text) isLoading(text);
     try{
       const res = await service({
-        url: url,
-        // url: url + `?versionCode=${AppVersions.versionCode}&versionName=${AppVersions.versionName}&unique_id=${AppVersions.unique_id}&device_id=${AppVersions.device_id}`,
+        url: url + `?versionCode=${store.AppVersions.versionCode}&versionName=${store.AppVersions.versionName}&unique_id=${store.AppVersions.unique_id}`,
         method: "POST",
         data: data,
         headers,
@@ -84,7 +83,7 @@ export function post(url:string, data?:any, text?:string,headers={}) {
       if (text) hideLoading();
       if(res?.data?.error==400){
         data.navigation && data.navigation.navigate('LoginPage');
-        AppStore.setUserInfo(null);
+        store.AppStore.setUserInfo(null);
       }
     }catch(err){
       reject(err); 
@@ -99,8 +98,7 @@ export function get(url:string, params?:any, text?:string, headers={}) {
     hideLoading();
     if (text) isLoading(text);
     service({
-      url: url,
-      // url: url + `?versionCode=${AppVersions.versionCode}&versionName=${AppVersions.versionName}&unique_id=${AppVersions.unique_id}&device_id=${AppVersions.device_id}`,
+      url: url + `?versionCode=${store.AppVersions.versionCode}&versionName=${store.AppVersions.versionName}&unique_id=${store.AppVersions.unique_id}`,
       method: "GET",
       params: params,
       headers,
@@ -110,7 +108,7 @@ export function get(url:string, params?:any, text?:string, headers={}) {
         if (text) hideLoading();
         if(res.data.error==400){
           params.navigation && params.navigation.navigate('HomePage');
-          AppStore.setUserInfo(null);
+          store.AppStore.setUserInfo(null);
         }
       })
       .catch((err) => {

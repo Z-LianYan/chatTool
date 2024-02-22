@@ -21,7 +21,7 @@ import store from '../../store';
 import { scaleView as sv,scaleText as st } from '../../utils/scaleSize';
 import { HasNewVersionComp } from './HasNewVersionComp';
 import { VersionUpdatingComp } from './VersionUpdatingComp';
-// import { checkAppUpdate } from '../../api/appVersions';
+import { checkAppUpdate } from '../../api/appVersions';
 type IProps= {
     hide:()=>void,
     isClickCheck:boolean,
@@ -40,7 +40,7 @@ export class SystemUpdataContent extends Component<IProps,IState> {
         }
     }
     async componentDidMount(): Promise<void> {
-        let lastVersion:any = await store.AppVersions.checkAppUpdate()                      
+        let lastVersion:any = await checkAppUpdate()                      
         if(!this.props.isClickCheck){
             if(!lastVersion){
                 return this.props.hide();

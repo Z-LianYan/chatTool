@@ -43,13 +43,19 @@ export async function handlerChatLog({
             }, des = {
                 type: 'des',
                 des: '以上是打招呼的内容'
+            },des2 = {
+                type: 'des',
+                des: `你已添加了${data?.user_name},现在可以开始聊天了`
             }
             if(!chatLogs[login_user_id]){
+                console.log('------------->>>0',data?.user_id, type, JSON.stringify(chatLogs));
                 chatLogs[login_user_id] = {
                     userIdSort: [from_user_id]
                 };
-                const msg_contents = [data.msg_content];
-                if(['acceptAddFriends'].includes(type)) msg_contents.unshift(des)
+                let msg_contents = [data.msg_content];
+                //acceptAddFriends 同意添加好友 notAddFriendVerify 对方开启了添加好友无需认证， alreadyFriend 你已经是对方好友 (notAddFriendVerify,alreadyFriend 申请添加好友的时候返回的)
+                if(['acceptAddFriends'].includes(type)) msg_contents = msg_contents.concat([des]); 
+                if(['notAddFriendVerify','alreadyFriend'].includes(type)) msg_contents = msg_contents.concat([des,des2]); 
                 if(!addTypes.includes(type))  msg_contents.unshift(time);
                 chatLogs[login_user_id][from_user_id] = {
                     user_id:  data?.user_id,
@@ -59,6 +65,8 @@ export async function handlerChatLog({
                     msg_contents: msg_contents,
                 }
             }else{
+                console.log('------------->>>1',data?.user_id, type, JSON.stringify(chatLogs))
+
                 if(!Array.isArray(chatLogs[login_user_id].userIdSort)){
                     chatLogs[login_user_id].userIdSort = [];
                 }
@@ -67,8 +75,13 @@ export async function handlerChatLog({
                 chatLogs[login_user_id].userIdSort.unshift(from_user_id);
 
                 if(!chatLogs[login_user_id][from_user_id]){
-                    const msg_contents = [data.msg_content];
+                    console.log('------------->>>2',data?.user_id, type)
+
+                    let msg_contents = [data.msg_content];
                     if(!addTypes.includes(type)) msg_contents.unshift(time) 
+                    //acceptAddFriends 同意添加好友 notAddFriendVerify 对方开启了添加好友无需认证， alreadyFriend 你已经是对方好友  (notAddFriendVerify,alreadyFriend 申请添加好友的时候返回的)
+                    if(['acceptAddFriends'].includes(type)) msg_contents = msg_contents.concat([des]); 
+                    if(['notAddFriendVerify','alreadyFriend'].includes(type)) msg_contents = msg_contents.concat([des,des2]); 
                     chatLogs[login_user_id][from_user_id]={
                         user_id:  data?.user_id,
                         user_name:  data?.user_name,
@@ -77,13 +90,19 @@ export async function handlerChatLog({
                         msg_contents: msg_contents,
                     }
                 }else if(chatLogs[login_user_id][from_user_id]){
-                    const msg_contents = [...chatLogs[login_user_id][from_user_id].msg_contents];
+                    console.log('------------->>>3',data?.user_id, type, JSON.stringify(chatLogs))
+
+                    let msg_contents = [...chatLogs[login_user_id][from_user_id].msg_contents];
                     if(!addTypes.includes(type)){
                         const finalRowMsg = getFinalRowMsg(msg_contents);
                         const minute = dayjs(data?.msg_content?.created_at).diff(finalRowMsg?.created_at,'minute');
+                        //acceptAddFriends 同意添加好友 notAddFriendVerify 对方开启了添加好友无需认证， alreadyFriend 你已经是对方好友    (notAddFriendVerify,alreadyFriend 申请添加好友的时候返回的)
                         if(['acceptAddFriends'].includes(type)){
                             msg_contents.unshift(time); 
-                            msg_contents.push(des)
+                            // msg_contents.push(des)
+                            msg_contents = msg_contents.concat([des]);
+                        }else if(['notAddFriendVerify','alreadyFriend'].includes(type)){
+                            msg_contents = msg_contents.concat([des,des2]);
                         }else if(minute>3) {
                             msg_contents.push(time); 
                         }

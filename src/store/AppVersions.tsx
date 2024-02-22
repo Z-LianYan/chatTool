@@ -1,6 +1,6 @@
 
 import { observable, action, makeAutoObservable,runInAction } from 'mobx';
-import * as HttpUtils from '../utils/request';
+// import * as HttpUtils from '../utils/request';
 import * as Api from '../api/constant';
 import {Toast} from '../component/teaset/index';
 import DeviceInfo from 'react-native-device-info';
@@ -25,28 +25,28 @@ export default class AppVersions {
 	static package_name = DeviceInfo.getInstallerPackageNameSync();
 	static bundle_id = DeviceInfo.getBundleId();
   
-  static checkAppUpdate(params:any={}) {
-    return new Promise((resolve, reject) => {
-      HttpUtils.post(Api.APP_VERSIONS_CHECK_UPDATE, {
-        platform: this.platform,
-        packageName: 'com.chattool',
-        ...params
-      }).then((res:any) => {
-        runInAction(()=>{
-          // this.versionCode = res.data.versionCode;
-        });
-        switch (res.error) {
-          case 0:
-            resolve(res.data);
-            break;
-          default:
-            reject(res.data);
-            break;
-        }
-      }).catch(err=>{
-        reject(err)
-      });;
-    })
-  }
+  // static checkAppUpdate(params:any={}) {
+  //   return new Promise((resolve, reject) => {
+  //     HttpUtils.post(Api.APP_VERSIONS_CHECK_UPDATE, {
+  //       platform: this.platform,
+  //       packageName: 'com.chattool',
+  //       ...params
+  //     }).then((res:any) => {
+  //       runInAction(()=>{
+  //         // this.versionCode = res.data.versionCode;
+  //       });
+  //       switch (res.error) {
+  //         case 0:
+  //           resolve(res.data);
+  //           break;
+  //         default:
+  //           reject(res.data);
+  //           break;
+  //       }
+  //     }).catch(err=>{
+  //       reject(err)
+  //     });;
+  //   })
+  // }
   
 }

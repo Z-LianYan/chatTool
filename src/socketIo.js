@@ -26,7 +26,6 @@ export default class SocketIoClient {
         console.log('实例化会触发构造函数');
         this.connect();
     }
-    
     async connect(){
         const { userInfo } = store?.AppStore;
         console.log('连接socket服务',userInfo);
@@ -34,6 +33,9 @@ export default class SocketIoClient {
             // 实际使用中可以在这里传递参数
             query: {
                 token: await AsyncStorage.getItem('token'),
+                versionCode: store.AppVersions.versionCode,
+                versionName: store.AppVersions.versionName,
+                unique_id: store.AppVersions.unique_id,
             },
             transports: ['websocket'],
         });
@@ -148,6 +150,9 @@ export default class SocketIoClient {
                         type: data?.type
                     }
                     await handlerChatLog(target_obj);
+                    if(['refreshAddressBookPage'].includes(data.flag)){
+                        await store.FriendsStore.getFriendList();
+                    }
                 }
 
 
