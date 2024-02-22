@@ -33,7 +33,8 @@ import {
   Theme,
   ListRow,
   Toast,
-  Input
+  Input,
+  Checkbox
 } from '../../component/teaset/index';
 import PropTypes, { number } from 'prop-types';
 import CustomListRow from '../../component/CustomListRow';
@@ -58,6 +59,7 @@ const EditUserInfo = ({AppStore,navigation,MyThemed}:any) => {
     avatar: "",
     user_name: "",
     chat_no: "",
+    sex: true
   });
   let [qiniuConfig,setQiniuConfig] = useState({
     static_host: "",
@@ -68,15 +70,15 @@ const EditUserInfo = ({AppStore,navigation,MyThemed}:any) => {
 
 
   useEffect(()=>{
-      // let isMounted = true;// 防止报 Can't perform a React state update on an unmounted component.
-      // if(isMounted){
-        setFormData({
-          avatar: AppStore?.userInfo?.avatar,
-          user_name: AppStore?.userInfo?.user_name,
-          chat_no: AppStore?.userInfo?.chat_no
-        });
-      // }
-      getUserInfo();
+      (async ()=>{
+       await getUserInfo();
+       setFormData({
+        avatar: AppStore?.userInfo?.avatar,
+        user_name: AppStore?.userInfo?.user_name,
+        chat_no: AppStore?.userInfo?.chat_no,
+        sex: AppStore?.userInfo?.sex?true:false
+      });
+      })();
     return ()=>{
       // isMounted = false
     }
@@ -102,7 +104,10 @@ const EditUserInfo = ({AppStore,navigation,MyThemed}:any) => {
     if (!formData?.avatar) return Toast.message("头像不能为空");
     setSubmiting(true);
     try{
-      const result = await edit_user_info(formData);
+      const result = await edit_user_info({
+        ...formData,
+        sex: formData?.sex?1:0
+      });
       AppStore.setUserInfo(result);
       navigation.goBack()
     }catch(err){
@@ -199,6 +204,56 @@ const EditUserInfo = ({AppStore,navigation,MyThemed}:any) => {
     </View>} />
 
     <CustomListRow 
+    bottomSeparator="none"  
+    title={"性别"}
+    detail={
+      <View style={{flexDirection:'row'}}>
+        <Checkbox
+        title='男'
+        checked={formData?.sex}
+        checkedIconStyle={{
+          width: 20,
+          height: 20,
+          borderRadius: 0
+        }}
+        uncheckedIconStyle={{
+          width: 20,
+          height: 20,
+          borderRadius: 0
+        }}
+        onChange={(value:boolean) => {
+          setFormData({
+            ...formData,
+            sex: value
+          })
+        }}
+        />
+        <Checkbox
+
+        style={{marginLeft: 50}}
+        title='女'
+        checked={!formData?.sex}
+        checkedIconStyle={{
+          width: 20,
+          height: 20,
+          borderRadius: 0
+        }}
+        uncheckedIconStyle={{
+          width: 20,
+          height: 20,
+          borderRadius: 0
+        }}
+        onChange={(value:boolean) => {
+          setFormData({
+            ...formData,
+            sex: !value
+          })
+        }}
+        />
+      </View>
+    }/>
+
+    <CustomListRow 
     accessory="none"
     bottomSeparator="indent" 
     title={'畅聊号'} 
@@ -247,6 +302,7 @@ const EditUserInfo = ({AppStore,navigation,MyThemed}:any) => {
         </TouchableOpacity>
       </View>
     </View>} />
+    
 
     
 
