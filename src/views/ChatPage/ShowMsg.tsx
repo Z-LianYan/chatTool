@@ -235,7 +235,9 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
                     const obj = {
                       msg_type: im?.msg_type,
                       msg_content: im.msg_content,
-                      file: im.file
+                      file: im.file,
+                      
+                      msg_unique_id: im.msg_unique_id,
                     }
                     if(['img'].includes(im?.msg_type)) obj.file = im.file;
                     onSendMsg([obj]);

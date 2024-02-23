@@ -115,7 +115,7 @@ export default class SocketIoClient {
             const from_user_id = data.user_id;
             runInAction(async ()=>{// acceptAddFriends
                 const isAddFriend = ['addFriendsApply','addFriendApplyReply'].includes(data?.type);
-                if(['acceptAddFriends'].includes(data?.type)){
+                if(['acceptAddFriends','notAddFriendVerifyAcceptAddFriends'].includes(data?.type)){
                     runInAction(async ()=>{
                         const addFriendChatLogs = store.FriendsStore.addFriendChatLogs[login_user_id]||{};
                         const addUser = addFriendChatLogs[from_user_id];
@@ -139,9 +139,14 @@ export default class SocketIoClient {
                             data: data,
                             type: data?.type
                         });
+                        runInAction(async ()=>{
+                            if(['acceptAddFriends'].includes(data?.type)) store.FriendsStore.addFriendChatLogs[login_user_id][from_user_id].newAddFriendReadMsg = true;
+                        });
                     });
                     await store.FriendsStore.getFriendList();
                     await store.FriendsStore.get_new_friends_list();
+
+                    
                 }else{
                     const target_obj = {
                         chatLogs: isAddFriend ? store.FriendsStore.addFriendChatLogs : store.FriendsStore.chatLogs,

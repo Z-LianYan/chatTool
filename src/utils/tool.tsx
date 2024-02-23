@@ -17,7 +17,7 @@ const getFinalRowMsg =  function(msg_contents:any[]){
     return null;
 }
 export function uniqueMsgId(user_id:string){
-    return (user_id?String(user_id):'') + dayjs().format('YYYYMMDDHHmmssSSS')+String(Math.floor(Math.random()*1000))
+    return (user_id?String(user_id):'') + String(dayjs().valueOf()) + String(Math.random()).substring(2,6);
 }
 type handlerChatLogType = {
     chatLogs:any,
@@ -34,7 +34,6 @@ export async function handlerChatLog({
     return new Promise((resolve,reject)=>{
         runInAction(async ()=>{
             const from_user_id = data.user_id;
-    
             if(!data.msg_content) return;
             const addTypes = ['addFriendsApply','addFriendApplyReply'];
             const time = {
@@ -48,14 +47,21 @@ export async function handlerChatLog({
                 des: `你已添加了${data?.user_name},现在可以开始聊天了`
             }
             if(!chatLogs[login_user_id]){
-                console.log('------------->>>0',data?.user_id, type, JSON.stringify(chatLogs));
                 chatLogs[login_user_id] = {
                     userIdSort: [from_user_id]
                 };
                 let msg_contents = [data.msg_content];
                 //acceptAddFriends 同意添加好友 notAddFriendVerify 对方开启了添加好友无需认证， alreadyFriend 你已经是对方好友 (notAddFriendVerify,alreadyFriend 申请添加好友的时候返回的)
-                if(['acceptAddFriends'].includes(type)) msg_contents = msg_contents.concat([des]); 
-                if(['notAddFriendVerify','alreadyFriend'].includes(type)) msg_contents = msg_contents.concat([des,des2]); 
+                /**
+                 * 
+                 * notAddFriendVerify alreadyFriend 添加人 传给 添加人的类型
+                 * 
+                 * acceptAddFriends  接受人同意添加好友时通知添加人 传给 添加人的类型
+                 * 
+                 * notAddFriendVerifyAcceptAddFriends 接受人开启了无需认证添加好友申请 传给 接受人的类型
+                */
+                if(['notAddFriendVerifyAcceptAddFriends'].includes(type)) msg_contents = msg_contents.concat([des,des2]);// 对方开启了添加好友无需认证默认接受添加好友
+                if(['acceptAddFriends','notAddFriendVerify','alreadyFriend'].includes(type)) msg_contents = msg_contents.concat([des]); 
                 if(!addTypes.includes(type))  msg_contents.unshift(time);
                 chatLogs[login_user_id][from_user_id] = {
                     user_id:  data?.user_id,
@@ -65,8 +71,6 @@ export async function handlerChatLog({
                     msg_contents: msg_contents,
                 }
             }else{
-                console.log('------------->>>1',data?.user_id, type, JSON.stringify(chatLogs))
-
                 if(!Array.isArray(chatLogs[login_user_id].userIdSort)){
                     chatLogs[login_user_id].userIdSort = [];
                 }
@@ -75,13 +79,12 @@ export async function handlerChatLog({
                 chatLogs[login_user_id].userIdSort.unshift(from_user_id);
 
                 if(!chatLogs[login_user_id][from_user_id]){
-                    console.log('------------->>>2',data?.user_id, type)
-
                     let msg_contents = [data.msg_content];
-                    if(!addTypes.includes(type)) msg_contents.unshift(time) 
+                    if(!addTypes.includes(type)) msg_contents.unshift(time);
                     //acceptAddFriends 同意添加好友 notAddFriendVerify 对方开启了添加好友无需认证， alreadyFriend 你已经是对方好友  (notAddFriendVerify,alreadyFriend 申请添加好友的时候返回的)
-                    if(['acceptAddFriends'].includes(type)) msg_contents = msg_contents.concat([des]); 
-                    if(['notAddFriendVerify','alreadyFriend'].includes(type)) msg_contents = msg_contents.concat([des,des2]); 
+                    if(['notAddFriendVerifyAcceptAddFriends'].includes(type)) msg_contents = msg_contents.concat([des,des2]);// 对方开启了添加好友无需认证默认接受添加好友
+                    if(['acceptAddFriends','notAddFriendVerify','alreadyFriend'].includes(type)) msg_contents = msg_contents.concat([des]); 
+                    
                     chatLogs[login_user_id][from_user_id]={
                         user_id:  data?.user_id,
                         user_name:  data?.user_name,
@@ -90,24 +93,25 @@ export async function handlerChatLog({
                         msg_contents: msg_contents,
                     }
                 }else if(chatLogs[login_user_id][from_user_id]){
-                    console.log('------------->>>3',data?.user_id, type, JSON.stringify(chatLogs))
-
                     let msg_contents = [...chatLogs[login_user_id][from_user_id].msg_contents];
                     if(!addTypes.includes(type)){
                         const finalRowMsg = getFinalRowMsg(msg_contents);
                         const minute = dayjs(data?.msg_content?.created_at).diff(finalRowMsg?.created_at,'minute');
                         //acceptAddFriends 同意添加好友 notAddFriendVerify 对方开启了添加好友无需认证， alreadyFriend 你已经是对方好友    (notAddFriendVerify,alreadyFriend 申请添加好友的时候返回的)
-                        if(['acceptAddFriends'].includes(type)){
-                            msg_contents.unshift(time); 
-                            // msg_contents.push(des)
-                            msg_contents = msg_contents.concat([des]);
-                        }else if(['notAddFriendVerify','alreadyFriend'].includes(type)){
-                            msg_contents = msg_contents.concat([des,des2]);
+                        if(['alreadyFriend'].includes(type)){
+                            if(minute==0 || minute>3) msg_contents.push(time);
+                            msg_contents = msg_contents.concat([data.msg_content,des]);
+                        }else if(['acceptAddFriends','notAddFriendVerify'].includes(type)){// acceptAddFriends 接受人同意添加好友时通知添加人 传给 添加人的类型
+                            if(minute==0 || minute>3) msg_contents.unshift(time);
+                            msg_contents.push(des);
+                        }else if(['notAddFriendVerifyAcceptAddFriends'].includes(type)){// 接受人开启了无需认证添加好友申请 传给 接受人的类型
+                            if(minute==0 || minute>3) msg_contents.push(time);
+                            msg_contents = msg_contents.concat([des,des2]);// 对方开启了添加好友无需认证默认接受添加好友
                         }else if(minute>3) {
                             msg_contents.push(time); 
                         }
                     }
-                    msg_contents.push(data.msg_content);
+                    if(!['alreadyFriend'].includes(type)) msg_contents.push(data.msg_content);
                     chatLogs[login_user_id][from_user_id] = {
                         ...chatLogs[login_user_id][from_user_id],
                         msg_contents: msg_contents,

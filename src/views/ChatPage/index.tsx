@@ -260,7 +260,7 @@ const ChatPage = ({
           from_avatar: AppStore?.userInfo?.avatar,
           msg_type: (item as any)?.msg_type||'text',
           sendIng: true,
-          msg_unique_id: uniqueMsgId(AppStore.userInfo?.user_id),
+          msg_unique_id: item.msg_unique_id||uniqueMsgId(AppStore.userInfo?.user_id),
           file: item?.file
         }
         msg_rows.push(msg_row);
