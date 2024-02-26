@@ -102,7 +102,7 @@ export async function handlerChatLog({
                             if(minute==0 || minute>3) msg_contents.push(time);
                             msg_contents = msg_contents.concat([data.msg_content,des]);
                         }else if(['acceptAddFriends','notAddFriendVerify'].includes(type)){// acceptAddFriends 接受人同意添加好友时通知添加人 传给 添加人的类型
-                            if(minute==0 || minute>3) msg_contents.unshift(time);
+                            if(minute==0 || minute>3) msg_contents.push(time); // 这里使用push 会有点小问题，不过不影响暂时这样子
                             msg_contents.push(des);
                         }else if(['notAddFriendVerifyAcceptAddFriends'].includes(type)){// 接受人开启了无需认证添加好友申请 传给 接受人的类型
                             if(minute==0 || minute>3) msg_contents.push(time);

@@ -91,9 +91,9 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
       AppStore.search_user_info = friends;
 
       // 更新聊天记录的会员信息
-      if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][params?.user_id]){
-        FriendsStore.chatLogs[login_user_id][params?.user_id] = {
-          ...FriendsStore.chatLogs[login_user_id][params?.user_id],
+      if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][user_id]){
+        FriendsStore.chatLogs[login_user_id][user_id] = {
+          ...FriendsStore.chatLogs[login_user_id][user_id],
           user_id:  friends?.user_id,
           user_name:  friends?.user_name,
           f_user_name_remark: friends?.f_user_name_remark,
@@ -104,13 +104,13 @@ const ShowMsg = ({AppStore,MyThemed,FriendsStore,navigation,AppVersions,onSendMs
 
       //更新通讯录的个人信息
       FriendsStore?.friendsData?.rows.map((item:any)=>{
-        runInAction(()=>{
-          if(item.user_id===friends?.user_id) {
+        if(item.user_id===friends?.user_id) {
+          runInAction(()=>{
             item.user_name = friends?.user_name;
             item.f_user_name_remark = friends?.f_user_name_remark;
             item.avatar = friends?.avatar;
-          }
-        })
+          })
+        }
       })
       
     });

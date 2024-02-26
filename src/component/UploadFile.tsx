@@ -170,7 +170,7 @@ const UploadFile = ({
       const tokenConfig:any = await get_upload_qiuniu_config();
       setPercent(0);
       setIsUplaodIng(true);
-      const key = `public/chatTool/userAvatar/${dayjs().format('YYYYMMDDHHmmssSSS')+String(Math.floor(Math.random() * 10000))+getExtName(file.fileName)}`;; // 上传后文件资源名以设置的 key 为主，如果 key 为 null 或者 undefined，则文件资源名会以 hash 值作为资源名。
+      const key = `public/chatTool/userAvatar/${dayjs().format('YYYYMMDDHHmmssSSS')+String(Math.random()).substring(2,6)+getExtName(file.fileName)}`;; // 上传后文件资源名以设置的 key 为主，如果 key 为 null 或者 undefined，则文件资源名会以 hash 值作为资源名。
       let config = {
         useCdnDomain: true, //表示是否使用 cdn 加速域名，为布尔值，true 表示使用，默认为 false。
         region: qiniu.region.z2, // 根据具体提示修改上传地区,当为 null 或 undefined 时，自动分析上传域名区域
@@ -182,8 +182,17 @@ const UploadFile = ({
         // mimeType: ["image/png", "image/jpeg", "image/gif"], //用来限制上传文件类型，为 null 时表示不对文件类型限制；限制类型放到数组里： ["image/png", "image/jpeg", "image/gif"]
       };
       console.log("key", key);
+      const idx1 = file.uri.lastIndexOf('/')
+      const str = file.uri.slice(idx1+1);
+      const idx2 = str.lastIndexOf('.');
+      const name = str.slice(0,idx2);
       let observable = qiniu.upload(
-        file,
+        // file,
+        {
+          uri: file.uri, 
+          type: file.type, 
+          name: name
+        } as any,//文件格式需要这样子否则上传会失败
         key,
         tokenConfig.upload_token,
         putExtra,

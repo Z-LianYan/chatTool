@@ -130,6 +130,8 @@ export default class SocketIoClient {
                                 const idx = store.FriendsStore.chatLogs[login_user_id].userIdSort.indexOf(from_user_id);
                                 if(idx!=-1) store.FriendsStore.chatLogs[login_user_id].userIdSort.splice(idx,1);
                                 store.FriendsStore.chatLogs[login_user_id].userIdSort.unshift(from_user_id);
+                            }else if(store.FriendsStore.chatLogs[login_user_id][from_user_id]){
+                                store.FriendsStore.chatLogs[login_user_id][from_user_id].msg_contents = store.FriendsStore.chatLogs[login_user_id][from_user_id].msg_contents.concat(_.cloneDeep(addUser.msg_contents));
                             }
                         };
 

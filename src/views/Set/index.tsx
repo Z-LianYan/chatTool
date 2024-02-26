@@ -41,7 +41,7 @@ import SocketIoClient from '../../socketIo';
 
 
 
-const SetPage = ({AppStore,navigation,AppVersions}:any) => {
+const SetPage = ({AppStore,navigation,AppVersions,FriendsStore}:any) => {
   const sockitIo = SocketIoClient.getInstance({
     callBack: ()=>{},
     navigation: navigation
@@ -68,7 +68,17 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
           }catch(err){
 
           }
-          
+          FriendsStore.addFriendChatLogs = {};
+          FriendsStore.chatLogs = {};
+          FriendsStore.friendsData = {
+            count: 0,
+            rows: []
+          };
+          FriendsStore.new_friends_list = {
+            recentlyThreeDays:[],
+            threeDaysBefore:[],
+          };
+
           AppStore.setUserInfo(null);
           navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
           navigation.replace('LoginPage',{
@@ -78,7 +88,8 @@ const SetPage = ({AppStore,navigation,AppVersions}:any) => {
           await AsyncStorage.removeItem('token');
           await AsyncStorage.removeItem('userInfo');
           sockitIo.getSocketIo()?.disconnect();
-          sockitIo.removeInstance()
+          sockitIo.removeInstance();
+
         } }
       ]
     );
@@ -142,4 +153,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default inject("AppStore","AppVersions")(observer(SetPage));
+export default inject("AppStore","AppVersions","FriendsStore")(observer(SetPage));

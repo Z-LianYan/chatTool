@@ -164,7 +164,7 @@ const ChatPage = ({
     return new Promise(async (resolve,reject)=>{
       try{
         const tokenConfig:any = await get_upload_qiuniu_config();
-        const key = `public/chatTool/chatLogs/${dayjs().format('YYYYMMDD')}/${dayjs().format('HHmmssSSS')+String(Math.floor(Math.random() * 10000)) + getExtName(file.uri)}`; // 上传后文件资源名以设置的 key 为主，如果 key 为 null 或者 undefined，则文件资源名会以 hash 值作为资源名。
+        const key = `public/chatTool/chatLogs/${dayjs().format('YYYYMMDD')}/${dayjs().format('HHmmssSSS')+String(Math.random()).substring(2,6) + getExtName(file.uri)}`; // 上传后文件资源名以设置的 key 为主，如果 key 为 null 或者 undefined，则文件资源名会以 hash 值作为资源名。
         let config = {
           useCdnDomain: true, //表示是否使用 cdn 加速域名，为布尔值，true 表示使用，默认为 false。
           region: qiniu.region.z2, // 根据具体提示修改上传地区,当为 null 或 undefined 时，自动分析上传域名区域
