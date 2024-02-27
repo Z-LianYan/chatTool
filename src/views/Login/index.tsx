@@ -57,6 +57,7 @@ const Login = (props:any) => {
   let reg_tel = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
 
   useEffect(()=>{
+    // navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
     return ()=>{}
   },[]);
 
@@ -71,11 +72,7 @@ const Login = (props:any) => {
       if (!reg_tel.test(mobile_phone)) {
         return Toast.message("请输入正确的手机号");
       }
-      console.log('======>>>12345')
       const result:any = await userLogin(form_data);
-      console.log('reuslt=======>>>login',result);
-
-
       AppStore.setUserInfo(result);
       await AsyncStorage.setItem('userInfo',JSON.stringify(result));
       if(result && result.token){

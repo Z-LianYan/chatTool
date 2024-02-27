@@ -31,7 +31,7 @@ import { Button, Input } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { runInAction } from 'mobx';
-import { ACCEPT_ADD_FRIENDS, ADD_FRIENDS_APPLY, editFriends, searchFriends } from '../../api/friends';
+import { ACCEPT_ADD_FRIENDS, ADD_FRIENDS_APPLY, editFriends, getFriendList, get_new_friends_list, searchFriends } from '../../api/friends';
 import { StackActions } from '@react-navigation/core';
 import dayjs from 'dayjs';
 import { handlerChatLog, uniqueMsgId } from '../../utils/tool';
@@ -178,8 +178,8 @@ const SetRemarkLabel = ({
               },
             });
           }
-          await FriendsStore.getFriendList();
-          await FriendsStore.get_new_friends_list();
+          await getFriendList();
+          await get_new_friends_list();
           navigation.navigate({
             name: 'ChatListPage',
             params: {
@@ -201,12 +201,11 @@ const SetRemarkLabel = ({
       
       // navigation.dispatch(navigation.pop(2));//清除内部导航堆栈
 
-      const friends:any = await searchFriends({user_id: search_user_info.user_id});
-      
-      runInAction(()=>{
+      runInAction(async ()=>{
+        const friends:any = await searchFriends({user_id: search_user_info.user_id});
         AppStore.search_user_info = friends;
-        if(!['alreadyFriend','notAddFriendVerify'].includes(res?.status)) navigation.goBack()
       });
+      if(!['alreadyFriend','notAddFriendVerify'].includes(res?.status)) navigation.goBack()
     }catch(err:any){
       console.log('err======>>>',err.message);
     };
@@ -239,7 +238,7 @@ const SetRemarkLabel = ({
 
   const getAddressBookList = useCallback(async()=>{
     try{
-      await FriendsStore.getFriendList();
+      await getFriendList();
     }catch(err:any){
       console.log('err------>>',err.message)
     }
@@ -522,8 +521,8 @@ const SetRemarkLabel = ({
                   console.log('FriendsStore.chatLogs[login_user_id][search_user_id]======>>>123', JSON.stringify(FriendsStore.chatLogs[login_user_id][search_user_id]));
 
                 }
-                await FriendsStore.getFriendList();
-                await FriendsStore.get_new_friends_list();
+                await getFriendList();
+                await get_new_friends_list();
 
                 await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
                 await AsyncStorage.setItem('addFriendChatLogs',JSON.stringify(FriendsStore.addFriendChatLogs));

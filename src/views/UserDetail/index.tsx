@@ -32,7 +32,7 @@ import {
 import { Button, Label, Toast } from '../../component/teaset';
 import NavigationBar from '../../component/NavigationBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { searchFriends } from '../../api/friends';
+import { del_friends, getFriendList, get_new_friends_list, searchFriends } from '../../api/friends';
 import dayjs from 'dayjs';
 import { runInAction } from 'mobx';
 import ReplyMsg from './ReplyMsg';
@@ -86,10 +86,36 @@ const UserDetail = ({
   const login_user_id = AppStore.userInfo?.user_id;
   const addFriendChatLogs = FriendsStore.addFriendChatLogs[login_user_id]||{};
   const add_msg_contents = addFriendChatLogs[search_user_info.user_id]?.msg_contents||[];
+  const addAddressBook = useCallback(async ()=>{
+    runInAction(async ()=>{
+      const friends:any = await searchFriends({user_id: search_user_info.user_id});
+      runInAction(()=>{
+        AppStore.search_user_info = friends;
+      });
+      if(friends.f_status==1 && friends.to_f_status==1) {
+        runInAction(()=>{
+          // FriendsStore.addFriendChatLogs[login_user_id][search_user_info?.user_id].newAddFriendReadMsg = true;
+          let addressBookPageNotreadMsgCount = 0;
 
+          
+          const addFriendChatLogs = FriendsStore.addFriendChatLogs[login_user_id]||{};
+          addFriendChatLogs[search_user_info?.user_id].newAddFriendReadMsg = true;
+          for(const key in addFriendChatLogs) {
+              if(['userIdSort'].includes(key)) continue;
+              if(!addFriendChatLogs[key].newAddFriendReadMsg) addressBookPageNotreadMsgCount += 1;
+          }
+          AppStore.tabBar.AddressBookPage.msgCnt =  addressBookPageNotreadMsgCount;
+        });
+        return;
+      };
+      navigation.navigate('SetRemarkLabel',{
+        search_user_info: search_user_info,
+        op_type: 'addUser'
+      });
+    });
+    
+  },[search_user_info]);
   const footerShowBtn = useCallback(()=>{
-    console.log('search_user_info=====>>>>999',search_user_info)
-    // !search_user_info.expire || (dayjs(search_user_info.expire).unix() < dayjs().unix()) && 
     if((search_user_info.f_status===0 && [1].includes(search_user_info.f_is_apply))) return <Button
       title={'添加到通讯录'}
       type="default"
@@ -97,10 +123,11 @@ const UserDetail = ({
       titleStyle={{color: search_user_info.f_is_apply?MyThemed[colorScheme||'light'].ftCr3:MyThemed[colorScheme||'light'].ftCr3}}
       style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
       onPress={() => {
-        navigation.navigate('SetRemarkLabel',{
-          search_user_info: search_user_info,
-          op_type: 'addUser'
-        });
+        // navigation.navigate('SetRemarkLabel',{
+        //   search_user_info: search_user_info,
+        //   op_type: 'addUser'
+        // });
+        addAddressBook();
       }}
     />
     if(search_user_info.f_status===0) return <Button
@@ -167,7 +194,7 @@ const UserDetail = ({
                     onPress: async () => {
                       runInAction(async ()=>{
                         try{
-                          const res = await FriendsStore.del_friends({
+                          const res = await del_friends({
                             f_user_id: search_user_info.user_id,
                           });
 
@@ -191,8 +218,8 @@ const UserDetail = ({
                           });
                           
 
-                          await FriendsStore.getFriendList();
-                          await FriendsStore.get_new_friends_list();
+                          await getFriendList();
+                          await get_new_friends_list();
                           
                           navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
                           navigation.navigate('ChatListPage');
@@ -217,10 +244,11 @@ const UserDetail = ({
         titleStyle={{color: MyThemed[colorScheme||'light'].ftCr3}}
         style={{marginTop:10,height: 55,borderWidth:0,backgroundColor: MyThemed[colorScheme||'light'].ctBg}}
         onPress={() => {
-          navigation.navigate('SetRemarkLabel',{
-            search_user_info: search_user_info,
-            op_type: 'addUser'
-          });
+          // navigation.navigate('SetRemarkLabel',{
+          //   search_user_info: search_user_info,
+          //   op_type: 'addUser'
+          // });
+          addAddressBook();
         }}
       />
     }

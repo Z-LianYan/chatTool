@@ -33,7 +33,7 @@ import MyCell from '../../component/MyCell';
 import { ADD_CIR, ADD_USER, NEW_FIREND, RIGHT_UP_ARROW } from '../../assets/image';
 import { Menu,Button, Label } from '../../component/teaset';
 import SearchModal from '../AddFriend/SearchModal';
-import { GET_NEW_FRIENDS_LIST, getFriendList, searchFriends } from '../../api/friends';
+import { get_new_friends_list, searchFriends } from '../../api/friends';
 import { isIndexed } from 'immutable';
 import dayjs from 'dayjs';
 // import { 
@@ -83,7 +83,7 @@ const NewFriendsList = ({
 
   const getAddressBookList = useCallback(async()=>{
     try{
-      await FriendsStore.get_new_friends_list();
+      await get_new_friends_list();
     }catch(err:any){
     }
     

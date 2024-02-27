@@ -86,19 +86,9 @@ const ReplyMsg = ({
     },function(response:any) {
       if (response && response.status === 'success') {
           console.log('Message sent successfully!',response);
-          // close();
-          // set_reply_content('');
       } else {
         console.log('Failed to send message!',response);
         Toast.fail(response?.msg);
-        // if(['alreadyDelFriend'].includes(response.status)) {
-        //   Toast.fail(response?.msg);
-          // setTimeout(async() => {
-          //   navigation.navigate('ChatListPage');
-          //   await FriendsStore.getFriendList();
-          //   await FriendsStore.get_new_friends_list();
-          // }, 800);
-        // }
       }
       close();
       set_reply_content('');

@@ -107,7 +107,7 @@ export function get(url:string, params?:any, text?:string, headers={}) {
         resolve(res.data);
         if (text) hideLoading();
         if(res.data.error==400){
-          params.navigation && params.navigation.navigate('HomePage');
+          params.navigation && params.navigation.navigate('LoginPage');
           store.AppStore.setUserInfo(null);
         }
       })

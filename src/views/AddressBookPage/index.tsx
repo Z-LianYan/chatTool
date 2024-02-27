@@ -46,7 +46,7 @@ const AddressBookPage = ({
 
   const getAddressBookList = useCallback(async()=>{
     try{
-      await FriendsStore.getFriendList();
+      await getFriendList();
     }catch(err:any){
       console.log('err------>>',err.message)
     }

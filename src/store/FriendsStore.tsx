@@ -33,71 +33,13 @@ class FriendsStore {
     count: 0,
     rows: []
   }
-  
-  async getFriendList(params?:any,text='加载中...') {
-    return new Promise((resolve, reject) => {
-      HttpUtils.post(Api.GET_FRIENDS_LIST, params, text).then((res:any)=> {
-        switch (res.error) {
-          case 0:
-            runInAction(()=>{
-              (this as any).friendsData = res.data;
-            });
-            resolve(res.data);
-            break;
-          default:
-            Toast.fail(res.message);
-            reject(res);
-            break;
-        }
-      });
-    });
-  }
+
 
   new_friends_list = {
     recentlyThreeDays:[],
     threeDaysBefore:[],
   };
 
-  async get_new_friends_list(params?:any,text='') {
-    return new Promise((resolve, reject) => {
-      HttpUtils.post(Api.GET_NEW_FRIENDS_LIST, params, text).then((res:any)=> {
-        switch (res.error) {
-          case 0:
-            runInAction(()=>{
-              this.new_friends_list = res.data;
-            });
-            resolve(res.data);
-            break;
-          default:
-            Toast.fail(res.message);
-            reject(res);
-            break;
-        }
-      });
-    });
-  }
-
-
-  async del_friends(params?:any,text='') {
-    return new Promise((resolve, reject) => {
-      HttpUtils.post(Api.DEL_FRIENDS, params, text).then((res:any)=> {
-        switch (res.error) {
-          case 0:
-          resolve(res.data);
-          Toast.show({
-            icon: 'success',
-            duration: 2000,
-            text: res.message,
-          });
-          break;
-        default:
-          Toast.fail(res.message);
-          reject(res);
-          break;
-        }
-      });
-    });
-  }
 
   
 }

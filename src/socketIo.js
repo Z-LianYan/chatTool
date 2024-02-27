@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { chatListPageMsgCount, handlerChatLog } from "./utils/tool";
 import { login_out } from "./api/user";
 import { useNavigation,StackActions } from '@react-navigation/core';
+import { getFriendList, get_new_friends_list } from "./api/friends";
 export default class SocketIoClient {
     static getInstance({
         callBack,
@@ -145,8 +146,8 @@ export default class SocketIoClient {
                             if(['acceptAddFriends'].includes(data?.type)) store.FriendsStore.addFriendChatLogs[login_user_id][from_user_id].newAddFriendReadMsg = true;
                         });
                     });
-                    await store.FriendsStore.getFriendList();
-                    await store.FriendsStore.get_new_friends_list();
+                    await getFriendList();
+                    await get_new_friends_list();
 
                     
                 }else{
@@ -158,7 +159,7 @@ export default class SocketIoClient {
                     }
                     await handlerChatLog(target_obj);
                     if(['refreshAddressBookPage'].includes(data.flag)){
-                        await store.FriendsStore.getFriendList();
+                        await getFriendList();
                     }
                 }
 
@@ -188,6 +189,7 @@ export default class SocketIoClient {
         socket.on('outLogin',async (data,callBack)=>{
             // await login_out();
             store.AppStore.setUserInfo(null);
+            console.log('SocketIoClient?.navigation=========>>>>',SocketIoClient?.navigation)
             SocketIoClient?.navigation?.dispatch(StackActions.popToTop());//清除内部导航堆栈
             if(SocketIoClient.navigation.replace){
                 SocketIoClient.navigation.replace('LoginPage',{
