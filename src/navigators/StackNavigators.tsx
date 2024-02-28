@@ -54,6 +54,7 @@ const routes=[
         name:"LoginPage",
         options: {
             headerShown:true,
+            headerLeft: "",
             title:'登录',
         } 
     },
@@ -63,6 +64,7 @@ const routes=[
         name:"VerifyCodeLogin",
         options: {
             headerShown:true,
+            headerLeft: "",
             title:'登录',
         } 
     },
@@ -206,7 +208,6 @@ function StackNavigators(props:any){
     let navigation:any = useNavigation();
     const colorScheme = useColorScheme();
     useEffect(()=>{
-        console.log("props.token=======>>>",props.AppStore.userInfo?.user_name,props.token);
         if(props.token){
             const sockitIo = SocketIoClient.getInstance({
                 callBack: ()=>{

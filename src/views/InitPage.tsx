@@ -52,7 +52,7 @@ const InitPage = ({AppStore,navigation,route}:any) => {
         clearInterval(timer);
         // getUserInfo();
         navigation.replace('LoginPage',{
-          hidBackBtn:true
+          // hidBackBtn:true
         })
       };
       time -= 1;
@@ -62,30 +62,6 @@ const InitPage = ({AppStore,navigation,route}:any) => {
       clearInterval(timer);
     }
   },[]);
-
-  // const  getUserInfo = useCallback(async ()=>{
-  //   const token = await AsyncStorage.getItem('token');
-  //   if(!token) return navigation.replace('LoginPage',{
-  //     hidBackBtn:true
-  //   });
-  //   try{
-  //     const result:any = await get_user_info();
-  //     console.log('result====>>init',result);
-  //     if(result) AppStore.setUserInfo(result);
-  //     if(result) {
-  //       navigation.replace('AppTabBar')
-  //     }else{
-  //       navigation.replace('LoginPage',{
-  //         hidBackBtn:true
-  //       })
-  //     };
-  //   }catch(err:any){
-  //     console.log('error---init',err.message)
-  //     navigation.replace('LoginPage',{
-  //       hidBackBtn:true
-  //     })
-  //   }
-  // },[]);
   
   return <View style={styles.container}>
     <Image style={{ 

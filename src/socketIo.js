@@ -6,7 +6,7 @@ import { runInAction } from "mobx";
 import _ from 'lodash';
 import { chatListPageMsgCount, handlerChatLog } from "./utils/tool";
 import { login_out } from "./api/user";
-import { useNavigation,StackActions } from '@react-navigation/core';
+import { useNavigation,StackActions,CommonActions } from '@react-navigation/core';
 import { getFriendList, get_new_friends_list } from "./api/friends";
 export default class SocketIoClient {
     static getInstance({
@@ -189,23 +189,27 @@ export default class SocketIoClient {
         socket.on('outLogin',async (data,callBack)=>{
             // await login_out();
             store.AppStore.setUserInfo(null);
-            console.log('SocketIoClient?.navigation=========>>>>',SocketIoClient?.navigation)
-            SocketIoClient?.navigation?.dispatch(StackActions.popToTop());//清除内部导航堆栈
-            if(SocketIoClient.navigation.replace){
-                SocketIoClient.navigation.replace('LoginPage',{
-                    hidBackBtn: true
-                })
-            }else{
-                SocketIoClient.navigation.navigate('LoginPage',{
-                    hidBackBtn: true
-                })
-            }
-            
+            // console.log('SocketIoClient?.navigation=========>>>>',SocketIoClient?.navigation)
             await AsyncStorage.removeItem('token');
             await AsyncStorage.removeItem('userInfo');
-            callBack && callBack();
-            // socket?.disconnect(); //服务端执行断开
             this.removeInstance();
+            callBack && callBack();
+            // SocketIoClient?.navigation?.dispatch(StackActions.popToTop());//清除内部导航堆栈
+
+            SocketIoClient?.navigation?.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [
+                    // { name: 'LoginPage' },
+                    {
+                      name: 'LoginPage',
+                    //   params: { hidBackBtn: true },
+                    },
+                  ],
+                })
+            );
+            
+            // socket?.disconnect(); //服务端执行断开
         })
 
 

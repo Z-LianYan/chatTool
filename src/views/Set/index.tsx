@@ -18,6 +18,7 @@ import {
   NavigationContainer,
   DarkTheme,
   DefaultTheme, 
+  CommonActions
 } from '@react-navigation/native';
 import { 
   View,
@@ -38,6 +39,7 @@ import { login_out } from "../../api/user";
 import MyCell from '../../component/MyCell';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SocketIoClient from '../../socketIo';
+import { runInAction } from 'mobx';
 
 
 
@@ -68,23 +70,33 @@ const SetPage = ({AppStore,navigation,AppVersions,FriendsStore}:any) => {
           }catch(err){
 
           }
-          FriendsStore.addFriendChatLogs = {};
-          FriendsStore.chatLogs = {};
-          FriendsStore.friendsData = {
-            count: 0,
-            rows: []
-          };
-          FriendsStore.new_friends_list = {
-            recentlyThreeDays:[],
-            threeDaysBefore:[],
-          };
+          runInAction(()=>{
+            FriendsStore.addFriendChatLogs = {};
+            FriendsStore.chatLogs = {};
+            FriendsStore.friendsData = {
+              count: 0,
+              rows: []
+            };
+            FriendsStore.new_friends_list = {
+              recentlyThreeDays:[],
+              threeDaysBefore:[],
+            };
+          })
+          
 
           AppStore.setUserInfo(null);
-          navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
-          navigation.replace('LoginPage',{
-            hidBackBtn: true
-          })
-          // navigation.popToTop()
+          // navigation.dispatch(StackActions.popToTop());//带回堆栈中的第一个屏幕，并忽略所有其他屏幕
+          navigation?.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'LoginPage',
+                  params: { hidBackBtn: true },
+                },
+              ],
+            })
+          );
           await AsyncStorage.removeItem('token');
           await AsyncStorage.removeItem('userInfo');
           sockitIo.getSocketIo()?.disconnect();

@@ -38,11 +38,11 @@ const VerifyCodeLogin = (props:any) => {
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
-    if(props.route.params && props.route.params.hidBackBtn){
-      navigation.setOptions({
-        headerLeft:''
-      });
-    }
+    // if(props.route.params && props.route.params.hidBackBtn){
+    //   navigation.setOptions({
+    //     headerLeft:''
+    //   });
+    // }
     
   });
   
@@ -170,7 +170,7 @@ const VerifyCodeLogin = (props:any) => {
         bottomSeparator="none"  
         title={
           <Input 
-          placeholder="请输入短信验证码" 
+          placeholder="请输入短信验证码（默认1234）" 
           maxLength={4}
           keyboardType="numeric"
           value={verify_code} 
@@ -190,7 +190,7 @@ const VerifyCodeLogin = (props:any) => {
           activeOpacity={0.6} 
           onPress={()=>{
             props.navigation.replace('LoginPage',{
-              hidBackBtn:true
+              // hidBackBtn:true
             })
           }}>
             <Text style={{

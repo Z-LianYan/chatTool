@@ -52,13 +52,16 @@ function App(): JSX.Element {
       (async ()=>{
 
 
-        runInAction(async ()=>{
           const chatLogs = await AsyncStorage.getItem('chatLogs');
-          store.FriendsStore.chatLogs = chatLogs?JSON.parse(chatLogs):{};
+          runInAction(()=>{
+            store.FriendsStore.chatLogs = chatLogs?JSON.parse(chatLogs):{};
+          })
+          
 
           const addFriendChatLogs = await AsyncStorage.getItem('addFriendChatLogs');
-          store.FriendsStore.addFriendChatLogs = addFriendChatLogs?JSON.parse(addFriendChatLogs):{};
-        });
+          runInAction(()=>{
+            store.FriendsStore.addFriendChatLogs = addFriendChatLogs?JSON.parse(addFriendChatLogs):{};
+          })
 
         
         const _token:any = await AsyncStorage.getItem('token');
@@ -77,16 +80,28 @@ function App(): JSX.Element {
 
   const  getUserInfo = useCallback(async ()=>{
     try{
+      let userInfo = await AsyncStorage.getItem('userInfo');
+      if(userInfo) {
+        userInfo = JSON.parse(userInfo);
+        runInAction(()=>{
+          store.AppStore.setUserInfo(userInfo);
+        });
+      }
       const result:any = await get_user_info();
+      console.log('result========>>>userinfo--',result);
       if(result) {
-        store.AppStore.setUserInfo(result);
+        runInAction(()=>{
+          store.AppStore.setUserInfo(result);
+        });
         await AsyncStorage.setItem('userInfo',JSON.stringify(result));
       }
     }catch(err:any){
       let userInfo = await AsyncStorage.getItem('userInfo');
       if(userInfo) {
         userInfo = JSON.parse(userInfo);
-        store.AppStore.setUserInfo(userInfo);
+        runInAction(()=>{
+          store.AppStore.setUserInfo(userInfo);
+        });
       }
     }
   },[]);
@@ -142,6 +157,7 @@ function App(): JSX.Element {
           />
           <NavigationContainerCom>
             {tokenComplete && <StackNavigators token={token}/>}
+            {/* <StackNavigators token={token}/> */}
           </NavigationContainerCom>
         </TopView>
       {/* </SafeAreaView> */}

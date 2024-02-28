@@ -38,11 +38,11 @@ const RegisterPage = (props:any) => {
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
-    if(props.route.params && props.route.params.hidBackBtn){
-      navigation.setOptions({
-        headerLeft:''
-      });
-    }
+    // if(props.route.params && props.route.params.hidBackBtn){
+    //   navigation.setOptions({
+    //     headerLeft:''
+    //   });
+    // }
     
   });
   

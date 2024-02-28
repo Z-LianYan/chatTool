@@ -42,11 +42,11 @@ const Login = (props:any) => {
   // 在页面显示之前设(重)置 options 值，相当于在 componentDidMount 阶段执行
   // useLayoutEffect 是阻塞同步的，即执行完此处之后，才会继续向下执行
   useLayoutEffect(() => {
-    if(props.route.params && props.route.params.hidBackBtn){
-      navigation.setOptions({
-        headerLeft:''
-      });
-    }
+    // if(props.route.params && props.route.params.hidBackBtn){
+    //   navigation.setOptions({
+    //     headerLeft:''
+    //   });
+    // }
   });
   
   let [form_data,set_form_data] = useState({
@@ -57,7 +57,7 @@ const Login = (props:any) => {
   let reg_tel = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
 
   useEffect(()=>{
-    // navigation.dispatch(StackActions.popToTop());//清除内部导航堆栈
+    console.log('props.route.params=====>>>',props.route.params)
     return ()=>{}
   },[]);
 
@@ -145,7 +145,7 @@ const Login = (props:any) => {
         <View style={{flexDirection: 'row',justifyContent: 'space-between'}}>
           <TouchableOpacity activeOpacity={0.6} onPress={()=>{
             props.navigation.replace('VerifyCodeLogin',{
-              hidBackBtn:true
+              // hidBackBtn:true
             })
           }}>
             <Text style={{
