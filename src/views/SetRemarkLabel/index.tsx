@@ -274,6 +274,16 @@ const SetRemarkLabel = ({
           await AsyncStorage.setItem('remarkLabel',JSON.stringify(infoObj));
         }
 
+
+        // 更新聊天记录的会员信息
+        const login_user_id = AppStore.userInfo?.user_id;
+        if(FriendsStore.chatLogs[login_user_id] && FriendsStore.chatLogs[login_user_id][search_user_info?.user_id]){
+          runInAction(async ()=>{
+            FriendsStore.chatLogs[login_user_id][search_user_info?.user_id].f_user_name_remark = formData?.f_user_name_remark;
+            await AsyncStorage.setItem('chatLogs',JSON.stringify(FriendsStore.chatLogs));
+          });
+        }
+
         runInAction(()=>{
           AppStore.search_user_info = {
             ...search_user_info,
