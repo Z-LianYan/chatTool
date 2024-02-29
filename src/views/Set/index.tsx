@@ -71,8 +71,8 @@ const SetPage = ({AppStore,navigation,AppVersions,FriendsStore}:any) => {
 
           }
           runInAction(()=>{
-            FriendsStore.addFriendChatLogs = {};
-            FriendsStore.chatLogs = {};
+            // FriendsStore.addFriendChatLogs = {};
+            // FriendsStore.chatLogs = {};
             FriendsStore.friendsData = {
               count: 0,
               rows: []
@@ -82,21 +82,21 @@ const SetPage = ({AppStore,navigation,AppVersions,FriendsStore}:any) => {
               threeDaysBefore:[],
             };
           })
-          
-
-          AppStore.setUserInfo(null);
           // navigation.dispatch(StackActions.popToTop());//带回堆栈中的第一个屏幕，并忽略所有其他屏幕
           navigation?.dispatch(
             CommonActions.reset({
-              index: 0,
+              index: 1,
               routes: [
                 {
                   name: 'LoginPage',
-                  params: { hidBackBtn: true },
+                  params: { 
+                    // hidBackBtn: true 
+                  },
                 },
               ],
             })
           );
+          AppStore.setUserInfo(null);
           await AsyncStorage.removeItem('token');
           await AsyncStorage.removeItem('userInfo');
           sockitIo.getSocketIo()?.disconnect();

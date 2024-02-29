@@ -188,7 +188,7 @@ export default class SocketIoClient {
 
         socket.on('outLogin',async (data,callBack)=>{
             // await login_out();
-            store.AppStore.setUserInfo(null);
+            
             // console.log('SocketIoClient?.navigation=========>>>>',SocketIoClient?.navigation)
             await AsyncStorage.removeItem('token');
             await AsyncStorage.removeItem('userInfo');
@@ -208,7 +208,7 @@ export default class SocketIoClient {
                   ],
                 })
             );
-            
+            store.AppStore.setUserInfo(null);
             // socket?.disconnect(); //服务端执行断开
         })
 
